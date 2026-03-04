@@ -1,3 +1,6 @@
+import 'package:agrova_apps/view/buatakunscreen.dart';
+import 'package:agrova_apps/view/loginscreen.dart';
+import 'package:agrova_apps/view/spalshscreen.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -30,7 +33,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: .fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const BuatAkun(),
     );
   }
 }
