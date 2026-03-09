@@ -1,8 +1,12 @@
-import 'package:agrova_apps/view/homescreen.dart';
-import 'package:agrova_apps/view/pilihperanpage.dart';
-import 'package:agrova_apps/view/register.dart';
-import 'package:agrova_apps/view/loginpage.dart';
-import 'package:agrova_apps/view/spalshscreen.dart';
+import 'package:agrova_apps/view/pembeli/homepembeli.dart';
+import 'package:agrova_apps/view/login/lupapassword.dart';
+import 'package:agrova_apps/view/login/pilihperanpage.dart';
+import 'package:agrova_apps/view/login/register.dart';
+import 'package:agrova_apps/view/login/loginpage.dart';
+import 'package:agrova_apps/view/login/spalshscreen.dart';
+import 'package:agrova_apps/view/login/ubahpassword.dart';
+import 'package:agrova_apps/view/login/verifikasiacc.dart';
+import 'package:agrova_apps/view/pembeli/kategorisc.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -35,7 +39,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: .fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const PilihPeranPage(),
+      home: const KategoriSc(),
     );
   }
 }
