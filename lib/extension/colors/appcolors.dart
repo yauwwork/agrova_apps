@@ -10,6 +10,7 @@ class AppColors {
   static const mintGreen = Color(0xFF22C55E);
   static const softMint = Color(0xFFDCFCE7);
   static const charcoal = Color(0xFF1F2937);
+  static const bgpenjual = Color.fromARGB(255, 225, 237, 252);
 
   static const skyBlue = Color(0xFF3B82F6);
   static const darkLeafGreen = Color(0xFF15803D);

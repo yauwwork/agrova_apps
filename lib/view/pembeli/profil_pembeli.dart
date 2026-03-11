@@ -188,6 +188,9 @@ class _PpPembeliState extends State<PpPembeli> {
                         ),
                         title: Text("Produk Saya"),
                         trailing: Icon(Icons.chevron_right),
+                        onTap: () {
+                          print("Produk Saya");
+                        },
                       ),
 
                       Divider(color: Colors.grey.shade300, thickness: 1),
@@ -203,6 +206,9 @@ class _PpPembeliState extends State<PpPembeli> {
                         ),
                         title: Text("Produk Favorit"),
                         trailing: Icon(Icons.chevron_right),
+                        onTap: () {
+                          print("Favorit Saya");
+                        },
                       ),
 
                       Divider(color: Colors.grey.shade300, thickness: 1),
@@ -221,6 +227,98 @@ class _PpPembeliState extends State<PpPembeli> {
                         ),
                         title: Text("Ulasan Saya"),
                         trailing: Icon(Icons.chevron_right),
+                        onTap: () {
+                          print("Ulas Produk");
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+
+                SizedBox(height: 20),
+
+                Container(
+                  width: double.infinity,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "Lainnya",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                      fontFamily: "Inter",
+                    ),
+                  ),
+                ),
+
+                SizedBox(height: 20),
+
+                Container(
+                  padding: EdgeInsets.symmetric(vertical: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Column(
+                    children: [
+                      ListTile(
+                        leading: Container(
+                          padding: EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.green.withOpacity(0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Amicons.remix_settings,
+                            color: Colors.green,
+                          ),
+                        ),
+                        title: Text("Pengaturan"),
+                        trailing: Icon(Icons.chevron_right),
+                        onTap: () {
+                          print("Pengaturan");
+                        },
+                      ),
+
+                      Divider(color: Colors.grey.shade300, thickness: 1),
+
+                      ListTile(
+                        leading: Container(
+                          padding: EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: AppColors.oceanBlue.withOpacity(0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Amicons.remix_question,
+                            color: AppColors.oceanBlue,
+                          ),
+                        ),
+                        title: Text("Pusat Bantuan"),
+                        trailing: Icon(Icons.chevron_right),
+                        onTap: () {
+                          print("Pusat Bantuan");
+                        },
+                      ),
+
+                      Divider(color: Colors.grey.shade300, thickness: 1),
+
+                      ListTile(
+                        leading: Container(
+                          padding: EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.red.withOpacity(0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Amicons.lucide_log_out,
+                            color: Colors.red,
+                          ),
+                        ),
+                        title: Text("Keluar Akun"),
+                        trailing: Icon(Icons.chevron_right),
+                        onTap: () {
+                          print("Keluar Akun");
+                        },
                       ),
                     ],
                   ),
