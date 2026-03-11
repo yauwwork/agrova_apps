@@ -11,38 +11,11 @@ class HomePenjual extends StatefulWidget {
 }
 
 class _HomePenjualState extends State<HomePenjual> {
-  int _selectedIndex = 0;
-
-  static const List<Widget> _widgetOptions = <Widget> [
-
-  ];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
       backgroundColor: AppColors.bgpenjual,
-
-      bottomNavigationBar: BottomNavigationBar(
-        unselectedItemColor: AppColors.charcoal.withOpacity(0.3),
-        selectedItemColor: AppColors.skyBlue,
-        backgroundColor: AppColors.bgpenjual,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Amicons.remix_home4),
-            label: "Beranda",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Amicons.iconly_plus_curved),
-            label: "Tambah Produk",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Amicons.vuesax_profile_2user),
-            label: "Profil",
-          ),
-        ],
-      ),
-
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(

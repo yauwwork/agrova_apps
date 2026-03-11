@@ -1,6 +1,5 @@
 import 'package:agrova_apps/view/pembeli/produk_pembeli.dart';
 import 'package:agrova_apps/view/pembeli/favoritsc.dart';
-import 'package:agrova_apps/view/pembeli/home_pembeli.dart';
 import 'package:agrova_apps/view/login/lupapassword.dart';
 import 'package:agrova_apps/view/login/pilihperanpage.dart';
 import 'package:agrova_apps/view/login/register.dart';
@@ -11,6 +10,7 @@ import 'package:agrova_apps/view/login/verifikasiacc.dart';
 import 'package:agrova_apps/view/pembeli/kategori_screen.dart';
 import 'package:agrova_apps/view/pembeli/profil_pembeli.dart';
 import 'package:agrova_apps/view/penjual/home_penjual.dart';
+import 'package:agrova_apps/view/penjual/home_penjual_screen.dart';
 import 'package:agrova_apps/view/penjual/produk_penjual.dart';
 import 'package:agrova_apps/view/penjual/profil_penjual.dart';
 import 'package:flutter/material.dart';
@@ -45,7 +45,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: .fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const HomePenjual(),
+      home: const HomePenjualSc(),
     );
   }
 }
