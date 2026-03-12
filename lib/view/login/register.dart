@@ -1,4 +1,6 @@
+import 'package:agrova_apps/database/database_helper.dart';
 import 'package:agrova_apps/extension/colors/appcolors.dart';
+import 'package:agrova_apps/view/login/loginpage.dart';
 import 'package:flutter/material.dart';
 
 class BuatAkun extends StatefulWidget {
@@ -11,6 +13,38 @@ class BuatAkun extends StatefulWidget {
 class _BuatAkunState extends State<BuatAkun> {
   bool _isObscure = true;
 
+  final namaController = TextEditingController();
+  final emailController = TextEditingController();
+  final waController = TextEditingController();
+  final passwordController = TextEditingController();
+  final konfirmasiController = TextEditingController();
+
+  void registerUser() async {
+    if (passwordController.text != konfirmasiController.text) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Password tidak sama")));
+
+      return;
+    }
+
+    await DatabaseHelper.instance.insertUser({
+      "nama": namaController.text,
+      "email": emailController.text,
+      "wa": waController.text,
+      "password": passwordController.text,
+    });
+
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text("Akun berhasil dibuat")));
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => Loginscreen()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,7 +53,9 @@ class _BuatAkunState extends State<BuatAkun> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          onPressed: () {},
+          onPressed: () {
+            Navigator.pop(context);
+          },
           icon: Icon(
             Icons.arrow_back_ios_new_outlined,
             color: AppColors.oceanBlue,
@@ -97,6 +133,7 @@ class _BuatAkunState extends State<BuatAkun> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: TextFormField(
+                        controller: namaController,
                         decoration: InputDecoration(
                           hintText: "Isi Dengan Nama Lengkap Anda",
                           border: InputBorder.none,
@@ -122,6 +159,7 @@ class _BuatAkunState extends State<BuatAkun> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: TextFormField(
+                        controller: emailController,
                         decoration: InputDecoration(
                           hintText: "Harap Masukan Email Anda",
                           border: InputBorder.none,
@@ -147,6 +185,7 @@ class _BuatAkunState extends State<BuatAkun> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: TextFormField(
+                        controller: waController,
                         decoration: InputDecoration(
                           hintText: "Harap Masukan Nomor WA",
                           border: InputBorder.none,
@@ -172,6 +211,7 @@ class _BuatAkunState extends State<BuatAkun> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: TextFormField(
+                        controller: passwordController,
                         decoration: InputDecoration(
                           hintText: "Password (Minimal 8 Karakter)",
                           border: InputBorder.none,
@@ -210,6 +250,7 @@ class _BuatAkunState extends State<BuatAkun> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: TextFormField(
+                        controller: konfirmasiController,
                         decoration: InputDecoration(
                           hintText: "Ulangi Password untuk Konfirmasi",
                           border: InputBorder.none,
@@ -240,7 +281,9 @@ class _BuatAkunState extends State<BuatAkun> {
                             style: ElevatedButton.styleFrom(
                               backgroundColor: AppColors.oceanBlue,
                             ),
-                            onPressed: () {},
+                            onPressed: () {
+                              registerUser();
+                            },
                             child: Text(
                               "Buat Akun",
                               style: TextStyle(

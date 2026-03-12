@@ -1,5 +1,8 @@
 import 'package:agrova_apps/extension/colors/appcolors.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:agrova_apps/view/login/loginpage.dart';
+import 'package:agrova_apps/view/login/pilihperanpage.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -9,6 +12,32 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  @override
+  void initState() {
+    super.initState();
+    checkLogin();
+  }
+
+  void checkLogin() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    bool? isLogin = prefs.getBool("isLogin");
+
+    await Future.delayed(Duration(seconds: 2));
+
+    if (isLogin == true) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => PilihPeranPage()),
+      );
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => Loginscreen()),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

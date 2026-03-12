@@ -1,4 +1,5 @@
-import 'package:agrova_apps/view/pilihperanpage.dart';
+// only SplashScreen is referenced in this file
+import 'package:agrova_apps/view/login/spalshscreen.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -16,7 +17,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         // This is the theme of your application.
         //
-        // TRY THIS: Try running your application with "flutter run". You'll see
+        // TRY THIS: Try running your applicati on with "flutter run". You'll see
         // the application has a purple toolbar. Then, without quitting the app,
         // try changing the seedColor in the colorScheme below to Colors.green
         // and then invoke "hot reload" (save your changes or press the "hot
@@ -31,7 +32,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: .fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const PilihPeranPage(),
+      home: const SplashScreen(),
     );
   }
 }

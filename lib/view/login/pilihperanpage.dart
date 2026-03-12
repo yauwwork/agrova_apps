@@ -1,5 +1,9 @@
 import 'package:agrova_apps/extension/colors/appcolors.dart';
-import 'package:agrova_apps/extension/rolecard.dart';
+import 'package:agrova_apps/extension/card/role_card.dart';
+import 'package:agrova_apps/view/pembeli/bottom_navigation_pembeli.dart';
+import 'package:agrova_apps/view/pembeli/home_pembeli.dart';
+import 'package:agrova_apps/view/penjual/bottom_navigation_penjual.dart';
+import 'package:agrova_apps/view/penjual/home_penjual.dart';
 import 'package:flutter/material.dart';
 
 class PilihPeranPage extends StatefulWidget {
@@ -60,6 +64,12 @@ class _PilihPeranPageState extends State<PilihPeranPage> {
                 icon: Icons.shopping_bag_outlined,
                 isSelected: selectedRole == "pembeli",
                 onTap: () {
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (context) => HomePembeliSc()),
+                    (route) => false,
+                  );
+
                   setState(() {
                     selectedRole = "pembeli";
                   });
@@ -72,8 +82,14 @@ class _PilihPeranPageState extends State<PilihPeranPage> {
                 icon: Icons.storefront_outlined,
                 isSelected: selectedRole == "penjual",
                 onTap: () {
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (context) => HomePenjualSc()),
+                    (route) => false,
+                  );
+
                   setState(() {
-                    selectedRole = "penjual";
+                    selectedRole = "pembeli";
                   });
                 },
               ),
