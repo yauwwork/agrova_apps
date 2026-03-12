@@ -1,5 +1,10 @@
+import 'package:agrova_apps/database/database_helper.dart';
 import 'package:agrova_apps/extension/colors/appcolors.dart';
+import 'package:agrova_apps/view/login/lupapassword.dart';
+import 'package:agrova_apps/view/login/pilihperanpage.dart';
+import 'package:agrova_apps/view/login/register.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Loginscreen extends StatefulWidget {
   const Loginscreen({super.key});
@@ -10,6 +15,30 @@ class Loginscreen extends StatefulWidget {
 
 class _LoginscreenState extends State<Loginscreen> {
   bool _isObscure = true;
+
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+
+  void loginUser() async {
+    final user = await DatabaseHelper.instance.login(
+      emailController.text,
+      passwordController.text,
+    );
+
+    if (user != null) {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setBool("isLogin", true);
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => PilihPeranPage()),
+      );
+    } else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Email atau password salah")));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -96,6 +125,7 @@ class _LoginscreenState extends State<Loginscreen> {
                             ),
 
                             TextFormField(
+                              controller: emailController,
                               decoration: InputDecoration(
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(15),
@@ -120,6 +150,7 @@ class _LoginscreenState extends State<Loginscreen> {
                             ),
 
                             TextFormField(
+                              controller: passwordController,
                               decoration: InputDecoration(
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(15),
@@ -149,7 +180,14 @@ class _LoginscreenState extends State<Loginscreen> {
                             Align(
                               alignment: AlignmentGeometry.centerRight,
                               child: TextButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => LupaPass(),
+                                    ),
+                                  );
+                                },
                                 child: Text(
                                   "Lupa Password?",
                                   style: TextStyle(
@@ -170,7 +208,9 @@ class _LoginscreenState extends State<Loginscreen> {
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: AppColors.oceanBlue,
                                     ),
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      loginUser();
+                                    },
                                     child: Text(
                                       "Masuk",
                                       style: TextStyle(
@@ -194,7 +234,14 @@ class _LoginscreenState extends State<Loginscreen> {
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: AppColors.mintGreen,
                                     ),
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => BuatAkun(),
+                                        ),
+                                      );
+                                    },
                                     child: Text(
                                       "Buat Akun",
                                       style: TextStyle(

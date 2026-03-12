@@ -2,6 +2,7 @@ import 'package:agrova_apps/extension/card/penjual_produk_card.dart';
 import 'package:agrova_apps/extension/card/penjual_produk_card.dart';
 import 'package:agrova_apps/extension/card/produk_card.dart';
 import 'package:agrova_apps/extension/colors/appcolors.dart';
+import 'package:agrova_apps/view/penjual/bottom_navigation_penjual.dart';
 import 'package:amicons/amicons.dart';
 import 'package:flutter/material.dart';
 
@@ -22,7 +23,12 @@ class _ProdukPenjualState extends State<ProdukPenjual> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          onPressed: () {},
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => HomePenjualSc()),
+            );
+          },
           icon: Icon(
             Icons.arrow_back_ios_new_outlined,
             color: AppColors.skyBlue,

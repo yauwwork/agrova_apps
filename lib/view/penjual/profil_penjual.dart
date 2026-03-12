@@ -1,6 +1,10 @@
 import 'package:agrova_apps/extension/colors/appcolors.dart';
+import 'package:agrova_apps/view/login/loginpage.dart';
+import 'package:agrova_apps/view/penjual/bottom_navigation_penjual.dart';
+import 'package:agrova_apps/view/penjual/produk_penjual.dart';
 import 'package:amicons/amicons.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfilPenjualSc extends StatefulWidget {
   const ProfilPenjualSc({super.key});
@@ -14,15 +18,20 @@ class _ProfilPenjualScState extends State<ProfilPenjualSc> {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
-      backgroundColor: Color(0xffF1F5F9),
+      backgroundColor: AppColors.bgpenjual,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          onPressed: () {},
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => HomePenjualSc()),
+            );
+          },
           icon: Icon(
             Icons.arrow_back_ios_new_outlined,
-            color: AppColors.leafGreen,
+            color: AppColors.skyBlue,
           ),
         ),
 
@@ -49,9 +58,9 @@ class _ProfilPenjualScState extends State<ProfilPenjualSc> {
                   //   borderRadius: BorderRadius.circular(16),
                   // ),
                   decoration: BoxDecoration(
-                    color: AppColors.mintGreen.withOpacity(0.2),
+                    color: AppColors.skyBlue.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: AppColors.leafGreen),
+                    border: Border.all(color: AppColors.skyBlue),
                   ),
                   width: double.infinity,
                   height: 265,
@@ -69,7 +78,7 @@ class _ProfilPenjualScState extends State<ProfilPenjualSc> {
                                 shape: BoxShape.circle,
                                 boxShadow: [
                                   BoxShadow(
-                                    color: AppColors.leafGreen,
+                                    color: AppColors.skyBlue,
                                     blurRadius: 10,
                                     offset: Offset(0, 1),
                                   ),
@@ -89,7 +98,7 @@ class _ProfilPenjualScState extends State<ProfilPenjualSc> {
                                 width: 28,
                                 height: 28,
                                 decoration: BoxDecoration(
-                                  color: AppColors.mintGreen,
+                                  color: AppColors.skyBlue,
                                   shape: BoxShape.circle,
                                 ),
                                 child: IconButton(
@@ -128,7 +137,7 @@ class _ProfilPenjualScState extends State<ProfilPenjualSc> {
                           decoration: BoxDecoration(
                             color: AppColors.warmWhite,
                             borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: AppColors.leafGreen),
+                            border: Border.all(color: AppColors.skyBlue),
                           ),
 
                           child: Center(
@@ -189,7 +198,10 @@ class _ProfilPenjualScState extends State<ProfilPenjualSc> {
                         title: Text("Produk Saya"),
                         trailing: Icon(Icons.chevron_right),
                         onTap: () {
-                          print("Produk Saya");
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => ProdukPenjual()),
+                          );
                         },
                       ),
 
@@ -202,12 +214,15 @@ class _ProfilPenjualScState extends State<ProfilPenjualSc> {
                             color: Colors.red.withOpacity(0.1),
                             shape: BoxShape.circle,
                           ),
-                          child: Icon(Amicons.remix_heart, color: Colors.red),
+                          child: Icon(
+                            Amicons.remix_notification3,
+                            color: Colors.red,
+                          ),
                         ),
-                        title: Text("Produk Favorit"),
+                        title: Text("Notifikasi"),
                         trailing: Icon(Icons.chevron_right),
                         onTap: () {
-                          print("Favorit Saya");
+                          print("ping");
                         },
                       ),
 
@@ -217,18 +232,18 @@ class _ProfilPenjualScState extends State<ProfilPenjualSc> {
                         leading: Container(
                           padding: EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: AppColors.oceanBlue.withOpacity(0.1),
+                            color: Colors.amber.withOpacity(0.2),
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
-                            Amicons.flaticon_comment_alt_rounded,
-                            color: AppColors.oceanBlue,
+                            Amicons.remix_star_fill,
+                            color: Colors.amber,
                           ),
                         ),
-                        title: Text("Ulasan Saya"),
+                        title: Text("Rating Saya"),
                         trailing: Icon(Icons.chevron_right),
                         onTap: () {
-                          print("Ulas Produk");
+                          print("Rating");
                         },
                       ),
                     ],
@@ -316,8 +331,19 @@ class _ProfilPenjualScState extends State<ProfilPenjualSc> {
                         ),
                         title: Text("Keluar Akun"),
                         trailing: Icon(Icons.chevron_right),
-                        onTap: () {
-                          print("Keluar Akun");
+                        onTap: () async {
+                          SharedPreferences prefs =
+                              await SharedPreferences.getInstance();
+
+                          await prefs.clear(); // hapus semua data login
+
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => Loginscreen(),
+                            ),
+                            (route) => false,
+                          );
                         },
                       ),
                     ],

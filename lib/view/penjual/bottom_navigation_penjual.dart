@@ -2,6 +2,7 @@ import 'package:agrova_apps/extension/colors/appcolors.dart';
 import 'package:agrova_apps/view/penjual/home_penjual.dart';
 import 'package:agrova_apps/view/penjual/produk_penjual.dart';
 import 'package:agrova_apps/view/penjual/profil_penjual.dart';
+import 'package:agrova_apps/view/penjual/tambah_produk.dart';
 import 'package:amicons/amicons.dart';
 import 'package:flutter/material.dart';
 
@@ -17,7 +18,7 @@ class _HomePenjualScState extends State<HomePenjualSc> {
 
   final List<Widget> _widgetOptions = <Widget>[
     HomePenjual(),
-    ProdukPenjual(),
+    TambahProduk(),
     ProfilPenjualSc(),
   ];
 

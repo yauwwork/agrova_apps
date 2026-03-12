@@ -1,5 +1,6 @@
 import 'package:agrova_apps/extension/card/produk_list_card.dart';
 import 'package:agrova_apps/extension/colors/appcolors.dart';
+import 'package:agrova_apps/view/penjual/produk_penjual.dart';
 import 'package:amicons/amicons.dart';
 import 'package:flutter/material.dart';
 
@@ -217,7 +218,10 @@ class _HomePenjualState extends State<HomePenjual> {
 
                     TextButton(
                       onPressed: () {
-                        print("Lihat Produk");
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => ProdukPenjual()),
+                        );
                       },
                       child: Text(
                         "Lihat Semua",

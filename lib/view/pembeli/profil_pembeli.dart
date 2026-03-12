@@ -1,6 +1,8 @@
 import 'package:agrova_apps/extension/colors/appcolors.dart';
+import 'package:agrova_apps/view/login/loginpage.dart';
 import 'package:amicons/amicons.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PpPembeli extends StatefulWidget {
   const PpPembeli({super.key});
@@ -316,8 +318,19 @@ class _PpPembeliState extends State<PpPembeli> {
                         ),
                         title: Text("Keluar Akun"),
                         trailing: Icon(Icons.chevron_right),
-                        onTap: () {
-                          print("Keluar Akun");
+                        onTap: () async {
+                          SharedPreferences prefs =
+                              await SharedPreferences.getInstance();
+
+                          await prefs.clear(); // hapus semua data login
+
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => Loginscreen(),
+                            ),
+                            (route) => false,
+                          );
                         },
                       ),
                     ],

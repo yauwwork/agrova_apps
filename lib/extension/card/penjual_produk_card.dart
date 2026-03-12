@@ -166,7 +166,7 @@ class SellerGridProductCard extends StatelessWidget {
                     ),
                     onPressed: onEdit,
                     child: const Text(
-                      "Edit Product",
+                      "Edit Produk",
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
