@@ -1,8 +1,4 @@
-import 'package:agrova_apps/view/homescreen.dart';
 import 'package:agrova_apps/view/pilihperanpage.dart';
-import 'package:agrova_apps/view/register.dart';
-import 'package:agrova_apps/view/loginpage.dart';
-import 'package:agrova_apps/view/spalshscreen.dart';
 import 'package:flutter/material.dart';
 
 void main() {
