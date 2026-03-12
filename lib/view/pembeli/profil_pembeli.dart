@@ -1,5 +1,6 @@
 import 'package:agrova_apps/extension/colors/appcolors.dart';
 import 'package:agrova_apps/view/login/loginpage.dart';
+import 'package:agrova_apps/view/penjual/bottom_navigation_penjual.dart';
 import 'package:amicons/amicons.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -223,14 +224,20 @@ class _PpPembeliState extends State<PpPembeli> {
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
-                            Amicons.flaticon_comment_alt_rounded,
+                            Amicons.vuesax_cloud_change,
                             color: AppColors.oceanBlue,
                           ),
                         ),
-                        title: Text("Ulasan Saya"),
+                        title: Text("Beralih Ke Penjual"),
                         trailing: Icon(Icons.chevron_right),
-                        onTap: () {
-                          print("Ulas Produk");
+                       onTap: () {
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => HomePenjualSc(),
+                            ),
+                            (route) => false,
+                          );
                         },
                       ),
                     ],

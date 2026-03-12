@@ -54,8 +54,8 @@ class _HomePembeliSc extends State<HomePembeliSc> {
             label: "Kategori",
           ),
           BottomNavigationBarItem(
-            icon: Icon(Amicons.iconly_plus_curved),
-            label: "Tambah Produk",
+            icon: Icon(Amicons.vuesax_lovely),
+            label: "Favorit",
           ),
           BottomNavigationBarItem(
             icon: Icon(Amicons.vuesax_profile_2user),

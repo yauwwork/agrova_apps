@@ -1,8 +1,10 @@
+import 'package:agrova_apps/database/produk_data.dart';
 import 'package:agrova_apps/extension/card/produk_list_card.dart';
 import 'package:agrova_apps/extension/colors/appcolors.dart';
 import 'package:agrova_apps/view/penjual/produk_penjual.dart';
 import 'package:amicons/amicons.dart';
 import 'package:flutter/material.dart';
+import 'dart:io';
 
 class HomePenjual extends StatefulWidget {
   const HomePenjual({super.key});
@@ -12,31 +14,89 @@ class HomePenjual extends StatefulWidget {
 }
 
 class _HomePenjualState extends State<HomePenjual> {
+
+  Widget buildStatCard(String title, String value, String percent) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        height: 100,
+        decoration: BoxDecoration(
+          color: AppColors.softBlue.withOpacity(0.2),
+          borderRadius: BorderRadius.circular(15),
+          border: Border.all(color: AppColors.softBlue),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(
+                fontFamily: "Inter",
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+
+            const SizedBox(height: 6),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 24,
+                    fontFamily: "Inter",
+                    color: AppColors.skyBlue,
+                  ),
+                ),
+
+                const SizedBox(width: 6),
+
+                Text(
+                  percent,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                    fontFamily: "Inter",
+                    color: AppColors.mintGreen,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBodyBehindAppBar: true,
       backgroundColor: AppColors.bgpenjual,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding: EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
+
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+
+                /// HEADER
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
+
                     Row(
                       children: [
-                        CircleAvatar(
-                          backgroundImage: AssetImage(
-                            "assets/images/gambarlain/download (1).jpg",
-                          ),
+                        const CircleAvatar(
                           radius: 20,
+                          backgroundImage: AssetImage(
+                              "assets/images/gambarlain/download (1).jpg"),
                         ),
 
-                        SizedBox(width: 8),
+                        const SizedBox(width: 10),
 
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -75,11 +135,12 @@ class _HomePenjualState extends State<HomePenjual> {
                   ],
                 ),
 
-                SizedBox(height: 36),
+                const SizedBox(height: 36),
 
+                /// PERFORMA TOKO
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
+                  children: const [
                     Text(
                       "Performa Toko",
                       style: TextStyle(
@@ -91,123 +152,32 @@ class _HomePenjualState extends State<HomePenjual> {
 
                     Text(
                       "Dalam 30 hari",
-                      style: TextStyle(fontFamily: "Inter", fontSize: 12),
-                    ),
-                  ],
-                ),
-
-                SizedBox(height: 16),
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      padding: EdgeInsets.all(8),
-                      width: 170,
-                      height: 100,
-                      decoration: BoxDecoration(
-                        color: AppColors.softBlue.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(15),
-                        border: Border.all(color: AppColors.softBlue),
-                      ),
-
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "Produk Dilihat",
-                            style: TextStyle(
-                              fontFamily: "Inter",
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                "150",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 24,
-                                  fontFamily: "Inter",
-                                  color: AppColors.skyBlue,
-                                ),
-                              ),
-
-                              SizedBox(width: 4),
-                              Text(
-                                "+15%",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 12,
-                                  fontFamily: "Inter",
-                                  color: AppColors.mintGreen,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    Container(
-                      width: 170,
-                      height: 100,
-                      decoration: BoxDecoration(
-                        color: AppColors.softBlue.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(15),
-                        border: Border.all(color: AppColors.softBlue),
-                      ),
-
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "Produk Disukai",
-                            style: TextStyle(
-                              fontFamily: "Inter",
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                "50",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 24,
-                                  fontFamily: "Inter",
-                                  color: AppColors.skyBlue,
-                                ),
-                              ),
-
-                              SizedBox(width: 4),
-                              Text(
-                                "+10%",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 12,
-                                  fontFamily: "Inter",
-                                  color: AppColors.mintGreen,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
+                      style: TextStyle(
+                        fontFamily: "Inter",
+                        fontSize: 12,
                       ),
                     ),
                   ],
                 ),
 
-                SizedBox(height: 24),
+                const SizedBox(height: 16),
 
+                Row(
+                  children: [
+                    buildStatCard("Produk Dilihat", "150", "+15%"),
+                    const SizedBox(width: 12),
+                    buildStatCard("Produk Disukai", "50", "+10%"),
+                  ],
+                ),
+
+                const SizedBox(height: 24),
+
+                /// PRODUK ANDA
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
+
+                    const Text(
                       "Produk Anda",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
@@ -220,7 +190,8 @@ class _HomePenjualState extends State<HomePenjual> {
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (_) => ProdukPenjual()),
+                          MaterialPageRoute(
+                              builder: (_) => ProdukPenjual()),
                         );
                       },
                       child: Text(
@@ -236,91 +207,28 @@ class _HomePenjualState extends State<HomePenjual> {
                   ],
                 ),
 
-                SizedBox(height: 16),
+                const SizedBox(height: 10),
 
-                ListView(
-                  shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
-                  children: [
-                    ListCard(
-                      name: "Ikan Kembung",
-                      category: "Ikan",
-                      price: "Rp 20.000/kg",
-                      image: "assets/images/gambarlain/download (2).jpg",
+                /// LIST PRODUK
+                Column(
+                  children: daftarProduk.take(5).map((produk) {
+                    return ListCard(
+                      name: produk.nama,
+                      category: produk.kategori,
+                      price: produk.harga,
+                      image: produk.image,
                       onEdit: () {
-                        print("Edit Produk");
+                        print("Edit ${produk.nama}");
                       },
                       onDelete: () {
-                        print("Delet PRODUK");
+                        setState(() {
+                          daftarProduk.remove(produk);
+                        });
                       },
-                    ),
-
-                    ListCard(
-                      name: "Brokoli Ngawi",
-                      category: "Sayur",
-                      price: "Rp 7.000/kg",
-                      image: "assets/images/gambarlain/🥦.jpg",
-                      onEdit: () {
-                        print("Edit Produk");
-                      },
-                      onDelete: () {
-                        print("Delet PRODUK");
-                      },
-                    ),
-
-                    ListCard(
-                      name: "Tomat Kebumen",
-                      category: "Sayur",
-                      price: "Rp 15.000/kg",
-                      image: "assets/images/gambarlain/download (3).jpg",
-                      onEdit: () {
-                        print("Edit Produk");
-                      },
-                      onDelete: () {
-                        print("Delet PRODUK");
-                      },
-                    ),
-
-                    ListCard(
-                      name: "Ikan Kembung",
-                      category: "Ikan",
-                      price: "Rp 20.000/kg",
-                      image: "assets/images/gambarlain/download (2).jpg",
-                      onEdit: () {
-                        print("Edit Produk");
-                      },
-                      onDelete: () {
-                        print("Delet PRODUK");
-                      },
-                    ),
-
-                    ListCard(
-                      name: "Brokoli Ngawi",
-                      category: "Sayur",
-                      price: "Rp 7.000/kg",
-                      image: "assets/images/gambarlain/🥦.jpg",
-                      onEdit: () {
-                        print("Edit Produk");
-                      },
-                      onDelete: () {
-                        print("Delet PRODUK");
-                      },
-                    ),
-
-                    ListCard(
-                      name: "Tomat Kebumen",
-                      category: "Sayur",
-                      price: "Rp 15.000/kg",
-                      image: "assets/images/gambarlain/download (3).jpg",
-                      onEdit: () {
-                        print("Edit Produk");
-                      },
-                      onDelete: () {
-                        print("Delet PRODUK");
-                      },
-                    ),
-                  ],
+                    );
+                  }).toList(),
                 ),
+
               ],
             ),
           ),

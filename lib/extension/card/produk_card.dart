@@ -1,4 +1,6 @@
+import 'package:agrova_apps/models/produk_models.dart';
 import 'package:flutter/material.dart';
+import 'dart:io';
 
 class ProductCard extends StatefulWidget {
   final String title;
@@ -44,13 +46,11 @@ class _ProductCardState extends State<ProductCard> {
           Stack(
             children: [
               ClipRRect(
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(16),
-                ),
-                child: Image.asset(
-                  widget.image,
-                  height: 110,
+                borderRadius: BorderRadius.circular(12),
+                child: Image.file(
+                  File(widget.image),
                   width: double.infinity,
+                  height: 120,
                   fit: BoxFit.cover,
                 ),
               ),

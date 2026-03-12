@@ -1,20 +1,18 @@
+import 'package:agrova_apps/database/produk_data.dart';
+import 'package:agrova_apps/extension/colors/appcolors.dart';
+import 'package:agrova_apps/models/produk_models.dart';
 import 'package:agrova_apps/view/penjual/bottom_navigation_penjual.dart';
 import 'package:amicons/amicons.dart';
 import 'package:flutter/material.dart';
-import 'package:agrova_apps/extension/colors/appcolors.dart';
-import 'package:agrova_apps/models/produk_models.dart';
-import 'package:agrova_apps/database/produk_data.dart';
-import 'package:image_picker/image_picker.dart';
-import 'dart:io';
 
-class TambahProduk extends StatefulWidget {
-  const TambahProduk({super.key});
+class EditProduk extends StatefulWidget {
+  const EditProduk({super.key});
 
   @override
-  State<TambahProduk> createState() => _TambahProduk();
+  State<EditProduk> createState() => _EditProdukState();
 }
 
-class _TambahProduk extends State<TambahProduk> {
+class _EditProdukState extends State<EditProduk> {
   final TextEditingController namaController = TextEditingController();
 
   final TextEditingController hargaController = TextEditingController();
@@ -24,21 +22,6 @@ class _TambahProduk extends State<TambahProduk> {
   final TextEditingController deskripsiController = TextEditingController();
 
   final TextEditingController lokasiController = TextEditingController();
-
-  File? imageProduk;
-  final ImagePicker picker = ImagePicker();
-
-  Future<void> ambilFoto() async {
-    final XFile? pickedFile = await picker.pickImage(
-      source: ImageSource.gallery,
-    );
-
-    if (pickedFile != null) {
-      setState(() {
-        imageProduk = File(pickedFile.path);
-      });
-    }
-  }
 
   String kategori = "Buah-buahan";
   String kuantitas = "Kilogram";
@@ -65,7 +48,7 @@ class _TambahProduk extends State<TambahProduk> {
         ),
         centerTitle: true,
         title: Text(
-          "Tambah Produk",
+          "Edit Produk",
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
@@ -104,42 +87,26 @@ class _TambahProduk extends State<TambahProduk> {
                   const SizedBox(width: 12),
 
                   /// TAMBAH FOTO
-                  GestureDetector(
-                    onTap: ambilFoto,
-                    child: Container(
-                      width: 90,
-                      height: 90,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.grey.shade300),
+                  Container(
+                    width: 90,
+                    height: 90,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: Colors.grey.shade300,
+                        style: BorderStyle.solid,
                       ),
-                      child: imageProduk == null
-                          ? const Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.add_a_photo_outlined,
-                                  color: Colors.grey,
-                                ),
-                                SizedBox(height: 4),
-                                Text(
-                                  "Tambah",
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontFamily: "Inter",
-                                  ),
-                                ),
-                              ],
-                            )
-                          : ClipRRect(
-                              borderRadius: BorderRadius.circular(12),
-                              child: Image.file(
-                                imageProduk!,
-                                width: 90,
-                                height: 90,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
+                    ),
+                    child: const Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.add_a_photo_outlined, color: Colors.grey),
+                        SizedBox(height: 4),
+                        Text(
+                          "Tambah",
+                          style: TextStyle(fontSize: 12, fontFamily: "Inter"),
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -219,6 +186,7 @@ class _TambahProduk extends State<TambahProduk> {
                 decoration: _inputDecoration(),
               ),
 
+
               const SizedBox(height: 24),
 
               /// TAMBAH PRODUK
@@ -227,24 +195,26 @@ class _TambahProduk extends State<TambahProduk> {
                   Expanded(
                     child: ElevatedButton.icon(
                       onPressed: () {
-                        Produk produkBaru = Produk(
-                          nama: namaController.text,
-                          kategori: kategori,
-                          harga: hargaController.text,
-                          stok: stokController.text,
-                          deskripsi: deskripsiController.text,
-                          image: imageProduk?.path ?? "",
-                          lokasi: lokasiController.text,
-                          penjual: "Petani Agrova",
-                        );
 
-                        daftarProduk.add(produkBaru);
+                       Produk produkBaru = Produk(
+                       nama: namaController.text,
+                       kategori: kategori,
+                       harga: hargaController.text,
+                       stok: stokController.text,
+                       deskripsi: deskripsiController.text,
+                       image: "assets/images/gambarlain/🥦.jpg",
+                       lokasi: lokasiController.text,
+                       penjual: "Petani Agrova",
+                       );
 
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(builder: (_) => HomePenjualSc()),
-                        );
-                      },
+                       daftarProduk.add(produkBaru);
+
+                       Navigator.pushReplacement(
+                       context,
+                       MaterialPageRoute(builder: (_) => HomePenjualSc()),
+                       );
+
+                       },
                       label: Text(
                         "Tambah Produk",
                         style: TextStyle(

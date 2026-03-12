@@ -1,3 +1,4 @@
+import 'package:agrova_apps/database/produk_data.dart';
 import 'package:agrova_apps/extension/colors/appcolors.dart';
 import 'package:agrova_apps/extension/card/produk_card.dart';
 import 'package:amicons/amicons.dart';
@@ -160,18 +161,21 @@ class _KategoriScState extends State<KategoriSc> {
                     mainAxisSpacing: 12,
                     childAspectRatio: 0.7,
                   ),
-                  itemCount: 27,
-                  itemBuilder: (context, index) {
-                    return ProductCard(
-                      title: "Apel Malang",
-                      price: "Rp 25.000/Kg",
-                      image:
-                          "assets/images/gambarlain/tobi-zLCR7RsxYGs-unsplash.jpg",
-                      seller: "Pak Jono",
-                      location: "Malang, Jawa Timur",
-                      rating: 5.0,
-                    );
-                  },
+                  itemCount: daftarProduk.length,
+                 itemBuilder: (context, index) {
+
+  final produk = daftarProduk[index];
+
+  return ProductCard(
+    title: produk.nama,
+    price: "Rp ${produk.harga}/Kg",
+    image: produk.image,
+    seller: produk.penjual,
+    location: produk.lokasi,
+    rating: 5.0,
+  );
+
+}
                 ),
               ],
             ),

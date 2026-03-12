@@ -1,5 +1,6 @@
 import 'package:agrova_apps/extension/colors/appcolors.dart';
 import 'package:flutter/material.dart';
+import 'dart:io';
 
 class SellerGridProductCard extends StatelessWidget {
   final String title;
@@ -47,13 +48,11 @@ class SellerGridProductCard extends StatelessWidget {
           Stack(
             children: [
               ClipRRect(
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(18),
-                ),
-                child: Image.asset(
-                  image,
-                  height: 100,
+                borderRadius: BorderRadius.circular(12),
+                child: Image.file(
+                  File(image),
                   width: double.infinity,
+                  height: 120,
                   fit: BoxFit.cover,
                 ),
               ),

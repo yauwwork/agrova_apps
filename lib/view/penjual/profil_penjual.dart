@@ -1,5 +1,6 @@
 import 'package:agrova_apps/extension/colors/appcolors.dart';
 import 'package:agrova_apps/view/login/loginpage.dart';
+import 'package:agrova_apps/view/pembeli/bottom_navigation_pembeli.dart';
 import 'package:agrova_apps/view/penjual/bottom_navigation_penjual.dart';
 import 'package:agrova_apps/view/penjual/produk_penjual.dart';
 import 'package:amicons/amicons.dart';
@@ -215,14 +216,20 @@ class _ProfilPenjualScState extends State<ProfilPenjualSc> {
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
-                            Amicons.remix_notification3,
+                            Amicons.vuesax_cloud_change,
                             color: Colors.red,
                           ),
                         ),
-                        title: Text("Notifikasi"),
+                        title: Text("Beralih Ke Pembeli"),
                         trailing: Icon(Icons.chevron_right),
                         onTap: () {
-                          print("ping");
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => HomePembeliSc(),
+                            ),
+                            (route) => false,
+                          );
                         },
                       ),
 

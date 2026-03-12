@@ -21,35 +21,42 @@ class ListCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 400,
-      margin: const EdgeInsets.symmetric(vertical: 10),
+      margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black12,
             blurRadius: 10,
-            offset: const Offset(0, 5),
+            offset: Offset(0, 4),
           ),
         ],
       ),
       child: Row(
         children: [
-          /// Gambar Produk
+
+          // FOTO PRODUK
           ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: Image.asset(image, width: 70, height: 70, fit: BoxFit.cover),
+            borderRadius: BorderRadius.circular(14),
+            child: Image.asset(
+              image,
+              width: 70,
+              height: 70,
+              fit: BoxFit.cover,
+            ),
           ),
 
-          const SizedBox(width: 12),
+          const SizedBox(width: 16),
 
-          /// Info Produk
+          // INFO PRODUK
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+
+                // NAMA PRODUK
                 Text(
                   name,
                   style: const TextStyle(
@@ -60,16 +67,22 @@ class ListCard extends StatelessWidget {
 
                 const SizedBox(height: 4),
 
+                // KATEGORI
                 Text(
                   category,
-                  style: const TextStyle(color: Colors.grey, fontSize: 13),
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Colors.grey[600],
+                  ),
                 ),
 
                 const SizedBox(height: 6),
 
+                // HARGA
                 Text(
                   price,
                   style: const TextStyle(
+                    fontSize: 15,
                     color: Colors.blue,
                     fontWeight: FontWeight.bold,
                   ),
@@ -78,8 +91,9 @@ class ListCard extends StatelessWidget {
             ),
           ),
 
-          /// Tombol Aksi
+          // TOMBOL EDIT & DELETE
           Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               IconButton(
                 icon: const Icon(Icons.edit, color: Colors.blue),

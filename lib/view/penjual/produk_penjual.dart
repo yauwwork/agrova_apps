@@ -1,3 +1,4 @@
+import 'package:agrova_apps/database/produk_data.dart';
 import 'package:agrova_apps/extension/card/penjual_produk_card.dart';
 import 'package:agrova_apps/extension/card/penjual_produk_card.dart';
 import 'package:agrova_apps/extension/card/produk_card.dart';
@@ -5,6 +6,8 @@ import 'package:agrova_apps/extension/colors/appcolors.dart';
 import 'package:agrova_apps/view/penjual/bottom_navigation_penjual.dart';
 import 'package:amicons/amicons.dart';
 import 'package:flutter/material.dart';
+import 'package:agrova_apps/models/produk_models.dart';
+import 'dart:io';
 
 class ProdukPenjual extends StatefulWidget {
   const ProdukPenjual({super.key});
@@ -157,20 +160,30 @@ class _ProdukPenjualState extends State<ProdukPenjual> {
                     crossAxisCount: 2,
                     crossAxisSpacing: 12,
                     mainAxisSpacing: 12,
-                    childAspectRatio: 0.65,
+                    childAspectRatio: 0.60,
                   ),
-                  itemCount: 27,
+                  itemCount: daftarProduk.length,
                   itemBuilder: (context, index) {
+                    final produk = daftarProduk[index];
+
                     return SellerGridProductCard(
-                      title: "Ikan Bandeng",
-                      subtitle: "Ikan",
-                      price: "Rp. 20.000",
-                      image: "assets/images/gambarlain/download (2).jpg",
-                      location: "Ngawi",
-                      views: "145",
-                      favorites: "20",
-                      onDelete: () {},
-                      onEdit: () {},
+                      title: produk.nama,
+                      subtitle: produk.kategori,
+                      price: "Rp ${produk.harga}",
+                      image: produk.image,
+                      location: produk.lokasi,
+                      views: "0",
+                      favorites: "0",
+
+                      onDelete: () {
+                        setState(() {
+                          daftarProduk.removeAt(index);
+                        });
+                      },
+
+                      onEdit: () {
+                        print("Edit produk");
+                      },
                     );
                   },
                 ),
