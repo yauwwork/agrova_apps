@@ -93,14 +93,6 @@ class _TambahProduk extends State<TambahProduk> {
 
               Row(
                 children: [
-                  /// FOTO 1
-                  _fotoItem("assets/images/gambarlain/🥦.jpg"),
-
-                  const SizedBox(width: 12),
-
-                  /// FOTO 2
-                  _fotoItem("assets/images/gambarlain/🥦.jpg"),
-
                   const SizedBox(width: 12),
 
                   /// TAMBAH FOTO
@@ -111,7 +103,9 @@ class _TambahProduk extends State<TambahProduk> {
                       height: 90,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.grey.shade300),
+                        border: Border.all(
+                          color: AppColors.skyBlue.withOpacity(0.4),
+                        ),
                       ),
                       child: imageProduk == null
                           ? const Column(
@@ -119,7 +113,7 @@ class _TambahProduk extends State<TambahProduk> {
                               children: [
                                 Icon(
                                   Icons.add_a_photo_outlined,
-                                  color: Colors.grey,
+                                  color: AppColors.skyBlue,
                                 ),
                                 SizedBox(height: 4),
                                 Text(
@@ -164,6 +158,9 @@ class _TambahProduk extends State<TambahProduk> {
                     child: Text("Buah-buahan"),
                   ),
                   DropdownMenuItem(value: "Sayuran", child: Text("Sayuran")),
+                  DropdownMenuItem(value: "Ikan", child: Text("Ikan")),
+                  DropdownMenuItem(value: "Daging", child: Text("Daging")),
+                  DropdownMenuItem(value: "Telur", child: Text("Telur")),
                 ],
                 onChanged: (value) {
                   setState(() {

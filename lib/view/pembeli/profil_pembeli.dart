@@ -17,7 +17,7 @@ class _PpPembeliState extends State<PpPembeli> {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
-      backgroundColor: Color(0xffF1F5F9),
+      backgroundColor: AppColors.softMint,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -185,14 +185,14 @@ class _PpPembeliState extends State<PpPembeli> {
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
-                            Icons.inventory_2_outlined,
+                            Amicons.flaticon_comment_rounded,
                             color: Colors.green,
                           ),
                         ),
-                        title: Text("Produk Saya"),
+                        title: Text("Ulasan Saya"),
                         trailing: Icon(Icons.chevron_right),
                         onTap: () {
-                          print("Produk Saya");
+                          print("Ulasan");
                         },
                       ),
 
@@ -205,9 +205,12 @@ class _PpPembeliState extends State<PpPembeli> {
                             color: Colors.red.withOpacity(0.1),
                             shape: BoxShape.circle,
                           ),
-                          child: Icon(Amicons.remix_heart, color: Colors.red),
+                          child: Icon(
+                            Amicons.iconly_profile_sharp,
+                            color: Colors.red,
+                          ),
                         ),
-                        title: Text("Produk Favorit"),
+                        title: Text("Edit Profil"),
                         trailing: Icon(Icons.chevron_right),
                         onTap: () {
                           print("Favorit Saya");
@@ -230,7 +233,7 @@ class _PpPembeliState extends State<PpPembeli> {
                         ),
                         title: Text("Beralih Ke Penjual"),
                         trailing: Icon(Icons.chevron_right),
-                       onTap: () {
+                        onTap: () {
                           Navigator.pushAndRemoveUntil(
                             context,
                             MaterialPageRoute(

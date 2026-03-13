@@ -1,32 +1,43 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
-class ListCard extends StatelessWidget {
-  final String name;
-  final String category;
+class ListCard extends StatefulWidget {
+  final String title;
   final String price;
   final String image;
+  final String subtitle;
+  final String location;
+  final double rating;
   final VoidCallback? onEdit;
   final VoidCallback? onDelete;
 
   const ListCard({
     super.key,
-    required this.name,
-    required this.category,
+    required this.title,
     required this.price,
     required this.image,
+    required this.subtitle,
+    required this.location,
+    required this.rating,
     this.onEdit,
     this.onDelete,
   });
 
   @override
+  State<ListCard> createState() => _ListCardState();
+}
+
+class _ListCardState extends State<ListCard> {
+  @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-      padding: const EdgeInsets.all(12),
+      margin: EdgeInsets.symmetric(vertical: 10),
+      padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: const [
+        boxShadow: [
           BoxShadow(
             color: Colors.black12,
             blurRadius: 10,
@@ -36,52 +47,43 @@ class ListCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-
           // FOTO PRODUK
           ClipRRect(
-            borderRadius: BorderRadius.circular(14),
-            child: Image.asset(
-              image,
+            borderRadius: BorderRadius.circular(12),
+            child: Image.file(
+              File(widget.image),
               width: 70,
               height: 70,
               fit: BoxFit.cover,
             ),
           ),
-
-          const SizedBox(width: 16),
+          SizedBox(width: 16),
 
           // INFO PRODUK
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-
                 // NAMA PRODUK
                 Text(
-                  name,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  widget.title,
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
 
-                const SizedBox(height: 4),
+                SizedBox(height: 4),
 
                 // KATEGORI
                 Text(
-                  category,
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: Colors.grey[600],
-                  ),
+                  widget.subtitle,
+                  style: TextStyle(fontSize: 13, color: Colors.grey[600]),
                 ),
 
-                const SizedBox(height: 6),
+                SizedBox(height: 6),
 
                 // HARGA
                 Text(
-                  price,
-                  style: const TextStyle(
+                  widget.price,
+                  style: TextStyle(
                     fontSize: 15,
                     color: Colors.blue,
                     fontWeight: FontWeight.bold,
@@ -97,11 +99,11 @@ class ListCard extends StatelessWidget {
             children: [
               IconButton(
                 icon: const Icon(Icons.edit, color: Colors.blue),
-                onPressed: onEdit,
+                onPressed: widget.onEdit,
               ),
               IconButton(
                 icon: const Icon(Icons.delete, color: Colors.red),
-                onPressed: onDelete,
+                onPressed: widget.onDelete,
               ),
             ],
           ),

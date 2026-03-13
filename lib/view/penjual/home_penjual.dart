@@ -1,6 +1,7 @@
 import 'package:agrova_apps/database/produk_data.dart';
 import 'package:agrova_apps/extension/card/produk_list_card.dart';
 import 'package:agrova_apps/extension/colors/appcolors.dart';
+import 'package:agrova_apps/view/penjual/edit_produk.dart';
 import 'package:agrova_apps/view/penjual/produk_penjual.dart';
 import 'package:amicons/amicons.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +15,6 @@ class HomePenjual extends StatefulWidget {
 }
 
 class _HomePenjualState extends State<HomePenjual> {
-
   Widget buildStatCard(String title, String value, String percent) {
     return Expanded(
       child: Container(
@@ -82,18 +82,17 @@ class _HomePenjualState extends State<HomePenjual> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-
                 /// HEADER
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-
                     Row(
                       children: [
                         const CircleAvatar(
                           radius: 20,
                           backgroundImage: AssetImage(
-                              "assets/images/gambarlain/download (1).jpg"),
+                            "assets/images/gambarlain/download (1).jpg",
+                          ),
                         ),
 
                         const SizedBox(width: 10),
@@ -152,10 +151,7 @@ class _HomePenjualState extends State<HomePenjual> {
 
                     Text(
                       "Dalam 30 hari",
-                      style: TextStyle(
-                        fontFamily: "Inter",
-                        fontSize: 12,
-                      ),
+                      style: TextStyle(fontFamily: "Inter", fontSize: 12),
                     ),
                   ],
                 ),
@@ -176,7 +172,6 @@ class _HomePenjualState extends State<HomePenjual> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-
                     const Text(
                       "Produk Anda",
                       style: TextStyle(
@@ -190,8 +185,7 @@ class _HomePenjualState extends State<HomePenjual> {
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(
-                              builder: (_) => ProdukPenjual()),
+                          MaterialPageRoute(builder: (_) => ProdukPenjual()),
                         );
                       },
                       child: Text(
@@ -211,24 +205,38 @@ class _HomePenjualState extends State<HomePenjual> {
 
                 /// LIST PRODUK
                 Column(
-                  children: daftarProduk.take(5).map((produk) {
+                  children: daftarProduk.take(5).toList().asMap().entries.map((
+                    entry,
+                  ) {
+                    int index = entry.key;
+                    var produk = entry.value;
+
                     return ListCard(
-                      name: produk.nama,
-                      category: produk.kategori,
-                      price: produk.harga,
+                      title: produk.nama,
+                      subtitle: produk.kategori,
+                      price: "Rp ${produk.harga}",
                       image: produk.image,
-                      onEdit: () {
-                        print("Edit ${produk.nama}");
-                      },
+                      location: produk.lokasi,
+                      rating: 0,
                       onDelete: () {
                         setState(() {
-                          daftarProduk.remove(produk);
+                          daftarProduk.removeAt(index);
+                        });
+                      },
+                      onEdit: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) =>
+                                EditProduk(produk: produk, index: index),
+                          ),
+                        ).then((_) {
+                          setState(() {});
                         });
                       },
                     );
                   }).toList(),
                 ),
-
               ],
             ),
           ),

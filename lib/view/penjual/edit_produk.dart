@@ -1,18 +1,23 @@
-import 'package:agrova_apps/database/produk_data.dart';
-import 'package:agrova_apps/extension/colors/appcolors.dart';
-import 'package:agrova_apps/models/produk_models.dart';
 import 'package:agrova_apps/view/penjual/bottom_navigation_penjual.dart';
 import 'package:amicons/amicons.dart';
 import 'package:flutter/material.dart';
+import 'package:agrova_apps/extension/colors/appcolors.dart';
+import 'package:agrova_apps/models/produk_models.dart';
+import 'package:agrova_apps/database/produk_data.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 class EditProduk extends StatefulWidget {
-  const EditProduk({super.key});
+  final Produk produk;
+  final int index;
+
+  const EditProduk({super.key, required this.produk, required this.index});
 
   @override
-  State<EditProduk> createState() => _EditProdukState();
+  State<EditProduk> createState() => _EditProduk();
 }
 
-class _EditProdukState extends State<EditProduk> {
+class _EditProduk extends State<EditProduk> {
   final TextEditingController namaController = TextEditingController();
 
   final TextEditingController hargaController = TextEditingController();
@@ -23,8 +28,40 @@ class _EditProdukState extends State<EditProduk> {
 
   final TextEditingController lokasiController = TextEditingController();
 
+  File? imageProduk;
+  final ImagePicker picker = ImagePicker();
+
+  Future<void> ambilFoto() async {
+    final XFile? pickedFile = await picker.pickImage(
+      source: ImageSource.gallery,
+    );
+
+    if (pickedFile != null) {
+      setState(() {
+        imageProduk = File(pickedFile.path);
+      });
+    }
+  }
+
   String kategori = "Buah-buahan";
   String kuantitas = "Kilogram";
+
+  @override
+  void initState() {
+    super.initState();
+
+    namaController.text = widget.produk.nama;
+    hargaController.text = widget.produk.harga;
+    stokController.text = widget.produk.stok;
+    deskripsiController.text = widget.produk.deskripsi;
+    lokasiController.text = widget.produk.lokasi;
+
+    kategori = widget.produk.kategori;
+
+    if (widget.produk.image.isNotEmpty) {
+      imageProduk = File(widget.produk.image);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -76,37 +113,47 @@ class _EditProdukState extends State<EditProduk> {
 
               Row(
                 children: [
-                  /// FOTO 1
-                  _fotoItem("assets/images/gambarlain/🥦.jpg"),
-
-                  const SizedBox(width: 12),
-
-                  /// FOTO 2
-                  _fotoItem("assets/images/gambarlain/🥦.jpg"),
-
                   const SizedBox(width: 12),
 
                   /// TAMBAH FOTO
-                  Container(
-                    width: 90,
-                    height: 90,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: Colors.grey.shade300,
-                        style: BorderStyle.solid,
-                      ),
-                    ),
-                    child: const Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.add_a_photo_outlined, color: Colors.grey),
-                        SizedBox(height: 4),
-                        Text(
-                          "Tambah",
-                          style: TextStyle(fontSize: 12, fontFamily: "Inter"),
+                  GestureDetector(
+                    onTap: ambilFoto,
+                    child: Container(
+                      width: 90,
+                      height: 90,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: AppColors.skyBlue.withOpacity(0.4),
                         ),
-                      ],
+                      ),
+                      child: imageProduk == null
+                          ? const Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.add_a_photo_outlined,
+                                  color: AppColors.skyBlue,
+                                ),
+                                SizedBox(height: 4),
+                                Text(
+                                  "Tambah",
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontFamily: "Inter",
+                                  ),
+                                ),
+                              ],
+                            )
+                          : ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Image.file(
+                                imageProduk!,
+                                width: 90,
+                                height: 90,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
                     ),
                   ),
                 ],
@@ -131,6 +178,9 @@ class _EditProdukState extends State<EditProduk> {
                     child: Text("Buah-buahan"),
                   ),
                   DropdownMenuItem(value: "Sayuran", child: Text("Sayuran")),
+                  DropdownMenuItem(value: "Ikan", child: Text("Ikan")),
+                  DropdownMenuItem(value: "Daging", child: Text("Daging")),
+                  DropdownMenuItem(value: "Telur", child: Text("Telur")),
                 ],
                 onChanged: (value) {
                   setState(() {
@@ -186,7 +236,6 @@ class _EditProdukState extends State<EditProduk> {
                 decoration: _inputDecoration(),
               ),
 
-
               const SizedBox(height: 24),
 
               /// TAMBAH PRODUK
@@ -195,35 +244,33 @@ class _EditProdukState extends State<EditProduk> {
                   Expanded(
                     child: ElevatedButton.icon(
                       onPressed: () {
+                        daftarProduk[widget.index] = Produk(
+                          nama: namaController.text,
+                          kategori: kategori,
+                          harga: hargaController.text,
+                          stok: stokController.text,
+                          deskripsi: deskripsiController.text,
+                          image: imageProduk?.path ?? "",
+                          lokasi: lokasiController.text,
+                          penjual: "Petani Agrova",
+                        );
 
-                       Produk produkBaru = Produk(
-                       nama: namaController.text,
-                       kategori: kategori,
-                       harga: hargaController.text,
-                       stok: stokController.text,
-                       deskripsi: deskripsiController.text,
-                       image: "assets/images/gambarlain/🥦.jpg",
-                       lokasi: lokasiController.text,
-                       penjual: "Petani Agrova",
-                       );
+                        Navigator.pop(context);
 
-                       daftarProduk.add(produkBaru);
-
-                       Navigator.pushReplacement(
-                       context,
-                       MaterialPageRoute(builder: (_) => HomePenjualSc()),
-                       );
-
-                       },
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (_) => HomePenjualSc()),
+                        );
+                      },
                       label: Text(
-                        "Tambah Produk",
+                        "Edit Produk",
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
                           fontFamily: "Inter",
                         ),
                       ),
-                      icon: Icon(Amicons.remix_add_circle, color: Colors.white),
+                      icon: Icon(Amicons.remix_edit, color: Colors.white),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.skyBlue,
                       ),

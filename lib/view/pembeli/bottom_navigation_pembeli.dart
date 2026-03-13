@@ -1,7 +1,7 @@
 import 'package:agrova_apps/extension/colors/appcolors.dart';
 import 'package:agrova_apps/view/pembeli/favoritsc.dart';
 import 'package:agrova_apps/view/pembeli/home_pembeli.dart';
-import 'package:agrova_apps/view/pembeli/kategori_screen.dart';
+import 'package:agrova_apps/view/pembeli/katalog_screen.dart';
 import 'package:agrova_apps/view/pembeli/profil_pembeli.dart';
 import 'package:agrova_apps/view/penjual/home_penjual.dart';
 import 'package:agrova_apps/view/penjual/produk_penjual.dart';

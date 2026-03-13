@@ -9,6 +9,8 @@ class ProductCard extends StatefulWidget {
   final String seller;
   final String location;
   final double rating;
+  final VoidCallback? onFavorite;
+  final bool isFavorited;
 
   const ProductCard({
     super.key,
@@ -18,6 +20,8 @@ class ProductCard extends StatefulWidget {
     required this.seller,
     required this.location,
     required this.rating,
+    this.onFavorite,
+    this.isFavorited = false,
   });
 
   @override
@@ -63,6 +67,8 @@ class _ProductCardState extends State<ProductCard> {
                     setState(() {
                       isFavorite = !isFavorite;
                     });
+
+                    widget.onFavorite?.call();
                   },
 
                   child: Container(
@@ -73,8 +79,10 @@ class _ProductCardState extends State<ProductCard> {
                     ),
 
                     child: Icon(
-                      isFavorite ? Icons.favorite : Icons.favorite_border,
-                      color: isFavorite ? Colors.red : Colors.grey,
+                      widget.isFavorited
+                          ? Icons.favorite
+                          : Icons.favorite_border,
+                      color: widget.isFavorited ? Colors.red : Colors.grey,
                       size: 18,
                     ),
                   ),

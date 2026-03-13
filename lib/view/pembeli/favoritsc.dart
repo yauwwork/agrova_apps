@@ -1,5 +1,6 @@
+import 'package:agrova_apps/database/produk_data.dart';
 import 'package:agrova_apps/extension/colors/appcolors.dart';
-import 'package:agrova_apps/extension/card/produk_card.dart';
+import 'package:agrova_apps/extension/card/pembeli_produk_card.dart';
 import 'package:amicons/amicons.dart';
 import 'package:flutter/material.dart';
 
@@ -15,7 +16,7 @@ class _FavoritScState extends State<FavoritSc> {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
-      backgroundColor: Color(0xfffFFFFF),
+      backgroundColor: AppColors.softMint,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -51,16 +52,23 @@ class _FavoritScState extends State<FavoritSc> {
                     mainAxisSpacing: 12,
                     childAspectRatio: 0.7,
                   ),
-                  itemCount: 27,
+                  itemCount: favoritProduk.length,
                   itemBuilder: (context, index) {
+                    final produk = favoritProduk[index];
+
                     return ProductCard(
-                      title: "Apel Malang",
-                      price: "Rp 25.000/Kg",
-                      image:
-                          "assets/images/gambarlain/tobi-zLCR7RsxYGs-unsplash.jpg",
-                      seller: "Pak Jono",
-                      location: "Malang, Jawa Timur",
+                      title: produk.nama,
+                      price: "Rp ${produk.harga}/Kg",
+                      image: produk.image,
+                      seller: produk.penjual,
+                      location: produk.lokasi,
                       rating: 5.0,
+                      isFavorited: true,
+                      onFavorite: () {
+                        setState(() {
+                          favoritProduk.remove(produk);
+                        });
+                      },
                     );
                   },
                 ),

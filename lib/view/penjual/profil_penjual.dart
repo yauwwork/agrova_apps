@@ -243,14 +243,14 @@ class _ProfilPenjualScState extends State<ProfilPenjualSc> {
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
-                            Amicons.remix_star_fill,
+                            Amicons.vuesax_profile_circle,
                             color: Colors.amber,
                           ),
                         ),
-                        title: Text("Rating Saya"),
+                        title: Text("Edit Profil"),
                         trailing: Icon(Icons.chevron_right),
                         onTap: () {
-                          print("Rating");
+                          print("Edit Profil");
                         },
                       ),
                     ],

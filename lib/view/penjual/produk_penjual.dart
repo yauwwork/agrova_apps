@@ -1,12 +1,12 @@
 import 'package:agrova_apps/database/produk_data.dart';
 import 'package:agrova_apps/extension/card/penjual_produk_card.dart';
 import 'package:agrova_apps/extension/card/penjual_produk_card.dart';
-import 'package:agrova_apps/extension/card/produk_card.dart';
 import 'package:agrova_apps/extension/colors/appcolors.dart';
 import 'package:agrova_apps/view/penjual/bottom_navigation_penjual.dart';
 import 'package:amicons/amicons.dart';
 import 'package:flutter/material.dart';
 import 'package:agrova_apps/models/produk_models.dart';
+import 'package:agrova_apps/view/penjual/edit_produk.dart';
 import 'dart:io';
 
 class ProdukPenjual extends StatefulWidget {
@@ -134,23 +134,6 @@ class _ProdukPenjualState extends State<ProdukPenjual> {
                   ),
                 ),
 
-                //NANTI TULISAN JUMLAH PRODUK dan NAMA PRODUK BISA BERUBAH MENYESUAIKAN
-                SizedBox(height: 20),
-
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Menampilkan 27 produk Ikan",
-                      style: TextStyle(
-                        fontFamily: "Inter",
-                        fontSize: 12,
-                        color: AppColors.charcoal,
-                      ),
-                    ),
-                  ],
-                ),
-
                 SizedBox(height: 28),
 
                 GridView.builder(
@@ -182,7 +165,15 @@ class _ProdukPenjualState extends State<ProdukPenjual> {
                       },
 
                       onEdit: () {
-                        print("Edit produk");
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) =>
+                                EditProduk(produk: produk, index: index),
+                          ),
+                        ).then((_) {
+                          setState(() {});
+                        });
                       },
                     );
                   },
