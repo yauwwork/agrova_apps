@@ -3,9 +3,29 @@ import 'package:amicons/amicons.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'dart:io';
 
 class DetailProdukSc extends StatefulWidget {
-  const DetailProdukSc({super.key});
+  final String title;
+  final String price;
+  final String image;
+  final String penjual;
+  final String location;
+  final String deskripsi;
+  final VoidCallback? onEdit;
+  final VoidCallback? onDelete;
+
+  const DetailProdukSc({
+    super.key,
+    required this.title,
+    required this.price,
+    required this.image,
+    required this.penjual,
+    required this.location,
+    required this.deskripsi,
+    this.onEdit,
+    this.onDelete,
+  });
 
   @override
   State<DetailProdukSc> createState() => _DetailProdukScState();
@@ -13,17 +33,6 @@ class DetailProdukSc extends StatefulWidget {
 
 class _DetailProdukScState extends State<DetailProdukSc> {
   final PageController _controller = PageController();
-
-  List<String> images = [
-    "assets/images/gambarlain/tobi-zLCR7RsxYGs-unsplash.jpg",
-    "assets/images/gambarlain/gregor-moser-QGIJUqnEpCY-unsplash.jpg",
-    "assets/images/gambarlain/tobi-zLCR7RsxYGs-unsplash.jpg",
-    "assets/images/gambarlain/gregor-moser-QGIJUqnEpCY-unsplash.jpg",
-    "assets/images/gambarlain/tobi-zLCR7RsxYGs-unsplash.jpg",
-    "assets/images/gambarlain/gregor-moser-QGIJUqnEpCY-unsplash.jpg",
-    "assets/images/gambarlain/tobi-zLCR7RsxYGs-unsplash.jpg",
-    "assets/images/gambarlain/gregor-moser-QGIJUqnEpCY-unsplash.jpg",
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +43,9 @@ class _DetailProdukScState extends State<DetailProdukSc> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          onPressed: () {},
+          onPressed: () {
+            Navigator.pop(context);
+          },
           icon: Icon(
             Icons.arrow_back_ios_new_outlined,
             color: AppColors.leafGreen,
@@ -73,16 +84,15 @@ class _DetailProdukScState extends State<DetailProdukSc> {
                   borderRadius: BorderRadius.circular(20),
                   child: SizedBox(
                     height: 250,
-                    child: PageView.builder(
+                    child: PageView(
                       controller: _controller,
-                      itemCount: images.length,
-                      itemBuilder: (context, index) {
-                        return Image.asset(
-                          images[index],
+                      children: [
+                        Image.file(
+                          File(widget.image),
                           fit: BoxFit.cover,
                           width: double.infinity,
-                        );
-                      },
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -92,7 +102,7 @@ class _DetailProdukScState extends State<DetailProdukSc> {
                 Center(
                   child: SmoothPageIndicator(
                     controller: _controller,
-                    count: images.length,
+                    count: 1,
                     effect: WormEffect(
                       dotHeight: 8,
                       dotWidth: 8,
@@ -104,7 +114,7 @@ class _DetailProdukScState extends State<DetailProdukSc> {
                 SizedBox(height: 20),
 
                 Text(
-                  "Apel Malang (1Kg)",
+                  widget.title,
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -113,7 +123,7 @@ class _DetailProdukScState extends State<DetailProdukSc> {
                 ),
 
                 Text(
-                  "Rp 125.000",
+                  widget.price,
                   style: TextStyle(
                     color: AppColors.leafGreen,
                     fontFamily: "Inter",
@@ -144,7 +154,7 @@ class _DetailProdukScState extends State<DetailProdukSc> {
                           SizedBox(width: 4),
 
                           Text(
-                            "Malang, Jawa Timur",
+                            widget.location,
                             style: TextStyle(
                               fontFamily: "Inter",
                               color: AppColors.oceanBlue,
@@ -181,7 +191,7 @@ class _DetailProdukScState extends State<DetailProdukSc> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Tani Makmur Jaya",
+                            widget.penjual,
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                           Row(
@@ -197,20 +207,6 @@ class _DetailProdukScState extends State<DetailProdukSc> {
                           ),
 
                           SizedBox(height: 4),
-
-                          // ElevatedButton(
-                          //   style: ElevatedButton.styleFrom(
-                          //     minimumSize: Size(0, 0),
-                          //   ),
-                          //   onPressed: () {},
-                          //   child: Text(
-                          //     "Laporkan Penjual",
-                          //     style: TextStyle(
-                          //       fontFamily: "Inter",
-                          //       color: Colors.red,
-                          //     ),
-                          //   ),
-                          // ),
                         ],
                       ),
                     ],
@@ -231,14 +227,7 @@ class _DetailProdukScState extends State<DetailProdukSc> {
                 SizedBox(height: 8),
 
                 Text(
-                  "Pupuk OrganiGrow Premium adalah solusi nutrisi tanaman terbaik yang diformulasikan khusus untuk meningkatkan hasil panen hingga 30%. Terbuat dari 100% bahan organik alami tanpa bahan kimia sintetis berbahaya..\n"
-                  "Keunggulan: - Meningkatkan kesuburan tanah secara\n"
-                  "berkelanjutan.\n"
-                  "- Mempercepat pertumbuhan akar dan tunas baru.\n"
-                  "- Ramah lingkungan dan aman bagi ekosistem\n"
-                  "sekitar.\n"
-                  "- Cocok untuk tanaman pangan, hortikultura,\n"
-                  "maupun tanaman hias.",
+                  widget.deskripsi,
                   style: TextStyle(
                     color: Colors.grey[700],
                     height: 1.5,

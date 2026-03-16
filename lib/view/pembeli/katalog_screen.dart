@@ -1,6 +1,7 @@
 import 'package:agrova_apps/database/produk_data.dart';
 import 'package:agrova_apps/extension/colors/appcolors.dart';
 import 'package:agrova_apps/extension/card/pembeli_produk_card.dart';
+import 'package:agrova_apps/view/pembeli/produk_pembeli.dart';
 import 'package:amicons/amicons.dart';
 import 'package:flutter/material.dart';
 
@@ -148,23 +149,40 @@ class _KategoriScState extends State<KategoriSc> {
                   itemBuilder: (context, index) {
                     final produk = daftarProduk[index];
 
-                    return ProductCard(
-                      title: produk.nama,
-                      price: "Rp ${produk.harga}/Kg",
-                      image: produk.image,
-                      seller: produk.penjual,
-                      location: produk.lokasi,
-                      rating: 5.0,
-                      isFavorited: favoritProduk.contains(produk),
-                      onFavorite: () {
-                        setState(() {
-                          if (favoritProduk.contains(produk)) {
-                            favoritProduk.remove(produk);
-                          } else {
-                            favoritProduk.add(produk);
-                          }
-                        });
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DetailProdukSc(
+                              title: produk.nama,
+                              price: "Rp ${produk.harga}/Kg",
+                              image: produk.image,
+                              penjual: produk.penjual,
+                              location: produk.lokasi,
+                              deskripsi: produk.deskripsi,
+                            ),
+                          ),
+                        );
                       },
+                      child: ProductCard(
+                        title: produk.nama,
+                        price: "Rp ${produk.harga}/Kg",
+                        image: produk.image,
+                        seller: produk.penjual,
+                        location: produk.lokasi,
+                        rating: 5.0,
+                        isFavorited: favoritProduk.contains(produk),
+                        onFavorite: () {
+                          setState(() {
+                            if (favoritProduk.contains(produk)) {
+                              favoritProduk.remove(produk);
+                            } else {
+                              favoritProduk.add(produk);
+                            }
+                          });
+                        },
+                      ),
                     );
                   },
                 ),
