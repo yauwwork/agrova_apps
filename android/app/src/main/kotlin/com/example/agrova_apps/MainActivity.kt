@@ -1,4 +1,4 @@
-package com.example.agrova_apps
+package com.ppkd.agrova
 
 import io.flutter.embedding.android.FlutterActivity
 
