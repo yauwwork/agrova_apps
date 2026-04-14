@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "269206967002",
+    "project_id": "agrova-gawean",
+    "storage_bucket": "agrova-gawean.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:269206967002:android:71378e4a05c5ff94244be3",
+        "android_client_info": {
+          "package_name": "com.ppkd.agrova"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAvySi1rWynzzoxfAlen2cPWTcTgT0tTa0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
