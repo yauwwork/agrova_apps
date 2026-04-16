@@ -1,5 +1,5 @@
 import 'package:agrova_apps/extension/colors/appcolors.dart';
-import 'package:agrova_apps/view/pembeli/favoritsc.dart';
+import 'package:agrova_apps/view/pembeli/favorit_screen.dart';
 import 'package:agrova_apps/view/pembeli/home_pembeli.dart';
 import 'package:agrova_apps/view/pembeli/katalog_screen.dart';
 import 'package:agrova_apps/view/pembeli/profil_pembeli.dart';
@@ -21,10 +21,10 @@ class _HomePembeliSc extends State<HomePembeliSc> {
   int _selectedIndex = 0;
 
   final List<Widget> _widgetOptions = <Widget>[
-    HomePembeli(),
+    HomePembeliScreen(),
     KategoriSc(),
-    FavoritSc(),
-    PpPembeli(),
+    FavoritScreen(),
+    ProfilPembeli(),
   ];
 
   void _onItemTapped(int index) {

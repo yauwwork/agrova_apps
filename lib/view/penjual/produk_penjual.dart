@@ -1,13 +1,9 @@
 import 'package:agrova_apps/database/produk_data.dart';
 import 'package:agrova_apps/extension/card/penjual_produk_card.dart';
-import 'package:agrova_apps/extension/card/penjual_produk_card.dart';
 import 'package:agrova_apps/extension/colors/appcolors.dart';
-import 'package:agrova_apps/view/penjual/bottom_navigation_penjual.dart';
-import 'package:amicons/amicons.dart';
 import 'package:flutter/material.dart';
-import 'package:agrova_apps/models/produk_models.dart';
 import 'package:agrova_apps/view/penjual/edit_produk.dart';
-import 'dart:io';
+import 'package:amicons/amicons.dart';
 
 class ProdukPenjual extends StatefulWidget {
   const ProdukPenjual({super.key});
@@ -17,203 +13,190 @@ class ProdukPenjual extends StatefulWidget {
 }
 
 class _ProdukPenjualState extends State<ProdukPenjual> {
+  int selectedKategori = 0;
+
+  final List<Map<String, dynamic>> kategori = [
+    {"icon": Amicons.remix_plant, "name": "Pertanian", "color": Colors.green},
+    {
+      "icon": Amicons.flaticon_fish_rounded,
+      "name": "Perikanan",
+      "color": Colors.blue,
+    },
+    {
+      "icon": Amicons.flaticon_cow_rounded,
+      "name": "Peternakan",
+      "color": Colors.brown,
+    },
+    {
+      "icon": Amicons.lucide_tree_palm,
+      "name": "Perkebunan",
+      "color": Colors.teal,
+    },
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBodyBehindAppBar: true,
-      backgroundColor: AppColors.bgpenjual,
+      backgroundColor: const Color(0xffF5F7FA),
+
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: IconButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => HomePenjualSc()),
-            );
-          },
-          icon: Icon(
-            Icons.arrow_back_ios_new_outlined,
-            color: AppColors.skyBlue,
-          ),
-        ),
         centerTitle: true,
-        title: Text(
+        title: const Text(
           "Produk Saya",
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            fontFamily: "Inter",
-          ),
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
 
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 360,
+        child: Column(
+          children: [
+            /// 🔍 SEARCH + FILTER
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  /// SEARCH BAR
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14),
                       decoration: BoxDecoration(
-                        color: AppColors.skyBlue.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: TextFormField(
-                        decoration: InputDecoration(
-                          hintText: "Cari Produk",
-                          prefixIcon: Icon(
-                            Amicons.remix_search,
-                            color: AppColors.skyBlue,
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(30), // 🔥 rounded
+                        boxShadow: [
+                          BoxShadow(
+                            blurRadius: 10,
+                            color: Colors.black.withOpacity(0.05),
                           ),
+                        ],
+                      ),
+                      child: const TextField(
+                        decoration: InputDecoration(
+                          icon: Icon(Icons.search),
+                          hintText: "Cari produk...",
                           border: InputBorder.none,
-                          contentPadding: EdgeInsets.symmetric(vertical: 12),
                         ),
                       ),
                     ),
-                  ],
-                ),
-
-                SizedBox(height: 12),
-
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      MenuKategori(
-                        Amicons.remix_plant,
-                        "Pertanian",
-                        AppColors.leafGreen,
-                        AppColors.mintGreen.withOpacity(0.2),
-                      ),
-                      SizedBox(width: 20),
-
-                      MenuKategori(
-                        Amicons.flaticon_fish_rounded,
-                        "Perikanan",
-                        AppColors.darkOceanBlue,
-                        AppColors.oceanBlue.withOpacity(0.2),
-                      ),
-                      SizedBox(width: 20),
-
-                      MenuKategori(
-                        Amicons.flaticon_cow_rounded,
-                        "Peternakan",
-                        Colors.brown,
-                        Colors.brown.withOpacity(0.2),
-                      ),
-                      SizedBox(width: 20),
-
-                      MenuKategori(
-                        Amicons.lucide_tree_palm,
-                        "Perkebunan",
-                        AppColors.darkLeafGreen,
-                        AppColors.leafGreen.withOpacity(0.2),
-                      ),
-                      SizedBox(width: 20),
-
-                      MenuKategori(
-                        Amicons.lucide_tree_palm,
-                        "Perkebunan",
-                        AppColors.darkLeafGreen,
-                        AppColors.leafGreen.withOpacity(0.2),
-                      ),
-                      SizedBox(width: 20),
-
-                      MenuKategori(
-                        Amicons.lucide_tree_palm,
-                        "Perkebunan",
-                        AppColors.darkLeafGreen,
-                        AppColors.leafGreen.withOpacity(0.2),
-                      ),
-                    ],
                   ),
-                ),
 
-                SizedBox(height: 28),
+                  const SizedBox(width: 10),
 
-                GridView.builder(
-                  shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  /// FILTER BUTTON
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: const Icon(Icons.tune),
+                  ),
+                ],
+              ),
+            ),
+
+            /// 🔥 KATEGORI (PILL BUTTON)
+            SizedBox(
+              height: 50,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                itemCount: kategori.length,
+                itemBuilder: (context, index) {
+                  final isSelected = selectedKategori == index;
+                  final item = kategori[index];
+
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        selectedKategori = index;
+                      });
+                    },
+                    child: Container(
+                      margin: const EdgeInsets.only(right: 10),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isSelected ? item["color"] : Colors.grey[200],
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            item["icon"],
+                            size: 16,
+                            color: isSelected ? Colors.white : Colors.black54,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            item["name"],
+                            style: TextStyle(
+                              color: isSelected ? Colors.white : Colors.black54,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+
+            const SizedBox(height: 10),
+
+            /// 🔥 GRID PRODUK
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: GridView.builder(
+                  itemCount: daftarProduk.length,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
                     crossAxisSpacing: 12,
                     mainAxisSpacing: 12,
-                    childAspectRatio: 0.60,
+                    childAspectRatio: 0.65, // 🔥 lebih proporsional
                   ),
-                  itemCount: daftarProduk.length,
                   itemBuilder: (context, index) {
                     final produk = daftarProduk[index];
 
-                    return SellerGridProductCard(
-                      title: produk.nama,
-                      subtitle: produk.kategori,
-                      price: "Rp ${produk.harga}",
-                      image: produk.image,
-                      location: produk.lokasi,
-                      views: "0",
-                      favorites: "0",
+                    // return SellerGridProductCard(
+                    //   title: produk.nama,
+                    //   subtitle: produk.kategori,
+                    //   price: "Rp ${produk.harga}",
+                    //   image: produk.image,
+                    //   location: produk.lokasi,
+                    //   views: "0",
+                    //   favorites: "0",
 
-                      onDelete: () {
-                        setState(() {
-                          daftarProduk.removeAt(index);
-                        });
-                      },
+                    //   /// DELETE
+                    //   onDelete: () {
+                    //     setState(() {
+                    //       daftarProduk.removeAt(index);
+                    //     });
+                    //   },
 
-                      onEdit: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) =>
-                                EditProduk(produk: produk, index: index),
-                          ),
-                        ).then((_) {
-                          setState(() {});
-                        });
-                      },
-                    );
+                    //   /// EDIT
+                    //   onEdit: () {
+                    //     Navigator.push(
+                    //       context,
+                    //       MaterialPageRoute(
+                    //         builder: (_) =>
+                    //             EditProduk(produk: produk, index: index),
+                    //       ),
+                    //     ).then((_) => setState(() {}));
+                    //   },
+                    // );
                   },
                 ),
-              ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
-    );
-  }
-
-  Widget MenuKategori(
-    IconData icon,
-    String title,
-    Color iconColor,
-    Color bgColor,
-  ) {
-    return Column(
-      children: [
-        Container(
-          decoration: BoxDecoration(
-            color: bgColor,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: IconButton(
-            onPressed: () {},
-            icon: Icon(icon, color: iconColor),
-          ),
-        ),
-        const SizedBox(height: 6),
-        Text(
-          title,
-          style: const TextStyle(
-            fontSize: 12,
-            fontFamily: "Inter",
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ],
     );
   }
 }

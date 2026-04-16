@@ -1,11 +1,5 @@
-import 'package:agrova_apps/database/produk_data.dart';
-import 'package:agrova_apps/extension/card/produk_list_card.dart';
-import 'package:agrova_apps/extension/colors/appcolors.dart';
-import 'package:agrova_apps/view/penjual/edit_produk.dart';
-import 'package:agrova_apps/view/penjual/produk_penjual.dart';
-import 'package:amicons/amicons.dart';
+import 'package:agrova_apps/extension/card/penjual_produk_card.dart';
 import 'package:flutter/material.dart';
-import 'dart:io';
 
 class HomePenjual extends StatefulWidget {
   const HomePenjual({super.key});
@@ -15,231 +9,163 @@ class HomePenjual extends StatefulWidget {
 }
 
 class _HomePenjualState extends State<HomePenjual> {
-  Widget buildStatCard(String title, String value, String percent) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        height: 100,
-        decoration: BoxDecoration(
-          color: AppColors.softBlue.withOpacity(0.2),
-          borderRadius: BorderRadius.circular(15),
-          border: Border.all(color: AppColors.softBlue),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              title,
-              style: const TextStyle(
-                fontFamily: "Inter",
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-
-            const SizedBox(height: 6),
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  value,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 24,
-                    fontFamily: "Inter",
-                    color: AppColors.skyBlue,
-                  ),
-                ),
-
-                const SizedBox(width: 6),
-
-                Text(
-                  percent,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12,
-                    fontFamily: "Inter",
-                    color: AppColors.mintGreen,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.bgpenjual,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
+      backgroundColor: const Color(0xffF5F7FA),
 
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                /// HEADER
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        const CircleAvatar(
-                          radius: 20,
-                          backgroundImage: AssetImage(
-                            "assets/images/gambarlain/download (1).jpg",
-                          ),
-                        ),
-
-                        const SizedBox(width: 10),
-
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Agrova",
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontFamily: "Poppins",
-                                fontWeight: FontWeight.w700,
-                                color: AppColors.oceanBlue,
-                              ),
-                            ),
-
-                            Text(
-                              "Nama Penjual",
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontFamily: "Inter",
-                                color: AppColors.oceanBlue,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-
-                    IconButton(
-                      onPressed: () {},
-                      icon: Icon(
-                        Amicons.remix_notification,
-                        size: 25,
-                        color: AppColors.oceanBlue,
-                      ),
-                    ),
-                  ],
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            /// 🔥 HEADER
+            Container(
+              padding: const EdgeInsets.fromLTRB(16, 50, 16, 90),
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Color(0xff3B82F6), Color(0xff22C55E)],
                 ),
-
-                const SizedBox(height: 36),
-
-                /// PERFORMA TOKO
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: const [
-                    Text(
-                      "Performa Toko",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontFamily: "Inter",
-                        fontSize: 20,
-                      ),
-                    ),
-
-                    Text(
-                      "Dalam 30 hari",
-                      style: TextStyle(fontFamily: "Inter", fontSize: 12),
-                    ),
-                  ],
+                borderRadius: BorderRadius.vertical(
+                  bottom: Radius.circular(30),
                 ),
+              ),
+              child: Row(
+                children: [
+                  const CircleAvatar(
+                    radius: 22,
+                    backgroundImage: AssetImage("assets/profile.jpg"),
+                  ),
+                  const SizedBox(width: 10),
 
-                const SizedBox(height: 16),
-
-                Row(
-                  children: [
-                    buildStatCard("Produk Dilihat", "150", "+15%"),
-                    const SizedBox(width: 12),
-                    buildStatCard("Produk Disukai", "50", "+10%"),
-                  ],
-                ),
-
-                const SizedBox(height: 24),
-
-                /// PRODUK ANDA
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      "Produk Anda",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontFamily: "Inter",
-                        fontSize: 20,
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: const [
+                      Text(
+                        "Dashboard Penjual 🏪",
+                        style: TextStyle(color: Colors.white70),
                       ),
-                    ),
-
-                    TextButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => ProdukPenjual()),
-                        );
-                      },
-                      child: Text(
-                        "Lihat Semua",
+                      Text(
+                        "Andi Wijaya",
                         style: TextStyle(
+                          color: Colors.white,
                           fontWeight: FontWeight.bold,
-                          fontSize: 12,
-                          fontFamily: "Inter",
-                          color: AppColors.skyBlue,
+                          fontSize: 16,
                         ),
                       ),
-                    ),
-                  ],
-                ),
+                    ],
+                  ),
 
-                const SizedBox(height: 10),
-
-                /// LIST PRODUK
-                Column(
-                  children: daftarProduk.take(5).toList().asMap().entries.map((
-                    entry,
-                  ) {
-                    int index = entry.key;
-                    var produk = entry.value;
-
-                    return ListCard(
-                      title: produk.nama,
-                      subtitle: produk.kategori,
-                      price: "Rp ${produk.harga}",
-                      image: produk.image,
-                      location: produk.lokasi,
-                      rating: 0,
-                      onDelete: () {
-                        setState(() {
-                          daftarProduk.removeAt(index);
-                        });
-                      },
-                      onEdit: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) =>
-                                EditProduk(produk: produk, index: index),
-                          ),
-                        ).then((_) {
-                          setState(() {});
-                        });
-                      },
-                    );
-                  }).toList(),
-                ),
-              ],
+                  const Spacer(),
+                  const Icon(Icons.notifications, color: Colors.white),
+                ],
+              ),
             ),
-          ),
+
+            /// 🔥 STAT CARD (FIX OVERFLOW)
+            Transform.translate(
+              offset: const Offset(0, -60),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 18),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        blurRadius: 12,
+                        color: Colors.black.withOpacity(0.06),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: const [
+                      StatItem(Icons.inventory, "12", "Produk", Colors.green),
+                      StatItem(
+                        Icons.remove_red_eye,
+                        "15.7k",
+                        "Dilihat",
+                        Colors.blue,
+                      ),
+                      StatItem(Icons.favorite, "892", "Favorit", Colors.pink),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            /// 🔥 MENU (FIX OVERFLOW PAKAI EXPANDED)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                children: const [
+                  Expanded(child: MenuCard(Icons.add, "Tambah", Colors.green)),
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: MenuCard(Icons.show_chart, "Analitik", Colors.blue),
+                  ),
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: MenuCard(Icons.inventory_2, "Produk", Colors.purple),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            /// 🔥 TITLE
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: const [
+                  Text(
+                    "Produk Terlaris",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                  Text("Analitik", style: TextStyle(color: Colors.blue)),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 12),
+
+            /// 🔥 LIST PRODUK (FIX OVERFLOW)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                children: const [
+                  TopProductCard(
+                    1,
+                    "assets/sample.jpg",
+                    "Kopi Arabica Gayo",
+                    "3200",
+                    "204",
+                    "4.9",
+                  ),
+                  TopProductCard(
+                    2,
+                    "assets/sample.jpg",
+                    "Beras Premium Pandan Wangi",
+                    "2450",
+                    "89",
+                    "4.8",
+                  ),
+                  TopProductCard(
+                    3,
+                    "assets/sample.jpg",
+                    "Lada Hitam Lampung",
+                    "2780",
+                    "178",
+                    "4.9",
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 30),
+          ],
         ),
       ),
     );

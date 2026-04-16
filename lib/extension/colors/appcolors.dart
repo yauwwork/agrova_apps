@@ -37,4 +37,16 @@ class AppColors {
   static const slateGray = Color(0xFF334155);
   static const darkTeal = Color(0xFF134E4A);
   static const darkBlueSurface = Color(0xFF1E293B);
+
+  //---------------------------------------------
+
+  static const primary = Color(0xFF0FA958);
+  static const secondary = Color(0xFF0FB9B1);
+  static const background = Color(0xFFF5F6F8);
+  static const textPrimary = Color(0xFF1F2937);
+  static const textSecondary = Color(0xFF6B7280);
+  static const card = Colors.white;
+
+  static const greenLight = Color(0xFFE6F7EE);
+  static const orange = Color(0xFFFFA726);
 }

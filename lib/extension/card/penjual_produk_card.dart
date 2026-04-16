@@ -1,181 +1,164 @@
-import 'package:agrova_apps/extension/colors/appcolors.dart';
 import 'package:flutter/material.dart';
-import 'dart:io';
 
-class SellerGridProductCard extends StatelessWidget {
+/// =======================================================
+/// 🔥 STAT CARD (untuk dashboard angka)
+/// =======================================================
+class StatItem extends StatelessWidget {
+  final IconData icon;
+  final String value;
+  final String label;
+  final Color color;
+
+  const StatItem(this.icon, this.value, this.label, this.color, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        /// ICON BULAT
+        CircleAvatar(
+          backgroundColor: color.withOpacity(0.15),
+          child: Icon(icon, color: color),
+        ),
+
+        const SizedBox(height: 6),
+
+        /// ANGKA
+        Text(value, style: const TextStyle(fontWeight: FontWeight.bold)),
+
+        /// LABEL
+        Text(label, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+      ],
+    );
+  }
+}
+
+/// =======================================================
+/// 🔥 MENU CARD (Tambah Produk, Analitik, dll)
+/// =======================================================
+class MenuCard extends StatelessWidget {
+  final IconData icon;
   final String title;
-  final String subtitle;
-  final String price;
-  final String image;
-  final String location;
-  final String views;
-  final String favorites;
-  final VoidCallback onDelete;
-  final VoidCallback onEdit;
+  final Color color;
 
-  const SellerGridProductCard({
+  const MenuCard(this.icon, this.title, this.color, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 90,
+
+      /// BOX STYLE
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(blurRadius: 10, color: Colors.black.withOpacity(0.05)),
+        ],
+      ),
+
+      /// ISI CARD
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          /// ICON
+          CircleAvatar(
+            backgroundColor: color.withOpacity(0.15),
+            child: Icon(icon, color: color),
+          ),
+
+          const SizedBox(height: 6),
+
+          /// TITLE
+          Text(title, style: const TextStyle(fontSize: 12)),
+        ],
+      ),
+    );
+  }
+}
+
+/// =======================================================
+/// 🔥 TOP PRODUCT CARD (produk terlaris)
+/// =======================================================
+class TopProductCard extends StatelessWidget {
+  final int rank;
+  final String image;
+  final String title;
+  final String views;
+  final String likes;
+  final String rating;
+
+  const TopProductCard(
+    this.rank,
+    this.image,
+    this.title,
+    this.views,
+    this.likes,
+    this.rating, {
     super.key,
-    required this.title,
-    required this.subtitle,
-    required this.price,
-    required this.image,
-    required this.location,
-    required this.views,
-    required this.favorites,
-    required this.onDelete,
-    required this.onEdit,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(12),
+
+      /// BOX STYLE
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(16),
       ),
 
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          /// IMAGE + DELETE
-          Stack(
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Image.file(
-                  File(image),
-                  width: double.infinity,
-                  height: 120,
-                  fit: BoxFit.cover,
-                ),
-              ),
-
-              Positioned(
-                top: 6,
-                right: 6,
-                child: GestureDetector(
-                  onTap: onDelete,
-                  child: Container(
-                    padding: const EdgeInsets.all(5),
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.delete_outline,
-                      color: Colors.red,
-                      size: 18,
-                    ),
-                  ),
-                ),
-              ),
-            ],
+          /// 🔥 RANK (1,2,3)
+          CircleAvatar(
+            radius: 14,
+            backgroundColor: Colors.orange,
+            child: Text("$rank", style: const TextStyle(color: Colors.white)),
           ),
 
-          Padding(
-            padding: const EdgeInsets.all(10),
+          const SizedBox(width: 10),
+
+          /// 🔥 GAMBAR PRODUK
+          ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: Image.asset(image, width: 50, height: 50, fit: BoxFit.cover),
+          ),
+
+          const SizedBox(width: 10),
+
+          /// 🔥 INFO PRODUK
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                /// TITLE
+                /// NAMA PRODUK
                 Text(
                   title,
-                  maxLines: 2,
+                  maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14,
-                  ),
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
-
-                Text(subtitle, style: TextStyle(fontSize: 12)),
 
                 const SizedBox(height: 4),
 
-                /// PRICE
+                /// VIEW + LIKE
                 Text(
-                  price,
-                  style: const TextStyle(
-                    color: AppColors.skyBlue,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                  ),
-                ),
-
-                const SizedBox(height: 8),
-
-                /// STATS
-                Row(
-                  children: [
-                    Icon(Icons.location_on, size: 13, color: Colors.grey[600]),
-                    const SizedBox(width: 2),
-
-                    Text(
-                      location,
-                      style: TextStyle(fontSize: 11, color: Colors.grey[600]),
-                    ),
-
-                    const Spacer(),
-
-                    Icon(
-                      Icons.remove_red_eye,
-                      size: 13,
-                      color: Colors.grey[600],
-                    ),
-                    const SizedBox(width: 2),
-
-                    Text(
-                      views,
-                      style: TextStyle(fontSize: 11, color: Colors.grey[600]),
-                    ),
-
-                    const SizedBox(width: 6),
-
-                    const Icon(Icons.favorite, size: 13, color: Colors.red),
-
-                    const SizedBox(width: 2),
-
-                    Text(
-                      favorites,
-                      style: TextStyle(fontSize: 11, color: Colors.grey[600]),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 10),
-
-                /// BUTTON
-                SizedBox(
-                  width: double.infinity,
-                  height: 36,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.skyBlue,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    onPressed: onEdit,
-                    child: const Text(
-                      "Edit Produk",
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.lightSea,
-                      ),
-                    ),
-                  ),
+                  "$views dilihat • ❤️ $likes",
+                  style: const TextStyle(fontSize: 12, color: Colors.grey),
                 ),
               ],
             ),
+          ),
+
+          /// 🔥 RATING
+          Row(
+            children: [
+              const Icon(Icons.star, color: Colors.orange, size: 16),
+              Text(rating),
+            ],
           ),
         ],
       ),
