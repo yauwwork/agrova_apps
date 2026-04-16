@@ -1,4 +1,3 @@
-import 'package:agrova_apps/extension/card/penjual_produk_card.dart';
 import 'package:flutter/material.dart';
 
 class HomePenjual extends StatefulWidget {
@@ -14,159 +13,282 @@ class _HomePenjualState extends State<HomePenjual> {
     return Scaffold(
       backgroundColor: const Color(0xffF5F7FA),
 
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            /// 🔥 HEADER
-            Container(
-              padding: const EdgeInsets.fromLTRB(16, 50, 16, 90),
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Color(0xff3B82F6), Color(0xff22C55E)],
-                ),
-                borderRadius: BorderRadius.vertical(
-                  bottom: Radius.circular(30),
-                ),
-              ),
-              child: Row(
-                children: [
-                  const CircleAvatar(
-                    radius: 22,
-                    backgroundImage: AssetImage("assets/profile.jpg"),
+      /// 🔥 PAKAI STACK BIAR HEADER + STAT CARD MENYATU
+      body: Stack(
+        children: [
+          /// =========================
+          /// 🔥 MAIN CONTENT
+          /// =========================
+          SingleChildScrollView(
+            child: Column(
+              children: [
+                /// 🔥 HEADER (GRADIENT)
+                Container(
+                  padding: const EdgeInsets.fromLTRB(16, 50, 16, 100),
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Color(0xff3B82F6), Color(0xff22C55E)],
+                    ),
+                    borderRadius: BorderRadius.vertical(
+                      bottom: Radius.circular(30),
+                    ),
                   ),
-                  const SizedBox(width: 10),
-
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
-                      Text(
-                        "Dashboard Penjual 🏪",
-                        style: TextStyle(color: Colors.white70),
+                  child: Row(
+                    children: [
+                      const CircleAvatar(
+                        radius: 22,
+                        backgroundImage: AssetImage("assets/profile.jpg"),
                       ),
-                      Text(
-                        "Andi Wijaya",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                      const SizedBox(width: 10),
+
+                      /// NAMA USER
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: const [
+                          Text(
+                            "Dashboard Penjual 🏪",
+                            style: TextStyle(color: Colors.white70),
+                          ),
+                          Text(
+                            "Andi Wijaya",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const Spacer(),
+                      const Icon(Icons.notifications, color: Colors.white),
+                    ],
+                  ),
+                ),
+
+                /// 🔥 SPACE BUAT STAT CARD (PENTING!)
+                const SizedBox(height: 60),
+
+                /// 🔥 MENU
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Row(
+                    children: const [
+                      Expanded(
+                        child: MenuCard(Icons.add, "Tambah", Colors.green),
+                      ),
+                      SizedBox(width: 10),
+                      Expanded(
+                        child: MenuCard(
+                          Icons.show_chart,
+                          "Analitik",
+                          Colors.blue,
+                        ),
+                      ),
+                      SizedBox(width: 10),
+                      Expanded(
+                        child: MenuCard(
+                          Icons.inventory_2,
+                          "Produk",
+                          Colors.purple,
                         ),
                       ),
                     ],
                   ),
+                ),
 
-                  const Spacer(),
-                  const Icon(Icons.notifications, color: Colors.white),
-                ],
-              ),
-            ),
+                const SizedBox(height: 20),
 
-            /// 🔥 STAT CARD (FIX OVERFLOW)
-            Transform.translate(
-              offset: const Offset(0, -60),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 18),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        blurRadius: 12,
-                        color: Colors.black.withOpacity(0.06),
-                      ),
-                    ],
-                  ),
+                /// 🔥 TITLE
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: const [
-                      StatItem(Icons.inventory, "12", "Produk", Colors.green),
-                      StatItem(
-                        Icons.remove_red_eye,
-                        "15.7k",
-                        "Dilihat",
-                        Colors.blue,
+                      Text(
+                        "Produk Terlaris",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
                       ),
-                      StatItem(Icons.favorite, "892", "Favorit", Colors.pink),
+                      Text("Analitik", style: TextStyle(color: Colors.blue)),
                     ],
                   ),
                 ),
-              ),
-            ),
 
-            /// 🔥 MENU (FIX OVERFLOW PAKAI EXPANDED)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+                const SizedBox(height: 12),
+
+                /// 🔥 LIST PRODUK
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Column(
+                    children: const [
+                      // 👉 nanti isi TopProductCard di sini
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 30),
+              ],
+            ),
+          ),
+
+          /// =========================
+          /// 🔥 STAT CARD (FLOATING)
+          /// =========================
+          Positioned(
+            top: 140, // 🔥 posisi nempel ke header
+            left: 16,
+            right: 16,
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 18),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    blurRadius: 12,
+                    color: Colors.black.withOpacity(0.06),
+                  ),
+                ],
+              ),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: const [
-                  Expanded(child: MenuCard(Icons.add, "Tambah", Colors.green)),
-                  SizedBox(width: 10),
-                  Expanded(
-                    child: MenuCard(Icons.show_chart, "Analitik", Colors.blue),
+                  StatItem(Icons.inventory, "12", "Produk", Colors.green),
+                  StatItem(
+                    Icons.remove_red_eye,
+                    "15.7k",
+                    "Dilihat",
+                    Colors.blue,
                   ),
-                  SizedBox(width: 10),
-                  Expanded(
-                    child: MenuCard(Icons.inventory_2, "Produk", Colors.purple),
-                  ),
+                  StatItem(Icons.favorite, "892", "Favorit", Colors.pink),
                 ],
               ),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
-            const SizedBox(height: 20),
+/// =========================
+/// 🔥 STAT ITEM
+/// =========================
+class StatItem extends StatelessWidget {
+  final IconData icon;
+  final String value;
+  final String label;
+  final Color color;
 
-            /// 🔥 TITLE
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
-                  Text(
-                    "Produk Terlaris",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                  Text("Analitik", style: TextStyle(color: Colors.blue)),
-                ],
-              ),
+  const StatItem(this.icon, this.value, this.label, this.color, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Icon(icon, color: color),
+        const SizedBox(height: 6),
+        Text(value, style: const TextStyle(fontWeight: FontWeight.bold)),
+        Text(label, style: const TextStyle(color: Colors.grey)),
+      ],
+    );
+  }
+}
+
+/// =========================
+/// 🔥 MENU CARD
+/// =========================
+class MenuCard extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final Color color;
+
+  const MenuCard(this.icon, this.title, this.color, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        children: [
+          Icon(icon, color: color),
+          const SizedBox(height: 6),
+          Text(title),
+        ],
+      ),
+    );
+  }
+}
+
+/// =========================
+/// 🔥 TOP PRODUCT CARD
+/// =========================
+class TopProductCard extends StatelessWidget {
+  final int rank;
+  final String image;
+  final String title;
+  final String sold;
+  final String views;
+  final String rating;
+
+  const TopProductCard(
+    this.rank,
+    this.image,
+    this.title,
+    this.sold,
+    this.views,
+    this.rating, {
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        children: [
+          Text("#$rank", style: const TextStyle(fontWeight: FontWeight.bold)),
+          const SizedBox(width: 10),
+
+          ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: Image.asset(image, width: 50, height: 50, fit: BoxFit.cover),
+          ),
+
+          const SizedBox(width: 10),
+
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, maxLines: 1, overflow: TextOverflow.ellipsis),
+                Text(
+                  "$sold terjual",
+                  style: const TextStyle(color: Colors.grey),
+                ),
+              ],
             ),
+          ),
 
-            const SizedBox(height: 12),
-
-            /// 🔥 LIST PRODUK (FIX OVERFLOW)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                children: const [
-                  TopProductCard(
-                    1,
-                    "assets/sample.jpg",
-                    "Kopi Arabica Gayo",
-                    "3200",
-                    "204",
-                    "4.9",
-                  ),
-                  TopProductCard(
-                    2,
-                    "assets/sample.jpg",
-                    "Beras Premium Pandan Wangi",
-                    "2450",
-                    "89",
-                    "4.8",
-                  ),
-                  TopProductCard(
-                    3,
-                    "assets/sample.jpg",
-                    "Lada Hitam Lampung",
-                    "2780",
-                    "178",
-                    "4.9",
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 30),
-          ],
-        ),
+          Column(
+            children: [
+              const Icon(Icons.star, color: Colors.orange, size: 16),
+              Text(rating),
+            ],
+          ),
+        ],
       ),
     );
   }

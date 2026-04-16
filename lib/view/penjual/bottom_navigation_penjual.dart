@@ -19,7 +19,7 @@ class _HomePenjualScState extends State<HomePenjualSc> {
   final List<Widget> _widgetOptions = <Widget>[
     HomePenjual(),
     TambahProduk(),
-    ProfilPenjualSc(),
+    ProfilPenjualScreen(),
   ];
 
   void _onItemTapped(int index) {

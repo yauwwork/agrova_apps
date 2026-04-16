@@ -1,7 +1,5 @@
 import 'package:agrova_apps/view/penjual/bottom_navigation_penjual.dart';
-import 'package:amicons/amicons.dart';
 import 'package:flutter/material.dart';
-import 'package:agrova_apps/extension/colors/appcolors.dart';
 import 'package:agrova_apps/models/produk_models.dart';
 import 'package:agrova_apps/database/produk_data.dart';
 import 'package:image_picker/image_picker.dart';
@@ -14,37 +12,20 @@ class EditProduk extends StatefulWidget {
   const EditProduk({super.key, required this.produk, required this.index});
 
   @override
-  State<EditProduk> createState() => _EditProduk();
+  State<EditProduk> createState() => _EditProdukState();
 }
 
-class _EditProduk extends State<EditProduk> {
-  final TextEditingController namaController = TextEditingController();
+class _EditProdukState extends State<EditProduk> {
+  final namaController = TextEditingController();
+  final hargaController = TextEditingController();
+  final stokController = TextEditingController();
+  final deskripsiController = TextEditingController();
+  final lokasiController = TextEditingController();
 
-  final TextEditingController hargaController = TextEditingController();
-
-  final TextEditingController stokController = TextEditingController();
-
-  final TextEditingController deskripsiController = TextEditingController();
-
-  final TextEditingController lokasiController = TextEditingController();
-
-  File? imageProduk;
-  final ImagePicker picker = ImagePicker();
-
-  Future<void> ambilFoto() async {
-    final XFile? pickedFile = await picker.pickImage(
-      source: ImageSource.gallery,
-    );
-
-    if (pickedFile != null) {
-      setState(() {
-        imageProduk = File(pickedFile.path);
-      });
-    }
-  }
+  List<File> images = [];
+  final picker = ImagePicker();
 
   String kategori = "Buah-buahan";
-  String kuantitas = "Kilogram";
 
   @override
   void initState() {
@@ -59,290 +40,285 @@ class _EditProduk extends State<EditProduk> {
     kategori = widget.produk.kategori;
 
     if (widget.produk.image.isNotEmpty) {
-      imageProduk = File(widget.produk.image);
+      images.add(File(widget.produk.image));
+    }
+  }
+
+  Future<void> ambilFoto() async {
+    if (images.length >= 5) return;
+
+    final XFile? file = await picker.pickImage(source: ImageSource.gallery);
+
+    if (file != null) {
+      setState(() {
+        images.add(File(file.path));
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBodyBehindAppBar: true,
-      backgroundColor: AppColors.bgpenjual,
+      backgroundColor: const Color(0xffF5F7FA),
+
+      /// 🔥 APPBAR CONSISTENT
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: IconButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => HomePenjualSc()),
-            );
-          },
-          icon: Icon(
-            Icons.arrow_back_ios_new_outlined,
-            color: AppColors.skyBlue,
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.transparent,
+        clipBehavior: Clip.antiAlias,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(bottom: Radius.circular(24)),
+        ),
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xff3B82F6), Color(0xff22C55E)],
+            ),
           ),
         ),
-        centerTitle: true,
-        title: Text(
+        title: const Text(
           "Edit Produk",
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            fontFamily: "Inter",
-          ),
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
         ),
       ),
 
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              /// FOTO PRODUK
-              const Text(
-                "Foto Produk",
-                style: TextStyle(
-                  fontFamily: "Inter",
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-
-              const SizedBox(height: 12),
-
-              Row(
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            /// 🔥 FOTO
+            _card(
+              title: "Foto Produk",
+              icon: Icons.image,
+              child: Column(
                 children: [
-                  const SizedBox(width: 12),
-
-                  /// TAMBAH FOTO
-                  GestureDetector(
-                    onTap: ambilFoto,
-                    child: Container(
-                      width: 90,
-                      height: 90,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: AppColors.skyBlue.withOpacity(0.4),
+                  GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: images.length + (images.length < 5 ? 1 : 0),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          crossAxisSpacing: 10,
+                          mainAxisSpacing: 10,
                         ),
-                      ),
-                      child: imageProduk == null
-                          ? const Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.add_a_photo_outlined,
-                                  color: AppColors.skyBlue,
-                                ),
-                                SizedBox(height: 4),
-                                Text(
-                                  "Tambah",
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontFamily: "Inter",
-                                  ),
-                                ),
-                              ],
-                            )
-                          : ClipRRect(
+                    itemBuilder: (context, index) {
+                      if (index == images.length && images.length < 5) {
+                        return GestureDetector(
+                          onTap: ambilFoto,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  Colors.blue.withOpacity(0.15),
+                                  Colors.green.withOpacity(0.15),
+                                ],
+                              ),
                               borderRadius: BorderRadius.circular(12),
-                              child: Image.file(
-                                imageProduk!,
-                                width: 90,
-                                height: 90,
-                                fit: BoxFit.cover,
+                            ),
+                            child: const Icon(Icons.add, size: 30),
+                          ),
+                        );
+                      }
+
+                      return Stack(
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Image.file(
+                              images[index],
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                            ),
+                          ),
+
+                          Positioned(
+                            top: 5,
+                            right: 5,
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  images.removeAt(index);
+                                });
+                              },
+                              child: const CircleAvatar(
+                                radius: 10,
+                                backgroundColor: Colors.black54,
+                                child: Icon(
+                                  Icons.close,
+                                  size: 12,
+                                  color: Colors.white,
+                                ),
                               ),
                             ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: Text(
+                      "${images.length}/5 foto",
+                      style: const TextStyle(fontSize: 12, color: Colors.grey),
                     ),
                   ),
                 ],
               ),
+            ),
 
-              const SizedBox(height: 20),
+            const SizedBox(height: 16),
 
-              /// NAMA PRODUK
-              _label("Nama Produk"),
-              _textField(namaController),
+            /// 🔥 FORM
+            _card(
+              title: "Informasi Produk",
+              icon: Icons.inventory_2,
+              child: Column(
+                children: [
+                  _input(namaController, "Nama Produk"),
+                  const SizedBox(height: 12),
 
-              const SizedBox(height: 16),
-
-              /// KATEGORI
-              _label("Kategori"),
-
-              DropdownButtonFormField(
-                value: kategori,
-                items: const [
-                  DropdownMenuItem(
-                    value: "Buah-buahan",
-                    child: Text("Buah-buahan"),
+                  DropdownButtonFormField(
+                    value: kategori,
+                    decoration: _dec("Kategori"),
+                    items: const [
+                      DropdownMenuItem(
+                        value: "Buah-buahan",
+                        child: Text("Buah-buahan"),
+                      ),
+                      DropdownMenuItem(
+                        value: "Sayuran",
+                        child: Text("Sayuran"),
+                      ),
+                      DropdownMenuItem(value: "Ikan", child: Text("Ikan")),
+                      DropdownMenuItem(value: "Daging", child: Text("Daging")),
+                      DropdownMenuItem(value: "Telur", child: Text("Telur")),
+                    ],
+                    onChanged: (v) => setState(() => kategori = v!),
                   ),
-                  DropdownMenuItem(value: "Sayuran", child: Text("Sayuran")),
-                  DropdownMenuItem(value: "Ikan", child: Text("Ikan")),
-                  DropdownMenuItem(value: "Daging", child: Text("Daging")),
-                  DropdownMenuItem(value: "Telur", child: Text("Telur")),
+
+                  const SizedBox(height: 12),
+
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _input(hargaController, "Harga", prefix: "Rp "),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(child: _input(stokController, "Stok")),
+                    ],
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  TextField(
+                    controller: deskripsiController,
+                    maxLines: 3,
+                    decoration: _dec("Deskripsi"),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  TextField(
+                    controller: lokasiController,
+                    decoration: _dec("Lokasi"),
+                  ),
                 ],
-                onChanged: (value) {
-                  setState(() {
-                    kategori = value!;
-                  });
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            /// 🔥 BUTTON
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  daftarProduk[widget.index] = Produk(
+                    nama: namaController.text,
+                    kategori: kategori,
+                    harga: hargaController.text,
+                    stok: stokController.text,
+                    deskripsi: deskripsiController.text,
+                    image: images.isNotEmpty ? images.first.path : "",
+                    lokasi: lokasiController.text,
+                    penjual: "Petani Agrova",
+                  );
+
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (_) => const HomePenjualSc()),
+                  );
                 },
-                decoration: _inputDecoration(),
-              ),
-
-              const SizedBox(height: 16),
-
-              /// HARGA + STOK
-              Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _label("Harga (/Kg)"),
-                        _textField(hargaController, prefix: "Rp "),
-                      ],
-                    ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xff3B82F6),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
                   ),
-
-                  const SizedBox(width: 12),
-
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [_label("Stok"), _textField(stokController)],
-                    ),
-                  ),
-                ],
+                ),
+                child: const Text("Simpan Perubahan"),
               ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
-              const SizedBox(height: 16),
-
-              /// DESKRIPSI
-              _label("Deskripsi"),
-              TextField(
-                controller: deskripsiController,
-                maxLines: 4,
-                decoration: _inputDecoration(),
-              ),
-
-              const SizedBox(height: 20),
-
-              /// LOKASI KEBUN
-              _label("Lokasi"),
-              TextField(
-                controller: lokasiController,
-                maxLines: 4,
-                decoration: _inputDecoration(),
-              ),
-
-              const SizedBox(height: 24),
-
-              /// TAMBAH PRODUK
-              Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        daftarProduk[widget.index] = Produk(
-                          nama: namaController.text,
-                          kategori: kategori,
-                          harga: hargaController.text,
-                          stok: stokController.text,
-                          deskripsi: deskripsiController.text,
-                          image: imageProduk?.path ?? "",
-                          lokasi: lokasiController.text,
-                          penjual: "Petani Agrova",
-                        );
-
-                        Navigator.pop(context);
-
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(builder: (_) => HomePenjualSc()),
-                        );
-                      },
-                      label: Text(
-                        "Edit Produk",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: "Inter",
-                        ),
-                      ),
-                      icon: Icon(Amicons.remix_edit, color: Colors.white),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.skyBlue,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+  /// 🔥 CARD
+  Widget _card({
+    required String title,
+    required IconData icon,
+    required Widget child,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, size: 18, color: Colors.blue),
+              const SizedBox(width: 6),
+              Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
             ],
           ),
-        ),
+          const SizedBox(height: 12),
+          child,
+        ],
       ),
     );
   }
 
-  /// FOTO ITEM
-  Widget _fotoItem(String image) {
-    return Stack(
-      children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(12),
-          child: Image.asset(image, width: 90, height: 90, fit: BoxFit.cover),
-        ),
-
-        Positioned(
-          top: 4,
-          right: 4,
-          child: Container(
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.red,
-            ),
-            padding: const EdgeInsets.all(3),
-            child: const Icon(Icons.close, size: 14, color: Colors.white),
-          ),
-        ),
-      ],
-    );
-  }
-
-  /// LABEL
-  Widget _label(String text) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 6),
-      child: Text(
-        text,
-        style: const TextStyle(
-          fontFamily: "Inter",
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-    );
-  }
-
-  /// TEXTFIELD
-  Widget _textField(TextEditingController controller, {String? prefix}) {
+  Widget _input(TextEditingController c, String hint, {String? prefix}) {
     return TextField(
-      controller: controller,
-      decoration: _inputDecoration(prefix: prefix),
+      controller: c,
+      decoration: _dec(hint, prefix: prefix),
     );
   }
 
-  /// INPUT DECORATION
-  InputDecoration _inputDecoration({String? prefix}) {
+  InputDecoration _dec(String hint, {String? prefix}) {
     return InputDecoration(
+      hintText: hint,
       prefixText: prefix,
       filled: true,
-      fillColor: Colors.white,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-      border: OutlineInputBorder(
+      fillColor: Colors.grey[100],
+      enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide.none,
+        borderSide: BorderSide(color: Colors.grey.shade300),
       ),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
     );
   }
 }
