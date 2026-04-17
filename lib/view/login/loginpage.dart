@@ -1,5 +1,5 @@
-import 'package:agrova_apps/database/database_helper.dart';
 import 'package:agrova_apps/extension/colors/appcolors.dart';
+import 'package:agrova_apps/services/firebase_service.dart';
 import 'package:agrova_apps/view/login/lupapassword.dart';
 import 'package:agrova_apps/view/login/pilihperanpage.dart';
 import 'package:agrova_apps/view/login/register.dart';
@@ -19,316 +19,280 @@ class _LoginscreenState extends State<Loginscreen> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
+  /// 🔥 LOGIN FUNCTION
   void loginUser() async {
-    final user = await DatabaseHelper.instance.login(
-      emailController.text,
-      passwordController.text,
-    );
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
 
-    if (user != null) {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      prefs.setBool("isLogin", true);
+    /// 🔥 VALIDASI DASAR
+    if (email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Email & password wajib diisi")),
+      );
+      return;
+    }
 
+    try {
+      /// 🔥 LOGIN FIREBASE
+      final result = await FirebaseService.loginUser(
+        email: email,
+        password: password,
+      );
+
+      final user = result.user;
+
+      /// 🔥 AMBIL DATA FIRESTORE (OPTIONAL TAPI BAGUS)
+      final userData = await FirebaseService.getUserData(user!.uid);
+
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool("isLogin", true);
+      await prefs.setString("uid", user.uid); // 🔥 simpan uid user
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Login berhasil"),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      /// 🔥 NAVIGASI KE ROLE PAGE
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => PilihPeranPage()),
+        MaterialPageRoute(builder: (_) => const PilihPeranPage()),
       );
-    } else {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Email atau password salah")));
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString().replaceAll("Exception: ", "")),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    //BACKGROUND LOGIN
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              AppColors.brightGreen.withOpacity(0.5),
-              AppColors.warmWhite,
-              AppColors.oceanBlue.withOpacity(0.5),
-            ],
-          ),
-        ),
-
-        //KOTAK PUTIH
-        child: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                height: 700,
-                width: 350,
-                decoration: BoxDecoration(
-                  color: AppColors.warmWhite.withOpacity(0.6),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: AppColors.warmWhite),
-                ),
-
-                child: Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-
-                    children: [
-                      SizedBox(height: 24),
-
-                      // GAMBAR LOGO
-                      Image.asset(
-                        "assets/images/logo/LOGO APPS1 (1).png",
-                        width: 90,
-                        height: 90,
-                      ),
-
-                      SizedBox(height: 16),
-
-                      //TEKS HEADER
-                      Text(
-                        "Selamat Datang",
-                        style: TextStyle(
-                          fontFamily: "Inter",
-                          fontSize: 32,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-
-                      Text(
-                        "Masuk ke akun anda untuk melanjutkan",
-                        style: TextStyle(
-                          fontFamily: "Inter",
-                          fontSize: 12,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-
-                      SizedBox(height: 24),
-
-                      //TEKS DAN TEKS FORM FIELD
-                      SizedBox(
-                        width: double.infinity,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Email",
-                              style: TextStyle(
-                                fontFamily: "Inter",
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-
-                            TextFormField(
-                              controller: emailController,
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(15),
-                                ),
-                                hintText: "Masukan Email Anda",
-                                prefixIcon: Icon(
-                                  Icons.mail_outline,
-                                  color: AppColors.charcoal,
-                                ),
-                              ),
-                            ),
-
-                            SizedBox(height: 8),
-
-                            Text(
-                              "Password",
-                              style: TextStyle(
-                                fontFamily: "Inter",
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-
-                            TextFormField(
-                              controller: passwordController,
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(15),
-                                ),
-                                hintText: "Masukan Password Anda",
-                                prefixIcon: Icon(
-                                  Icons.lock_outline,
-                                  color: AppColors.charcoal,
-                                ),
-                                suffixIcon: IconButton(
-                                  icon: Icon(
-                                    _isObscure
-                                        ? Icons.visibility_off_outlined
-                                        : Icons.visibility_outlined,
-                                    color: AppColors.charcoal,
-                                  ),
-                                  onPressed: () {
-                                    setState(() {
-                                      _isObscure = !_isObscure;
-                                    });
-                                  },
-                                ),
-                              ),
-                            ),
-
-                            //LUPA PASSWORD BUTTON
-                            Align(
-                              alignment: AlignmentGeometry.centerRight,
-                              child: TextButton(
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => LupaPass(),
-                                    ),
-                                  );
-                                },
-                                child: Text(
-                                  "Lupa Password?",
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: AppColors.oceanBlue,
-                                  ),
-                                ),
-                              ),
-                            ),
-
-                            SizedBox(height: 12),
-
-                            //MASUK DAN BUAT AKUN BUTTON
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: AppColors.oceanBlue,
-                                    ),
-                                    onPressed: () {
-                                      loginUser();
-                                    },
-                                    child: Text(
-                                      "Masuk",
-                                      style: TextStyle(
-                                        fontFamily: "Inter",
-                                        fontWeight: FontWeight.w500,
-                                        color: AppColors.warmWhite,
-                                        fontSize: 20,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-
-                            SizedBox(height: 8),
-
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: AppColors.mintGreen,
-                                    ),
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (_) => BuatAkun(),
-                                        ),
-                                      );
-                                    },
-                                    child: Text(
-                                      "Buat Akun",
-                                      style: TextStyle(
-                                        fontFamily: "Inter",
-                                        fontWeight: FontWeight.w500,
-                                        color: AppColors.warmWhite,
-                                        fontSize: 20,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-
-                            SizedBox(height: 8),
-
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Divider(
-                                    color: AppColors.darkBackground,
-                                  ),
-                                ),
-
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Text(
-                                    "Atau masuk dengan",
-                                    style: TextStyle(fontFamily: "Inter"),
-                                  ),
-                                ),
-
-                                Expanded(
-                                  child: Divider(
-                                    color: AppColors.darkBackground,
-                                  ),
-                                ),
-                              ],
-                            ),
-
-                            SizedBox(height: 8),
-
-                            //BUTTON GOOGLE
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: AppColors.warmWhite,
-                                    ),
-                                    onPressed: () {},
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Image.asset(
-                                          "assets/images/logo/Google__G__logo.svg.png",
-                                          width: 20,
-                                          height: 20,
-                                        ),
-
-                                        SizedBox(width: 8),
-                                        Text(
-                                          "Google",
-                                          style: TextStyle(
-                                            fontFamily: "Inter",
-                                            fontWeight: FontWeight.w500,
-                                            color: AppColors.darkCharcoal,
-                                            fontSize: 20,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+      backgroundColor: AppColors.bgpenjual,
+      body: Stack(
+        children: [
+          /// 🔥 BULATAN (FIX: FULL KE BAWAH)
+          Positioned(
+            bottom: -150,
+            left: -120,
+            child: Container(
+              width: 280,
+              height: 280,
+              decoration: BoxDecoration(
+                color: Colors.green.withOpacity(0.15),
+                shape: BoxShape.circle,
               ),
-            ],
+            ),
           ),
-        ),
+
+          Positioned(
+            bottom: -180,
+            right: -120,
+            child: Container(
+              width: 260,
+              height: 260,
+              decoration: BoxDecoration(
+                color: Colors.blue.withOpacity(0.15),
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
+
+          SafeArea(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  /// 🔥 HEADER
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.fromLTRB(24, 60, 24, 40),
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [Color(0xff3B82F6), Color(0xff22C55E)],
+                      ),
+                      borderRadius: BorderRadius.vertical(
+                        bottom: Radius.circular(40),
+                      ),
+                    ),
+                    child: const Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Masuk",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: 6),
+                        Text(
+                          "Selamat datang kembali 👋",
+                          style: TextStyle(color: Colors.white70),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  /// 🔥 SPACER BIAR CARD TURUN (INI KUNCI NYA)
+                  SizedBox(height: screenHeight * 0.1),
+
+                  /// 🔥 CARD (NO TRANSFORM = ANTI NGATUNG)
+                  Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 20),
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(24),
+                      boxShadow: [
+                        BoxShadow(
+                          blurRadius: 20,
+                          offset: const Offset(0, 10),
+                          color: Colors.black.withOpacity(0.08),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      children: [
+                        /// EMAIL
+                        TextFormField(
+                          controller: emailController,
+                          decoration: InputDecoration(
+                            hintText: "Email",
+                            prefixIcon: const Icon(Icons.mail_outline),
+                            filled: true,
+                            fillColor: Colors.blue.withOpacity(0.05),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(18),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 14),
+
+                        /// PASSWORD
+                        TextFormField(
+                          controller: passwordController,
+                          obscureText: _isObscure,
+                          decoration: InputDecoration(
+                            hintText: "Password",
+                            prefixIcon: const Icon(Icons.lock_outline),
+                            filled: true,
+                            fillColor: Colors.green.withOpacity(0.05),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(18),
+                              borderSide: BorderSide.none,
+                            ),
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _isObscure
+                                    ? Icons.visibility_off
+                                    : Icons.visibility,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _isObscure = !_isObscure;
+                                });
+                              },
+                            ),
+                          ),
+                        ),
+
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: TextButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (_) => LupaPass()),
+                              );
+                            },
+                            child: const Text(
+                              "Lupa Password?",
+                              style: TextStyle(color: Color(0xff3B82F6)),
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 10),
+
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: loginUser,
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              backgroundColor: const Color(0xff3B82F6),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(18),
+                              ),
+                            ),
+                            child: const Text(
+                              "Masuk",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 14),
+
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (_) => BuatAkun()),
+                            );
+                          },
+                          child: const Text.rich(
+                            TextSpan(
+                              text: "Belum punya akun? ",
+                              children: [
+                                TextSpan(
+                                  text: "Daftar",
+                                  style: TextStyle(
+                                    color: Color(0xff3B82F6),
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 16),
+
+                        OutlinedButton.icon(
+                          onPressed: () {},
+                          icon: Image.asset(
+                            "assets/images/logo/Google__G__logo.svg.png",
+                            width: 18,
+                          ),
+                          label: const Text("Masuk dengan Google"),
+                          style: OutlinedButton.styleFrom(
+                            minimumSize: const Size(double.infinity, 50),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(18),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 160),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

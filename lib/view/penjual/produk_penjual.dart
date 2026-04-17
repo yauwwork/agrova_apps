@@ -37,7 +37,7 @@ class _ProdukPenjualState extends State<ProdukPenjual> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xffF5F7FA),
+      backgroundColor: AppColors.bgpenjual,
 
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -45,58 +45,58 @@ class _ProdukPenjualState extends State<ProdukPenjual> {
         centerTitle: true,
         title: const Text(
           "Produk Saya",
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: AppColors.textPrimary,
+          ),
         ),
       ),
 
       body: SafeArea(
         child: Column(
           children: [
-            /// 🔍 SEARCH + FILTER
+            /// SEARCH + FILTER
             Padding(
               padding: const EdgeInsets.all(16),
               child: Row(
                 children: [
-                  /// SEARCH BAR
                   Expanded(
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14),
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(30), // 🔥 rounded
+                        borderRadius: BorderRadius.circular(30),
                         boxShadow: [
                           BoxShadow(
-                            blurRadius: 10,
+                            blurRadius: 12,
+                            offset: const Offset(0, 4),
                             color: Colors.black.withOpacity(0.05),
                           ),
                         ],
                       ),
                       child: const TextField(
                         decoration: InputDecoration(
-                          icon: Icon(Icons.search),
+                          icon: Icon(Icons.search, color: Colors.grey),
                           hintText: "Cari produk...",
                           border: InputBorder.none,
                         ),
                       ),
                     ),
                   ),
-
                   const SizedBox(width: 10),
-
-                  /// FILTER BUTTON
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
+                      color: AppColors.skyBlue,
+                      borderRadius: BorderRadius.circular(14),
                     ),
-                    child: const Icon(Icons.tune),
+                    child: const Icon(Icons.tune, color: Colors.white),
                   ),
                 ],
               ),
             ),
 
-            /// 🔥 KATEGORI (PILL BUTTON)
+            /// KATEGORI
             SizedBox(
               height: 50,
               child: ListView.builder(
@@ -116,11 +116,13 @@ class _ProdukPenjualState extends State<ProdukPenjual> {
                     child: Container(
                       margin: const EdgeInsets.only(right: 10),
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
+                        horizontal: 16,
                         vertical: 8,
                       ),
                       decoration: BoxDecoration(
-                        color: isSelected ? item["color"] : Colors.grey[200],
+                        color: isSelected
+                            ? item["color"]
+                            : Colors.grey.shade200,
                         borderRadius: BorderRadius.circular(30),
                       ),
                       child: Row(
@@ -135,7 +137,6 @@ class _ProdukPenjualState extends State<ProdukPenjual> {
                             item["name"],
                             style: TextStyle(
                               color: isSelected ? Colors.white : Colors.black54,
-                              fontWeight: FontWeight.w500,
                             ),
                           ),
                         ],
@@ -148,7 +149,7 @@ class _ProdukPenjualState extends State<ProdukPenjual> {
 
             const SizedBox(height: 10),
 
-            /// 🔥 GRID PRODUK
+            /// GRID PRODUK
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -156,40 +157,38 @@ class _ProdukPenjualState extends State<ProdukPenjual> {
                   itemCount: daftarProduk.length,
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 12,
-                    childAspectRatio: 0.65, // 🔥 lebih proporsional
+                    crossAxisSpacing: 14,
+                    mainAxisSpacing: 14,
+                    childAspectRatio: 0.68,
                   ),
                   itemBuilder: (context, index) {
                     final produk = daftarProduk[index];
 
-                    // return SellerGridProductCard(
-                    //   title: produk.nama,
-                    //   subtitle: produk.kategori,
-                    //   price: "Rp ${produk.harga}",
-                    //   image: produk.image,
-                    //   location: produk.lokasi,
-                    //   views: "0",
-                    //   favorites: "0",
+                    return SellerGridProductCard(
+                      title: produk.nama,
+                      subtitle: produk.kategori,
+                      price: "Rp ${produk.harga}",
+                      image: produk.image,
+                      location: produk.lokasi,
+                      views: "120",
+                      favorites: "45",
 
-                    //   /// DELETE
-                    //   onDelete: () {
-                    //     setState(() {
-                    //       daftarProduk.removeAt(index);
-                    //     });
-                    //   },
+                      onDelete: () {
+                        setState(() {
+                          daftarProduk.removeAt(index);
+                        });
+                      },
 
-                    //   /// EDIT
-                    //   onEdit: () {
-                    //     Navigator.push(
-                    //       context,
-                    //       MaterialPageRoute(
-                    //         builder: (_) =>
-                    //             EditProduk(produk: produk, index: index),
-                    //       ),
-                    //     ).then((_) => setState(() {}));
-                    //   },
-                    // );
+                      onEdit: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) =>
+                                EditProduk(produk: produk, index: index),
+                          ),
+                        ).then((_) => setState(() {}));
+                      },
+                    );
                   },
                 ),
               ),

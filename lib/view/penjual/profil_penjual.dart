@@ -1,12 +1,16 @@
+import 'package:agrova_apps/extension/colors/appcolors.dart';
+import 'package:agrova_apps/extension/navigator.dart';
 import 'package:agrova_apps/view/login/loginpage.dart';
 import 'package:agrova_apps/view/pembeli/bottom_navigation_pembeli.dart';
-import 'package:agrova_apps/view/penjual/bottom_navigation_penjual.dart';
+import 'package:agrova_apps/view/penjual/pengaturan_penjual.dart';
 import 'package:agrova_apps/view/penjual/produk_penjual.dart';
 import 'package:amicons/amicons.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+/// =======================================================
 /// 🔥 SCREEN PROFIL PENJUAL
+/// =======================================================
 class ProfilPenjualScreen extends StatefulWidget {
   const ProfilPenjualScreen({super.key});
 
@@ -18,20 +22,16 @@ class _ProfilPenjualScreenState extends State<ProfilPenjualScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xffF5F7FA),
+      backgroundColor: AppColors.bgpenjual,
 
-      /// 🔥 APPBAR (CONSISTENT DENGAN SCREEN LAIN)
+      /// 🔥 HEADER
       appBar: AppBar(
         elevation: 0,
         automaticallyImplyLeading: false,
         backgroundColor: Colors.transparent,
-
-        /// bikin bagian bawah melengkung
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(bottom: Radius.circular(24)),
         ),
-
-        /// gradient warna
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
@@ -39,24 +39,23 @@ class _ProfilPenjualScreenState extends State<ProfilPenjualScreen> {
             ),
           ),
         ),
-
         title: const Text(
           "Profil Saya",
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
         ),
       ),
 
+      /// 🔥 BODY
       body: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
         child: Column(
           children: [
-            /// ================================
+            /// =====================================
             /// 🔥 PROFILE CARD
-            /// ================================
+            /// =====================================
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                /// gradient halus biar gak flat
                 gradient: LinearGradient(
                   colors: [
                     Colors.blue.withOpacity(0.1),
@@ -67,7 +66,7 @@ class _ProfilPenjualScreenState extends State<ProfilPenjualScreen> {
               ),
               child: Column(
                 children: [
-                  /// FOTO PROFIL + ICON EDIT
+                  /// FOTO
                   Stack(
                     children: [
                       const CircleAvatar(
@@ -76,8 +75,6 @@ class _ProfilPenjualScreenState extends State<ProfilPenjualScreen> {
                           "assets/images/gambarlain/download (1).jpg",
                         ),
                       ),
-
-                      /// tombol kamera
                       Positioned(
                         bottom: 0,
                         right: 0,
@@ -99,41 +96,39 @@ class _ProfilPenjualScreenState extends State<ProfilPenjualScreen> {
 
                   const SizedBox(height: 12),
 
-                  /// NAMA USER
+                  /// NAMA
                   const Text(
                     "Radit Karbu",
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                   ),
 
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 4),
 
-                  /// ROLE / STATUS
+                  /// ROLE
                   const Text(
                     "Petani Agrova",
                     style: TextStyle(color: Colors.grey),
                   ),
 
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 10),
 
-                  /// LOKASI
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Row(
-                      children: [
-                        Icon(Icons.location_on, size: 16, color: Colors.grey),
-                        SizedBox(width: 6),
-                        Expanded(
-                          child: Text(
-                            "Blok M, Jakarta Selatan",
-                            style: TextStyle(fontSize: 12),
-                          ),
+                  /// =====================================
+                  /// 🔥 LOKASI (VERSI SIMPLE, NO CONTAINER)
+                  /// =====================================
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Icon(Icons.location_on, size: 14, color: Colors.red),
+                      SizedBox(width: 4),
+                      Text(
+                        "Blok M, Jakarta Selatan",
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.black87,
+                          fontWeight: FontWeight.w500,
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -141,9 +136,9 @@ class _ProfilPenjualScreenState extends State<ProfilPenjualScreen> {
 
             const SizedBox(height: 20),
 
-            /// ================================
-            /// 🔥 AKTIVITAS SAYA
-            /// ================================
+            /// =====================================
+            /// 🔥 AKTIVITAS
+            /// =====================================
             _sectionTitle("Aktivitas Saya"),
             const SizedBox(height: 10),
 
@@ -152,8 +147,6 @@ class _ProfilPenjualScreenState extends State<ProfilPenjualScreen> {
                 icon: Icons.inventory_2_outlined,
                 color: Colors.green,
                 title: "Produk Saya",
-
-                /// navigasi ke halaman produk
                 onTap: () {
                   Navigator.push(
                     context,
@@ -161,22 +154,20 @@ class _ProfilPenjualScreenState extends State<ProfilPenjualScreen> {
                   );
                 },
               ),
-
               _menuItem(
                 icon: Amicons.vuesax_cloud_change,
                 color: Colors.blue,
                 title: "Beralih ke Pembeli",
-
-                /// pindah role ke pembeli
                 onTap: () {
                   Navigator.pushAndRemoveUntil(
                     context,
-                    MaterialPageRoute(builder: (_) => const HomePembeliSc()),
+                    MaterialPageRoute(
+                      builder: (_) => const BottomNavigationPembeli(),
+                    ),
                     (route) => false,
                   );
                 },
               ),
-
               _menuItem(
                 icon: Amicons.vuesax_profile_circle,
                 color: Colors.orange,
@@ -187,9 +178,9 @@ class _ProfilPenjualScreenState extends State<ProfilPenjualScreen> {
 
             const SizedBox(height: 20),
 
-            /// ================================
-            /// 🔥 MENU LAINNYA
-            /// ================================
+            /// =====================================
+            /// 🔥 LAINNYA
+            /// =====================================
             _sectionTitle("Lainnya"),
             const SizedBox(height: 10),
 
@@ -198,26 +189,23 @@ class _ProfilPenjualScreenState extends State<ProfilPenjualScreen> {
                 icon: Amicons.remix_settings,
                 color: Colors.green,
                 title: "Pengaturan",
-                onTap: () {},
+                onTap: () {
+                  context.push(const PengaturanPenjual());
+                },
               ),
-
               _menuItem(
                 icon: Amicons.remix_question,
                 color: Colors.blue,
                 title: "Pusat Bantuan",
                 onTap: () {},
               ),
-
               _menuItem(
                 icon: Amicons.lucide_log_out,
                 color: Colors.red,
                 title: "Keluar Akun",
-
-                /// LOGOUT
                 onTap: () async {
                   SharedPreferences prefs =
                       await SharedPreferences.getInstance();
-
                   await prefs.clear();
 
                   Navigator.pushAndRemoveUntil(
@@ -234,9 +222,7 @@ class _ProfilPenjualScreenState extends State<ProfilPenjualScreen> {
     );
   }
 
-  /// ================================
-  /// 🔥 TITLE SECTION
-  /// ================================
+  /// 🔥 TITLE
   Widget _sectionTitle(String text) {
     return Align(
       alignment: Alignment.centerLeft,
@@ -247,9 +233,7 @@ class _ProfilPenjualScreenState extends State<ProfilPenjualScreen> {
     );
   }
 
-  /// ================================
-  /// 🔥 CARD MENU
-  /// ================================
+  /// 🔥 CARD
   Widget _menuCard(List<Widget> children) {
     return Container(
       decoration: BoxDecoration(
@@ -260,9 +244,7 @@ class _ProfilPenjualScreenState extends State<ProfilPenjualScreen> {
     );
   }
 
-  /// ================================
-  /// 🔥 ITEM MENU
-  /// ================================
+  /// 🔥 ITEM
   Widget _menuItem({
     required IconData icon,
     required Color color,
@@ -284,8 +266,6 @@ class _ProfilPenjualScreenState extends State<ProfilPenjualScreen> {
           trailing: const Icon(Icons.chevron_right),
           onTap: onTap,
         ),
-
-        /// garis pemisah
         Divider(height: 1, color: Colors.grey.shade200),
       ],
     );

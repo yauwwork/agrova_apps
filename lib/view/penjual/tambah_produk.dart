@@ -1,3 +1,4 @@
+import 'package:agrova_apps/extension/colors/appcolors.dart';
 import 'package:agrova_apps/view/penjual/bottom_navigation_penjual.dart';
 import 'package:flutter/material.dart';
 import 'package:agrova_apps/models/produk_models.dart';
@@ -39,7 +40,7 @@ class _TambahProdukState extends State<TambahProduk> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xffF5F7FA),
+      backgroundColor: AppColors.bgpenjual,
 
       /// 🔥 APPBAR
       appBar: AppBar(
@@ -236,7 +237,9 @@ class _TambahProdukState extends State<TambahProduk> {
 
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (_) => const HomePenjualSc()),
+                    MaterialPageRoute(
+                      builder: (_) => const BottomNavigatorPenjual(),
+                    ),
                   );
                 },
                 style: ElevatedButton.styleFrom(

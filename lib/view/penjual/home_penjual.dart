@@ -1,3 +1,5 @@
+import 'package:agrova_apps/extension/colors/appcolors.dart';
+import 'package:agrova_apps/view/penjual/analitik_screen.dart';
 import 'package:flutter/material.dart';
 
 class HomePenjual extends StatefulWidget {
@@ -11,23 +13,23 @@ class _HomePenjualState extends State<HomePenjual> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xffF5F7FA),
+      backgroundColor: AppColors.bgpenjual,
 
-      /// 🔥 PAKAI STACK BIAR HEADER + STAT CARD MENYATU
-      body: Stack(
-        children: [
-          /// =========================
-          /// 🔥 MAIN CONTENT
-          /// =========================
-          SingleChildScrollView(
-            child: Column(
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            /// =======================================================
+            /// 🔥 HEADER + STAT CARD
+            /// =======================================================
+            Stack(
+              clipBehavior: Clip.none,
               children: [
                 /// 🔥 HEADER (GRADIENT)
                 Container(
-                  padding: const EdgeInsets.fromLTRB(16, 50, 16, 100),
+                  padding: const EdgeInsets.fromLTRB(16, 50, 16, 80),
                   decoration: const BoxDecoration(
                     gradient: LinearGradient(
-                      colors: [Color(0xff3B82F6), Color(0xff22C55E)],
+                      colors: [AppColors.skyBlue, AppColors.mintGreen],
                     ),
                     borderRadius: BorderRadius.vertical(
                       bottom: Radius.circular(30),
@@ -35,6 +37,7 @@ class _HomePenjualState extends State<HomePenjual> {
                   ),
                   child: Row(
                     children: [
+                      /// FOTO PROFILE
                       const CircleAvatar(
                         radius: 22,
                         backgroundImage: AssetImage("assets/profile.jpg"),
@@ -61,122 +64,148 @@ class _HomePenjualState extends State<HomePenjual> {
                       ),
 
                       const Spacer(),
+
+                      /// ICON NOTIF
                       const Icon(Icons.notifications, color: Colors.white),
                     ],
                   ),
                 ),
 
-                /// 🔥 SPACE BUAT STAT CARD (PENTING!)
-                const SizedBox(height: 60),
-
-                /// 🔥 MENU
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Row(
-                    children: const [
-                      Expanded(
-                        child: MenuCard(Icons.add, "Tambah", Colors.green),
-                      ),
-                      SizedBox(width: 10),
-                      Expanded(
-                        child: MenuCard(
-                          Icons.show_chart,
-                          "Analitik",
-                          Colors.blue,
+                /// 🔥 STAT CARD (FLOATING)
+                Positioned(
+                  bottom: -40,
+                  left: 16,
+                  right: 16,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 18),
+                    decoration: BoxDecoration(
+                      color: AppColors.card,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          blurRadius: 15,
+                          offset: const Offset(0, 8),
+                          color: Colors.black.withOpacity(0.08),
                         ),
-                      ),
-                      SizedBox(width: 10),
-                      Expanded(
-                        child: MenuCard(
-                          Icons.inventory_2,
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: const [
+                        StatItem(
+                          Icons.inventory,
+                          "12",
                           "Produk",
-                          Colors.purple,
+                          AppColors.mintGreen,
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-
-                /// 🔥 TITLE
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: const [
-                      Text(
-                        "Produk Terlaris",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                        StatItem(
+                          Icons.remove_red_eye,
+                          "15.7k",
+                          "Dilihat",
+                          AppColors.skyBlue,
                         ),
-                      ),
-                      Text("Analitik", style: TextStyle(color: Colors.blue)),
-                    ],
+                        StatItem(Icons.favorite, "892", "Favorit", Colors.pink),
+                      ],
+                    ),
                   ),
                 ),
-
-                const SizedBox(height: 12),
-
-                /// 🔥 LIST PRODUK
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Column(
-                    children: const [
-                      // 👉 nanti isi TopProductCard di sini
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 30),
               ],
             ),
-          ),
 
-          /// =========================
-          /// 🔥 STAT CARD (FLOATING)
-          /// =========================
-          Positioned(
-            top: 140, // 🔥 posisi nempel ke header
-            left: 16,
-            right: 16,
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 18),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    blurRadius: 12,
-                    color: Colors.black.withOpacity(0.06),
-                  ),
-                ],
-              ),
+            /// 🔥 SPACING BIAR CARD KELIHATAN
+            const SizedBox(height: 60),
+
+            /// =======================================================
+            /// 🔥 MENU
+            /// =======================================================
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: const [
-                  StatItem(Icons.inventory, "12", "Produk", Colors.green),
-                  StatItem(
-                    Icons.remove_red_eye,
-                    "15.7k",
-                    "Dilihat",
-                    Colors.blue,
+                children: [
+                  /// 🔹 TAMBAH
+                  const Expanded(
+                    child: MenuCard(Icons.add, "Tambah", AppColors.mintGreen),
                   ),
-                  StatItem(Icons.favorite, "892", "Favorit", Colors.pink),
+
+                  const SizedBox(width: 10),
+
+                  /// 🔥 ANALITIK (CLICKABLE)
+                  Expanded(
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(18),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const AnalitikScreen(),
+                          ),
+                        );
+                      },
+                      child: const MenuCard(
+                        Icons.show_chart,
+                        "Analitik",
+                        AppColors.skyBlue,
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(width: 10),
+
+                  /// 🔹 PRODUK
+                  const Expanded(
+                    child: MenuCard(
+                      Icons.inventory_2,
+                      "Produk",
+                      AppColors.secondary,
+                    ),
+                  ),
                 ],
               ),
             ),
-          ),
-        ],
+
+            const SizedBox(height: 20),
+
+            /// =======================================================
+            /// 🔥 TITLE
+            /// =======================================================
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: const [
+                  Text(
+                    "Produk Terlaris",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  Text(
+                    "Analitik",
+                    style: TextStyle(
+                      color: AppColors.skyBlue,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            /// 🔥 (NANTI BISA TAMBAH LIST PRODUK DI SINI)
+            const SizedBox(height: 30),
+          ],
+        ),
       ),
     );
   }
 }
 
-/// =========================
-/// 🔥 STAT ITEM
-/// =========================
+/// =======================================================
+/// 🔥 STAT ITEM (ATAS)
+/// =======================================================
 class StatItem extends StatelessWidget {
   final IconData icon;
   final String value;
@@ -189,18 +218,30 @@ class StatItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
+        /// ICON
         Icon(icon, color: color),
+
         const SizedBox(height: 6),
-        Text(value, style: const TextStyle(fontWeight: FontWeight.bold)),
-        Text(label, style: const TextStyle(color: Colors.grey)),
+
+        /// VALUE
+        Text(
+          value,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            color: AppColors.textPrimary,
+          ),
+        ),
+
+        /// LABEL
+        Text(label, style: const TextStyle(color: AppColors.textSecondary)),
       ],
     );
   }
 }
 
-/// =========================
-/// 🔥 MENU CARD
-/// =========================
+/// =======================================================
+/// 🔥 MENU CARD (UPDATED UI MODERN)
+/// =======================================================
 class MenuCard extends StatelessWidget {
   final IconData icon;
   final String title;
@@ -211,82 +252,44 @@ class MenuCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 16),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        children: [
-          Icon(icon, color: color),
-          const SizedBox(height: 6),
-          Text(title),
-        ],
-      ),
-    );
-  }
-}
+      height: 95,
 
-/// =========================
-/// 🔥 TOP PRODUCT CARD
-/// =========================
-class TopProductCard extends StatelessWidget {
-  final int rank;
-  final String image;
-  final String title;
-  final String sold;
-  final String views;
-  final String rating;
-
-  const TopProductCard(
-    this.rank,
-    this.image,
-    this.title,
-    this.sold,
-    this.views,
-    this.rating, {
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(10),
+      /// 🔥 STYLE CARD
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+            color: Colors.black.withOpacity(0.05),
+          ),
+        ],
       ),
-      child: Row(
+
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text("#$rank", style: const TextStyle(fontWeight: FontWeight.bold)),
-          const SizedBox(width: 10),
-
-          ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: Image.asset(image, width: 50, height: 50, fit: BoxFit.cover),
-          ),
-
-          const SizedBox(width: 10),
-
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title, maxLines: 1, overflow: TextOverflow.ellipsis),
-                Text(
-                  "$sold terjual",
-                  style: const TextStyle(color: Colors.grey),
-                ),
-              ],
+          /// 🔥 ICON BOX (MODERN)
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(14),
             ),
+            child: Icon(icon, color: color, size: 22),
           ),
 
-          Column(
-            children: [
-              const Icon(Icons.star, color: Colors.orange, size: 16),
-              Text(rating),
-            ],
+          const SizedBox(height: 8),
+
+          /// 🔥 TITLE
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: AppColors.textPrimary,
+            ),
           ),
         ],
       ),

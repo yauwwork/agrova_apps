@@ -8,9 +8,9 @@ class AppColors {
   static const oceanBlue = Color(0xFF1E40AF);
   static const leafGreen = Color(0xFF16A34A);
   static const mintGreen = Color(0xFF22C55E);
-  static const softMint = Color(0xFFDCFCE7);
+  static const softMint = Color.fromARGB(255, 236, 250, 241);
   static const charcoal = Color(0xFF1F2937);
-  static const bgpenjual = Color.fromARGB(255, 225, 237, 252);
+  static const bgpenjual = Color.fromARGB(255, 234, 242, 252);
 
   static const skyBlue = Color(0xFF3B82F6);
   static const darkLeafGreen = Color(0xFF15803D);

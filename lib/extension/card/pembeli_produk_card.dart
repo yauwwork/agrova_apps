@@ -1,25 +1,15 @@
-import 'package:agrova_apps/models/produk_models.dart';
-import 'package:flutter/material.dart';
 import 'dart:io';
+import 'package:flutter/material.dart';
+import 'package:agrova_apps/models/produk_models.dart';
 
 class ProductCard extends StatefulWidget {
-  final String title;
-  final String price;
-  final String image;
-  final String seller;
-  final String location;
-  final double rating;
+  final Produk produk;
   final VoidCallback? onFavorite;
   final bool isFavorited;
 
   const ProductCard({
     super.key,
-    required this.title,
-    required this.price,
-    required this.image,
-    required this.seller,
-    required this.location,
-    required this.rating,
+    required this.produk,
     this.onFavorite,
     this.isFavorited = false,
   });
@@ -29,10 +19,12 @@ class ProductCard extends StatefulWidget {
 }
 
 class _ProductCardState extends State<ProductCard> {
-  bool isFavorite = false;
+  bool isFav = false;
 
   @override
   Widget build(BuildContext context) {
+    final p = widget.produk;
+
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -46,13 +38,15 @@ class _ProductCardState extends State<ProductCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          /// =========================
           /// IMAGE + FAVORITE
+          /// =========================
           Stack(
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
                 child: Image.file(
-                  File(widget.image),
+                  File(p.image),
                   width: double.infinity,
                   height: 120,
                   fit: BoxFit.cover,
@@ -65,24 +59,20 @@ class _ProductCardState extends State<ProductCard> {
                 child: GestureDetector(
                   onTap: () {
                     setState(() {
-                      isFavorite = !isFavorite;
+                      isFav = !isFav;
                     });
 
                     widget.onFavorite?.call();
                   },
-
                   child: Container(
                     padding: const EdgeInsets.all(6),
                     decoration: const BoxDecoration(
                       color: Colors.white,
                       shape: BoxShape.circle,
                     ),
-
                     child: Icon(
-                      widget.isFavorited
-                          ? Icons.favorite
-                          : Icons.favorite_border,
-                      color: widget.isFavorited ? Colors.red : Colors.grey,
+                      isFav ? Icons.favorite : Icons.favorite_border,
+                      color: isFav ? Colors.red : Colors.grey,
                       size: 18,
                     ),
                   ),
@@ -91,6 +81,9 @@ class _ProductCardState extends State<ProductCard> {
             ],
           ),
 
+          /// =========================
+          /// CONTENT
+          /// =========================
           Padding(
             padding: const EdgeInsets.all(10),
             child: Column(
@@ -98,7 +91,7 @@ class _ProductCardState extends State<ProductCard> {
               children: [
                 /// NAMA PRODUK
                 Text(
-                  widget.title,
+                  p.nama,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(fontWeight: FontWeight.w600),
@@ -108,7 +101,7 @@ class _ProductCardState extends State<ProductCard> {
 
                 /// HARGA
                 Text(
-                  widget.price,
+                  "Rp ${p.harga}",
                   style: const TextStyle(
                     color: Colors.green,
                     fontWeight: FontWeight.bold,
@@ -117,25 +110,20 @@ class _ProductCardState extends State<ProductCard> {
 
                 const SizedBox(height: 6),
 
-                /// RATING
+                /// RATING (sementara dummy kalau belum ada di model)
                 Row(
-                  children: [
-                    const Icon(Icons.star, color: Colors.orange, size: 16),
-
-                    const SizedBox(width: 2),
-
-                    Text(
-                      widget.rating.toString(),
-                      style: const TextStyle(fontSize: 12),
-                    ),
+                  children: const [
+                    Icon(Icons.star, color: Colors.orange, size: 16),
+                    SizedBox(width: 2),
+                    Text("4.5", style: TextStyle(fontSize: 12)),
                   ],
                 ),
 
                 const SizedBox(height: 6),
 
-                /// NAMA PETANI
+                /// SELLER
                 Text(
-                  widget.seller,
+                  p.penjual,
                   style: TextStyle(fontSize: 12, color: Colors.grey[700]),
                 ),
 
@@ -145,11 +133,9 @@ class _ProductCardState extends State<ProductCard> {
                 Row(
                   children: [
                     const Icon(Icons.location_on, size: 12, color: Colors.grey),
-
                     const SizedBox(width: 2),
-
                     Text(
-                      widget.location,
+                      p.lokasi,
                       style: TextStyle(fontSize: 11, color: Colors.grey[600]),
                     ),
                   ],

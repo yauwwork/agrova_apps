@@ -1,3 +1,4 @@
+import 'package:agrova_apps/extension/colors/appcolors.dart';
 import 'package:flutter/material.dart';
 import 'package:agrova_apps/database/produk_data.dart';
 import 'package:agrova_apps/extension/card/pembeli_produk_card.dart';
@@ -19,7 +20,7 @@ class _HomePembeliScreenState extends State<HomePembeliScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xffF6F7F9), // background soft
+      backgroundColor: AppColors.softMint,
 
       body: SingleChildScrollView(
         child: Column(

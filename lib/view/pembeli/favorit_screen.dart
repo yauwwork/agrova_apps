@@ -1,5 +1,6 @@
 import 'package:agrova_apps/database/produk_data.dart';
 import 'package:agrova_apps/extension/card/pembeli_produk_card.dart';
+import 'package:agrova_apps/extension/colors/appcolors.dart';
 import 'package:agrova_apps/view/pembeli/produk_pembeli.dart';
 import 'package:flutter/material.dart';
 
@@ -30,7 +31,7 @@ class _FavoritScreenState extends State<FavoritScreen> {
     }).toList();
 
     return Scaffold(
-      backgroundColor: const Color(0xffF5F7FA),
+      backgroundColor: AppColors.softMint,
 
       appBar: AppBar(
         backgroundColor: Colors.transparent,

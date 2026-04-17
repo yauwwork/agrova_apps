@@ -38,7 +38,7 @@ class _DetailProdukScState extends State<DetailProdukSc> {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
-      backgroundColor: Color(0xfffFFFFF),
+      backgroundColor: AppColors.softMint,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,

@@ -252,7 +252,9 @@ class _EditProdukState extends State<EditProduk> {
 
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (_) => const HomePenjualSc()),
+                    MaterialPageRoute(
+                      builder: (_) => const BottomNavigatorPenjual(),
+                    ),
                   );
                 },
                 style: ElevatedButton.styleFrom(

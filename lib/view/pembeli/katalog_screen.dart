@@ -1,3 +1,4 @@
+import 'package:agrova_apps/extension/colors/appcolors.dart';
 import 'package:flutter/material.dart';
 import 'package:agrova_apps/database/produk_data.dart';
 import 'package:agrova_apps/view/pembeli/produk_pembeli.dart';
@@ -34,7 +35,8 @@ class _KategoriScState extends State<KategoriSc> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xffF6F7F9), // warna background abu soft
+      backgroundColor: AppColors.softMint,
+
       /// 🔥 APPBAR
       appBar: AppBar(
         backgroundColor: Colors.transparent,
