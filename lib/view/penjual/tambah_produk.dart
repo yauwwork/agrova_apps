@@ -285,7 +285,14 @@ class _TambahProdukState extends State<TambahProduk> {
                   ),
                 ),
                 child: _isLoading
-                    ? const CircularProgressIndicator(color: Colors.white)
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
+                      )
                     : const Text(
                         "Tambah Produk",
                         style: TextStyle(color: Colors.white),

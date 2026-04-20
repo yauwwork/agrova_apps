@@ -12,6 +12,7 @@ class BuatAkun extends StatefulWidget {
 
 class _BuatAkunState extends State<BuatAkun> {
   bool _isObscure = true;
+  bool _isLoading = false;
 
   final namaController = TextEditingController();
   final emailController = TextEditingController();
@@ -52,6 +53,8 @@ class _BuatAkunState extends State<BuatAkun> {
       return;
     }
 
+    setState(() => _isLoading = true);
+
     try {
       await FirebaseService.registerUser(
         email: email,
@@ -59,21 +62,29 @@ class _BuatAkunState extends State<BuatAkun> {
         username: nama,
       );
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Akun berhasil dibuat"),
-          backgroundColor: AppColors.skyBlue,
-        ),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Akun berhasil dibuat"),
+            backgroundColor: AppColors.skyBlue,
+          ),
+        );
 
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const Loginscreen()),
-      );
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const Loginscreen()),
+        );
+      }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString().replaceAll("Exception: ", ""))),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString().replaceAll("Exception: ", ""))),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
@@ -230,7 +241,7 @@ class _BuatAkunState extends State<BuatAkun> {
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
-                            onPressed: registerUser,
+                            onPressed: _isLoading ? null : registerUser,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xff3B82F6),
                               padding: const EdgeInsets.symmetric(vertical: 16),
@@ -238,10 +249,19 @@ class _BuatAkunState extends State<BuatAkun> {
                                 borderRadius: BorderRadius.circular(16),
                               ),
                             ),
-                            child: const Text(
-                              "Buat Akun",
-                              style: TextStyle(color: Colors.white),
-                            ),
+                            child: _isLoading
+                                ? const SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : const Text(
+                                    "Buat Akun",
+                                    style: TextStyle(color: Colors.white),
+                                  ),
                           ),
                         ),
                       ],

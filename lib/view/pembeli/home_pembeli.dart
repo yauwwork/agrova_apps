@@ -5,6 +5,7 @@ import 'package:agrova_apps/extension/colors/appcolors.dart';
 import 'package:agrova_apps/models/user_models.dart';
 import 'package:agrova_apps/services/firebase_service.dart';
 import 'package:agrova_apps/view/pembeli/produk_pembeli.dart';
+import 'package:agrova_apps/view/pembeli/profil_pembeli.dart';
 import 'package:flutter/material.dart';
 import 'package:agrova_apps/services/product_service.dart';
 import 'package:agrova_apps/services/favorite_service.dart';
@@ -33,15 +34,15 @@ class _HomePembeliScreenState extends State<HomePembeliScreen> {
   void initState() {
     super.initState();
 
-    _bannerTimer = Timer.periodic(const Duration(seconds: 3), (timer) {
+    _bannerTimer = Timer.periodic(const Duration(seconds: 4), (timer) {
       if (!_pageController.hasClients) return;
 
-      _currentPage = (_currentPage + 1) % 3;
+      int nextPage = (_currentPage + 1) % 3;
 
       _pageController.animateToPage(
-        _currentPage,
-        duration: const Duration(milliseconds: 500),
-        curve: Curves.easeInOut,
+        nextPage,
+        duration: const Duration(milliseconds: 800),
+        curve: Curves.fastOutSlowIn,
       );
     });
 
@@ -217,12 +218,20 @@ class _HomePembeliScreenState extends State<HomePembeliScreen> {
 
           return Row(
             children: [
-              CircleAvatar(
-                radius: 20,
-                backgroundColor: Colors.white24,
-                backgroundImage: photoBase64 != null
-                    ? MemoryImage(base64Decode(photoBase64))
-                    : const AssetImage("assets/profile.jpg") as ImageProvider,
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const ProfilPembeli()),
+                  );
+                },
+                child: CircleAvatar(
+                  radius: 20,
+                  backgroundColor: Colors.white24,
+                  backgroundImage: photoBase64 != null
+                      ? MemoryImage(base64Decode(photoBase64))
+                      : const AssetImage("assets/images/gambarlain/download (1).jpg") as ImageProvider,
+                ),
               ),
               const SizedBox(width: 10),
               Column(
@@ -241,8 +250,6 @@ class _HomePembeliScreenState extends State<HomePembeliScreen> {
                   ),
                 ],
               ),
-              const Spacer(),
-              const Icon(Icons.notifications, color: Colors.white),
             ],
           );
         },
@@ -252,20 +259,46 @@ class _HomePembeliScreenState extends State<HomePembeliScreen> {
 
   /// ================= BANNER =================
   Widget _buildBanner() {
-    return SizedBox(
-      height: 160,
-      child: PageView(
-        controller: _pageController,
-        children: const [
-          _Banner("Produk Segar", "Langsung dari petani", Icons.eco),
-          _Banner("Harga Murah", "Kualitas terbaik", Icons.shopping_bag),
-          _Banner(
-            "Pengiriman Cepat",
-            "Aman sampai rumah",
-            Icons.local_shipping,
+    return Column(
+      children: [
+        SizedBox(
+          height: 160,
+          child: PageView(
+            controller: _pageController,
+            onPageChanged: (index) {
+              setState(() {
+                _currentPage = index;
+              });
+            },
+            children: const [
+              _Banner("Produk Segar", "Langsung dari petani", Icons.eco),
+              _Banner("Harga Murah", "Kualitas terbaik", Icons.shopping_bag),
+              _Banner(
+                "Pengiriman Cepat",
+                "Aman sampai rumah",
+                Icons.local_shipping,
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+        const SizedBox(height: 12),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(3, (index) {
+            bool isActive = index == _currentPage;
+            return AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              margin: const EdgeInsets.symmetric(horizontal: 4),
+              height: 8,
+              width: isActive ? 24 : 8,
+              decoration: BoxDecoration(
+                color: isActive ? const Color(0xff3B82F6) : Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(4),
+              ),
+            );
+          }),
+        ),
+      ],
     );
   }
 }

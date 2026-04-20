@@ -30,7 +30,6 @@ class _ProfilPembeliState extends State<ProfilPembeli> {
       backgroundColor: AppColors.softMint,
       appBar: AppBar(
         elevation: 0,
-        automaticallyImplyLeading: false,
         backgroundColor: Colors.transparent,
         flexibleSpace: Container(
           decoration: const BoxDecoration(

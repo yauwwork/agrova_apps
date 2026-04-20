@@ -15,6 +15,7 @@ class Loginscreen extends StatefulWidget {
 
 class _LoginscreenState extends State<Loginscreen> {
   bool _isObscure = true;
+  bool _isLoading = false;
 
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
@@ -31,6 +32,8 @@ class _LoginscreenState extends State<Loginscreen> {
       );
       return;
     }
+
+    setState(() => _isLoading = true);
 
     try {
       /// 🔥 LOGIN FIREBASE
@@ -56,17 +59,25 @@ class _LoginscreenState extends State<Loginscreen> {
       );
 
       /// 🔥 NAVIGASI KE ROLE PAGE
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const PilihPeranPage()),
-      );
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const PilihPeranPage()),
+        );
+      }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(e.toString().replaceAll("Exception: ", "")),
-          backgroundColor: Colors.red,
-        ),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString().replaceAll("Exception: ", "")),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
@@ -206,28 +217,28 @@ class _LoginscreenState extends State<Loginscreen> {
                           ),
                         ),
 
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: TextButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (_) => LupaPass()),
-                              );
-                            },
-                            child: const Text(
-                              "Lupa Password?",
-                              style: TextStyle(color: Color(0xff3B82F6)),
-                            ),
-                          ),
-                        ),
+                        // Align(
+                        //   alignment: Alignment.centerRight,
+                        //   child: TextButton(
+                        //     onPressed: () {
+                        //       Navigator.push(
+                        //         context,
+                        //         MaterialPageRoute(builder: (_) => LupaPass()),
+                        //       );
+                        //     },
+                        //     child: const Text(
+                        //       "Lupa Password?",
+                        //       style: TextStyle(color: Color(0xff3B82F6)),
+                        //     ),
+                        //   ),
+                        // ),
 
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 20),
 
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
-                            onPressed: loginUser,
+                            onPressed: _isLoading ? null : loginUser,
                             style: ElevatedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(vertical: 16),
                               backgroundColor: const Color(0xff3B82F6),
@@ -235,10 +246,19 @@ class _LoginscreenState extends State<Loginscreen> {
                                 borderRadius: BorderRadius.circular(18),
                               ),
                             ),
-                            child: const Text(
-                              "Masuk",
-                              style: TextStyle(color: Colors.white),
-                            ),
+                            child: _isLoading
+                                ? const SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : const Text(
+                                    "Masuk",
+                                    style: TextStyle(color: Colors.white),
+                                  ),
                           ),
                         ),
 
@@ -287,7 +307,7 @@ class _LoginscreenState extends State<Loginscreen> {
                     ),
                   ),
 
-                  const SizedBox(height: 160),
+                  const SizedBox(height: 200),
                 ],
               ),
             ),

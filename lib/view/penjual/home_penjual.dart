@@ -1,10 +1,14 @@
 import 'dart:convert';
+
 import 'package:agrova_apps/extension/card/stat_item_card.dart';
 import 'package:agrova_apps/extension/colors/appcolors.dart';
 import 'package:agrova_apps/models/user_models.dart';
 import 'package:agrova_apps/services/firebase_service.dart';
 import 'package:agrova_apps/view/penjual/analitik_screen.dart';
 import 'package:agrova_apps/view/penjual/edit_produk.dart';
+import 'package:agrova_apps/view/penjual/produk_penjual.dart';
+import 'package:agrova_apps/view/penjual/profil_penjual.dart';
+import 'package:agrova_apps/view/penjual/tambah_produk.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agrova_apps/services/product_service.dart';
@@ -26,7 +30,6 @@ class _HomePenjualState extends State<HomePenjual> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.bgpenjual,
-
       body: Column(
         children: [
           /// ================= HEADER =================
@@ -37,11 +40,12 @@ class _HomePenjualState extends State<HomePenjual> {
                 stream: FirebaseService.userStream(user?.uid ?? ""),
                 builder: (context, snapshot) {
                   final userData = snapshot.data;
-                  final nama = userData?.username ?? user?.displayName ?? "User";
+                  final nama =
+                      userData?.username ?? user?.displayName ?? "User";
                   final photoBase64 = userData?.photoBase64;
 
                   return Container(
-                    padding: const EdgeInsets.fromLTRB(16, 50, 16, 80),
+                    padding: const EdgeInsets.fromLTRB(16, 50, 16, 110),
                     decoration: const BoxDecoration(
                       gradient: LinearGradient(
                         colors: [AppColors.skyBlue, AppColors.mintGreen],
@@ -52,17 +56,26 @@ class _HomePenjualState extends State<HomePenjual> {
                     ),
                     child: Row(
                       children: [
-                        CircleAvatar(
-                          radius: 22,
-                          backgroundColor: Colors.white24,
-                          backgroundImage: photoBase64 != null
-                              ? MemoryImage(base64Decode(photoBase64))
-                              : (user?.photoURL != null
-                                  ? NetworkImage(user!.photoURL!)
-                                  : null) as ImageProvider?,
-                          child: photoBase64 == null && user?.photoURL == null
-                              ? const Icon(Icons.person, color: Colors.white)
-                              : null,
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const ProfilPenjualScreen(),
+                              ),
+                            );
+                          },
+                          child: CircleAvatar(
+                            radius: 22,
+                            backgroundColor: Colors.white24,
+                            backgroundImage: photoBase64 != null
+                                ? MemoryImage(base64Decode(photoBase64))
+                                : (user?.photoURL != null
+                                    ? NetworkImage(user!.photoURL!)
+                                    : const AssetImage(
+                                            "assets/images/gambarlain/download (1).jpg")
+                                        as ImageProvider),
+                          ),
                         ),
                         const SizedBox(width: 10),
                         Column(
@@ -70,7 +83,8 @@ class _HomePenjualState extends State<HomePenjual> {
                           children: [
                             const Text(
                               "Dashboard Penjual 🏪",
-                              style: TextStyle(color: Colors.white70, fontSize: 12),
+                              style: TextStyle(
+                                  color: Colors.white70, fontSize: 12),
                             ),
                             Text(
                               nama,
@@ -81,8 +95,6 @@ class _HomePenjualState extends State<HomePenjual> {
                             ),
                           ],
                         ),
-                        const Spacer(),
-                        const Icon(Icons.notifications, color: Colors.white),
                       ],
                     ),
                   );
@@ -91,7 +103,7 @@ class _HomePenjualState extends State<HomePenjual> {
 
               /// ================= STAT =================
               Positioned(
-                bottom: -40,
+                bottom: -45,
                 left: 16,
                 right: 16,
                 child: Container(
@@ -101,7 +113,7 @@ class _HomePenjualState extends State<HomePenjual> {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: StreamBuilder<List<ProductModel>>(
-                    stream: ProductService.getMyProducts(), // ✅ FIX
+                    stream: ProductService.getMyProducts(),
                     builder: (context, snapshot) {
                       final myProducts = snapshot.data ?? [];
 
@@ -146,7 +158,12 @@ class _HomePenjualState extends State<HomePenjual> {
                   child: InkWell(
                     borderRadius: BorderRadius.circular(16),
                     onTap: () {
-                      // TODO: Tambah produk
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const TambahProduk(),
+                        ),
+                      );
                     },
                     child: const MenuCard(
                       Icons.add,
@@ -156,7 +173,6 @@ class _HomePenjualState extends State<HomePenjual> {
                   ),
                 ),
                 const SizedBox(width: 10),
-
                 Expanded(
                   child: InkWell(
                     borderRadius: BorderRadius.circular(16),
@@ -175,14 +191,17 @@ class _HomePenjualState extends State<HomePenjual> {
                     ),
                   ),
                 ),
-
                 const SizedBox(width: 10),
-
                 Expanded(
                   child: InkWell(
                     borderRadius: BorderRadius.circular(16),
                     onTap: () {
-                      // optional
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const ProdukPenjual(),
+                        ),
+                      );
                     },
                     child: const MenuCard(
                       Icons.inventory_2,
@@ -203,7 +222,7 @@ class _HomePenjualState extends State<HomePenjual> {
             child: Row(
               children: [
                 Text(
-                  "Produk Saya",
+                  "Produk Terbaru",
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 ),
               ],
@@ -215,13 +234,16 @@ class _HomePenjualState extends State<HomePenjual> {
           /// ================= PRODUK =================
           Expanded(
             child: StreamBuilder<List<ProductModel>>(
-              stream: ProductService.getMyProducts(), // ✅ FIX WAJIB
+              stream: ProductService.getMyProducts(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
                 }
 
-                final myProducts = snapshot.data ?? [];
+                final allMyProducts = snapshot.data ?? [];
+
+                // Ambil hanya 10 produk terbaru (asumsi list sudah terurut dari service)
+                final myProducts = allMyProducts.take(10).toList();
 
                 if (myProducts.isEmpty) {
                   return const Center(child: Text("Belum ada produk"));
@@ -241,8 +263,6 @@ class _HomePenjualState extends State<HomePenjual> {
 
                     return SellerGridProductCard(
                       produk: p,
-
-                      /// ✅ EDIT FIX
                       onEdit: () async {
                         await Navigator.push(
                           context,
@@ -251,8 +271,6 @@ class _HomePenjualState extends State<HomePenjual> {
                           ),
                         );
                       },
-
-                      /// ✅ DELETE FIX
                       onDelete: () async {
                         final confirm = await showDialog(
                           context: context,
