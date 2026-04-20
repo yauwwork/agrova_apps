@@ -1,6 +1,7 @@
 import 'package:agrova_apps/extension/card/stat_item_card.dart';
 import 'package:agrova_apps/extension/colors/appcolors.dart';
 import 'package:agrova_apps/view/penjual/analitik_screen.dart';
+import 'package:agrova_apps/view/penjual/edit_produk.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agrova_apps/services/product_service.dart';
@@ -23,200 +24,195 @@ class _HomePenjualState extends State<HomePenjual> {
     return Scaffold(
       backgroundColor: AppColors.bgpenjual,
 
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            /// ================= HEADER =================
-            Stack(
-              clipBehavior: Clip.none,
-              children: [
-                Container(
-                  padding: const EdgeInsets.fromLTRB(16, 50, 16, 80),
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [AppColors.skyBlue, AppColors.mintGreen],
-                    ),
-                    borderRadius: BorderRadius.vertical(
-                      bottom: Radius.circular(30),
-                    ),
+      body: Column(
+        children: [
+          /// ================= HEADER =================
+          Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Container(
+                padding: const EdgeInsets.fromLTRB(16, 50, 16, 80),
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [AppColors.skyBlue, AppColors.mintGreen],
                   ),
-                  child: Row(
-                    children: [
-                      /// 🔥 FOTO PROFILE (AMAN)
-                      CircleAvatar(
-                        radius: 22,
-                        backgroundImage: user?.photoURL != null
-                            ? NetworkImage(user!.photoURL!)
-                            : null,
-                        child: user?.photoURL == null
-                            ? const Icon(Icons.person)
-                            : null,
-                      ),
-
-                      const SizedBox(width: 10),
-
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            "Dashboard Penjual 🏪",
-                            style: TextStyle(color: Colors.white70),
+                  borderRadius: BorderRadius.vertical(
+                    bottom: Radius.circular(30),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 22,
+                      backgroundImage: user?.photoURL != null
+                          ? NetworkImage(user!.photoURL!)
+                          : null,
+                      child: user?.photoURL == null
+                          ? const Icon(Icons.person)
+                          : null,
+                    ),
+                    const SizedBox(width: 10),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Dashboard Penjual 🏪",
+                          style: TextStyle(color: Colors.white70),
+                        ),
+                        Text(
+                          user?.displayName ?? "User",
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
                           ),
+                        ),
+                      ],
+                    ),
+                    const Spacer(),
+                    const Icon(Icons.notifications, color: Colors.white),
+                  ],
+                ),
+              ),
 
-                          /// 🔥 NAMA DARI FIREBASE
-                          Text(
-                            user?.displayName ?? "User",
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
+              /// ================= STAT =================
+              Positioned(
+                bottom: -40,
+                left: 16,
+                right: 16,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 18),
+                  decoration: BoxDecoration(
+                    color: AppColors.card,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: StreamBuilder<List<ProductModel>>(
+                    stream: ProductService.getMyProducts(), // ✅ FIX
+                    builder: (context, snapshot) {
+                      final myProducts = snapshot.data ?? [];
+
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          StatItem(
+                            Icons.inventory,
+                            "${myProducts.length}",
+                            "Produk",
+                            AppColors.mintGreen,
+                          ),
+                          const StatItem(
+                            Icons.remove_red_eye,
+                            "15.7k",
+                            "Dilihat",
+                            AppColors.skyBlue,
+                          ),
+                          const StatItem(
+                            Icons.favorite,
+                            "892",
+                            "Favorit",
+                            Colors.pink,
                           ),
                         ],
-                      ),
-
-                      const Spacer(),
-                      const Icon(Icons.notifications, color: Colors.white),
-                    ],
+                      );
+                    },
                   ),
                 ),
+              ),
+            ],
+          ),
 
-                /// 🔥 STAT CARD
-                Positioned(
-                  bottom: -40,
-                  left: 16,
-                  right: 16,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 18),
-                    decoration: BoxDecoration(
-                      color: AppColors.card,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: StreamBuilder<List<ProductModel>>(
-                      stream: ProductService.getProducts(),
-                      builder: (context, snapshot) {
-                        final all = snapshot.data ?? [];
+          const SizedBox(height: 60),
 
-                        /// 🔥 FILTER PRODUK MILIK USER
-                        final myProducts = all.where((p) {
-                          return p.userId == user?.uid;
-                        }).toList();
-
-                        return Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            StatItem(
-                              Icons.inventory,
-                              "${myProducts.length}",
-                              "Produk",
-                              AppColors.mintGreen,
-                            ),
-                            const StatItem(
-                              Icons.remove_red_eye,
-                              "15.7k",
-                              "Dilihat",
-                              AppColors.skyBlue,
-                            ),
-                            const StatItem(
-                              Icons.favorite,
-                              "892",
-                              "Favorit",
-                              Colors.pink,
-                            ),
-                          ],
-                        );
-                      },
+          /// ================= MENU =================
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              children: [
+                Expanded(
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(16),
+                    onTap: () {
+                      // TODO: Tambah produk
+                    },
+                    child: const MenuCard(
+                      Icons.add,
+                      "Tambah",
+                      AppColors.mintGreen,
                     ),
                   ),
                 ),
-              ],
-            ),
+                const SizedBox(width: 10),
 
-            const SizedBox(height: 60),
-
-            /// ================= MENU =================
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                children: [
-                  const Expanded(
-                    child: MenuCard(Icons.add, "Tambah", AppColors.mintGreen),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const AnalitikScreen(),
-                          ),
-                        );
-                      },
-                      child: const MenuCard(
-                        Icons.show_chart,
-                        "Analitik",
-                        AppColors.skyBlue,
-                      ),
+                Expanded(
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(16),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const AnalitikScreen(),
+                        ),
+                      );
+                    },
+                    child: const MenuCard(
+                      Icons.show_chart,
+                      "Analitik",
+                      AppColors.skyBlue,
                     ),
                   ),
-                  const SizedBox(width: 10),
-                  const Expanded(
-                    child: MenuCard(
+                ),
+
+                const SizedBox(width: 10),
+
+                Expanded(
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(16),
+                    onTap: () {
+                      // optional
+                    },
+                    child: const MenuCard(
                       Icons.inventory_2,
                       "Produk",
                       AppColors.secondary,
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
+          ),
 
-            const SizedBox(height: 20),
+          const SizedBox(height: 20),
 
-            /// ================= TITLE =================
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Produk Saya",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                ],
-              ),
+          /// ================= TITLE =================
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              children: [
+                Text(
+                  "Produk Saya",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+              ],
             ),
+          ),
 
-            const SizedBox(height: 12),
+          const SizedBox(height: 12),
 
-            /// ================= PRODUK =================
-            StreamBuilder<List<ProductModel>>(
-              stream: ProductService.getProducts(), // ✅ FIX
+          /// ================= PRODUK =================
+          Expanded(
+            child: StreamBuilder<List<ProductModel>>(
+              stream: ProductService.getMyProducts(), // ✅ FIX WAJIB
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Padding(
-                    padding: EdgeInsets.all(20),
-                    child: CircularProgressIndicator(),
-                  );
+                  return const Center(child: CircularProgressIndicator());
                 }
 
-                final allProducts = snapshot.data ?? [];
-
-                /// 🔥 FILTER PRODUK USER (TANPA INDEX)
-                final myProducts = allProducts.where((p) {
-                  return p.userId == user?.uid;
-                }).toList();
+                final myProducts = snapshot.data ?? [];
 
                 if (myProducts.isEmpty) {
-                  return const Padding(
-                    padding: EdgeInsets.all(20),
-                    child: Text("Belum ada produk"),
-                  );
+                  return const Center(child: Text("Belum ada produk"));
                 }
 
                 return GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
                   padding: const EdgeInsets.all(16),
                   itemCount: myProducts.length,
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -231,12 +227,37 @@ class _HomePenjualState extends State<HomePenjual> {
                     return SellerGridProductCard(
                       produk: p,
 
-                      onEdit: () {
-                        /// TODO: arahkan ke edit screen
+                      /// ✅ EDIT FIX
+                      onEdit: () async {
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => EditProduk(produk: p),
+                          ),
+                        );
                       },
 
+                      /// ✅ DELETE FIX
                       onDelete: () async {
-                        if (p.id != null) {
+                        final confirm = await showDialog(
+                          context: context,
+                          builder: (_) => AlertDialog(
+                            title: const Text("Hapus Produk"),
+                            content: const Text("Yakin mau hapus produk ini?"),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, false),
+                                child: const Text("Batal"),
+                              ),
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, true),
+                                child: const Text("Hapus"),
+                              ),
+                            ],
+                          ),
+                        );
+
+                        if (confirm == true && p.id != null) {
                           await ProductService.deleteProduct(p.id!);
                         }
                       },
@@ -245,8 +266,8 @@ class _HomePenjualState extends State<HomePenjual> {
                 );
               },
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

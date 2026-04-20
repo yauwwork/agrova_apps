@@ -24,7 +24,6 @@ class KategoriSc extends StatefulWidget {
 class _KategoriScState extends State<KategoriSc> {
   int selectedKategori = 0;
 
-  /// 🔥 HARUS SAMA PERSIS DENGAN PENJUAL & DATABASE
   final List<KategoriModel> kategori = [
     KategoriModel("Semua", Icons.all_inbox, Colors.grey),
     KategoriModel("Buah-buahan", Icons.apple, Colors.green),
@@ -91,7 +90,7 @@ class _KategoriScState extends State<KategoriSc> {
 
             const SizedBox(height: 16),
 
-            /// 🔥 KATEGORI (UI PEMBELI, DATA PENJUAL)
+            /// 🔥 KATEGORI
             SizedBox(
               height: 40,
               child: ListView.builder(
@@ -149,7 +148,7 @@ class _KategoriScState extends State<KategoriSc> {
 
             const SizedBox(height: 12),
 
-            /// 🔥 PRODUK + FAVORITE
+            /// 🔥 PRODUK
             Expanded(
               child: StreamBuilder<List<ProductModel>>(
                 stream: ProductService.getProducts(),
@@ -160,7 +159,7 @@ class _KategoriScState extends State<KategoriSc> {
 
                   final allProducts = snapshot.data!;
 
-                  /// 🔥 FILTER EXACT MATCH (INI KUNCI UTAMA)
+                  /// FILTER
                   List<ProductModel> filtered = allProducts;
 
                   if (selectedKategori != 0) {
@@ -195,37 +194,31 @@ class _KategoriScState extends State<KategoriSc> {
                         builder: (context, favSnap) {
                           final isFav = favSnap.data ?? false;
 
-                          return GestureDetector(
+                          return ProductCard(
+                            produk: produk,
+                            isFavorited: isFav,
+                            onFavorite: (value) async {
+                              if (produk.id == null) return;
+
+                              if (value) {
+                                await FavoriteService.addFavorite(produk);
+                              } else {
+                                await FavoriteService.removeFavorite(
+                                  produk.id!,
+                                );
+                              }
+                            },
+
+                            /// 🔥 NAVIGASI KE DETAIL (FIX DI SINI)
                             onTap: () {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (_) => DetailProdukSc(
-                                    title: produk.name,
-                                    price: "Rp ${produk.price}",
-                                    imageBase64: produk.imageBase64,
-                                    penjual: produk.userId,
-                                    location: produk.location,
-                                    deskripsi: produk.description,
-                                  ),
+                                  builder: (_) =>
+                                      DetailProdukSc(product: produk),
                                 ),
                               );
                             },
-                            child: ProductCard(
-                              produk: produk,
-                              isFavorited: isFav,
-                              onFavorite: (value) async {
-                                if (produk.id == null) return;
-
-                                if (value) {
-                                  await FavoriteService.addFavorite(produk);
-                                } else {
-                                  await FavoriteService.removeFavorite(
-                                    produk.id!,
-                                  );
-                                }
-                              },
-                            ),
                           );
                         },
                       );

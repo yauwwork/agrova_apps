@@ -9,7 +9,13 @@ class ProductModel {
   final int stock;
   final String description;
   final String location;
+
+  /// 🔥 FALLBACK (1 gambar lama)
   final String imageBase64;
+
+  /// 🔥 MULTI IMAGE (baru)
+  final List<String> images;
+
   final DateTime? createdAt;
 
   ProductModel({
@@ -22,10 +28,13 @@ class ProductModel {
     required this.description,
     required this.location,
     required this.imageBase64,
+    this.images = const [],
     this.createdAt,
   });
 
-  /// 🔥 FIX TOTAL (NO MIX TYPE)
+  /// =====================
+  /// 🔥 TO MAP
+  /// =====================
   Map<String, dynamic> toMap() {
     return {
       "userId": userId.trim(),
@@ -36,11 +45,25 @@ class ProductModel {
       "description": description.trim(),
       "location": location.trim(),
       "imageBase64": imageBase64,
-      "createdAt": FieldValue.serverTimestamp(), // 🔥 FIX
+
+      /// 🔥 SIMPAN MULTI IMAGE
+      "images": images,
+
+      "createdAt": FieldValue.serverTimestamp(),
     };
   }
 
+  /// =====================
+  /// 🔥 FROM MAP (ANTI ERROR)
+  /// =====================
   factory ProductModel.fromMap(Map<String, dynamic> map, String id) {
+    List<String> imageList = [];
+
+    /// 🔥 HANDLE SEMUA KEMUNGKINAN
+    if (map["images"] != null && map["images"] is List) {
+      imageList = List<String>.from(map["images"]);
+    }
+
     return ProductModel(
       id: id,
       userId: map["userId"] ?? "",
@@ -50,7 +73,9 @@ class ProductModel {
       location: map["location"] ?? "",
       imageBase64: map["imageBase64"] ?? "",
 
-      /// 🔥 ANTI ERROR DOUBLE
+      /// 🔥 FIX UTAMA DI SINI
+      images: imageList,
+
       price: (map["price"] ?? 0) is int
           ? map["price"]
           : (map["price"] ?? 0).toInt(),
@@ -59,7 +84,6 @@ class ProductModel {
           ? map["stock"]
           : (map["stock"] ?? 0).toInt(),
 
-      /// 🔥 SAFE TIMESTAMP
       createdAt: map["createdAt"] != null
           ? (map["createdAt"] as Timestamp).toDate()
           : null,

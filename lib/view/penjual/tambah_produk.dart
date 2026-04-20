@@ -25,9 +25,10 @@ class _TambahProdukState extends State<TambahProduk> {
 
   final ImagePicker _picker = ImagePicker();
 
+  /// 🔥 LIST FILE IMAGE (MAX 5)
   List<File> _images = [];
-  String _kategori = "Buah-buahan";
 
+  String _kategori = "Buah-buahan";
   bool _isLoading = false;
 
   @override
@@ -40,28 +41,37 @@ class _TambahProdukState extends State<TambahProduk> {
     super.dispose();
   }
 
-  Future<void> _pickImage() async {
-    if (_images.length >= 5) return;
+  /// ================= PICK MULTI IMAGE =================
+  Future<void> _pickImages() async {
+    if (_images.length >= 5) {
+      _showSnack("Maksimal 5 foto");
+      return;
+    }
 
-    final XFile? file = await _picker.pickImage(
-      source: ImageSource.gallery,
-      imageQuality: 20, // 🔥 compress
-      maxWidth: 800, // 🔥 kecilin ukuran
-      maxHeight: 800, // 🔥 kecilin ukuran
+    /// 🔥 PILIH MULTI IMAGE
+    final List<XFile> picked = await _picker.pickMultiImage(
+      imageQuality: 20, // compress
+      maxWidth: 800,
+      maxHeight: 800,
     );
 
-    if (file == null) return;
+    if (picked.isEmpty) return;
 
     setState(() {
-      _images.add(File(file.path));
+      /// 🔥 BATASI TOTAL 5
+      int remaining = 5 - _images.length;
+
+      _images.addAll(picked.take(remaining).map((e) => File(e.path)));
     });
   }
 
+  /// ================= CONVERT BASE64 =================
   Future<String> _toBase64(File file) async {
     final bytes = await file.readAsBytes();
     return base64Encode(bytes);
   }
 
+  /// ================= SUBMIT =================
   Future<void> _submit() async {
     if (_isLoading) return;
 
@@ -70,25 +80,44 @@ class _TambahProdukState extends State<TambahProduk> {
       return;
     }
 
+    /// 🔥 WAJIB ADA FOTO
+    if (_images.isEmpty) {
+      _showSnack("Minimal 1 foto wajib");
+      return;
+    }
+
     setState(() => _isLoading = true);
 
     try {
+      /// ================= CONVERT SEMUA FOTO =================
       List<String> imagesBase64 = [];
+
       for (final img in _images) {
-        imagesBase64.add(await _toBase64(img));
+        final base64 = await _toBase64(img);
+        imagesBase64.add(base64);
       }
 
+      /// 🔥 AMBIL FOTO PERTAMA (fallback lama)
+      String firstImage = imagesBase64.first;
+
+      /// ================= BUAT OBJECT =================
       final product = ProductModel(
-        userId: "TODO_USER_ID",
+        userId: "AUTO", // 🔥 nanti dioverride di ProductService
         name: _namaController.text,
         category: _kategori,
         price: int.tryParse(_hargaController.text) ?? 0,
         stock: int.tryParse(_stokController.text) ?? 0,
         description: _deskripsiController.text,
         location: _lokasiController.text,
-        imageBase64: imagesBase64.isNotEmpty ? imagesBase64.first : "",
+
+        /// 🔥 FALLBACK (WAJIB ADA)
+        imageBase64: firstImage,
+
+        /// 🔥 INI YANG BIKIN MULTI IMAGE
+        images: imagesBase64,
       );
 
+      /// ================= SIMPAN =================
       await ProductService.addProduct(product);
 
       _showSnack("Produk berhasil ditambahkan");
@@ -130,7 +159,7 @@ class _TambahProdukState extends State<TambahProduk> {
           children: [
             /// ================= FOTO =================
             _buildCard(
-              title: "Foto Produk",
+              title: "Foto Produk (max 5)",
               child: GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
@@ -139,12 +168,12 @@ class _TambahProdukState extends State<TambahProduk> {
                   crossAxisCount: 3,
                   crossAxisSpacing: 10,
                   mainAxisSpacing: 10,
-                  childAspectRatio: 1, // 🔥 FIX RATIO
                 ),
                 itemBuilder: (context, i) {
+                  /// 🔥 BUTTON TAMBAH
                   if (i == _images.length) {
                     return GestureDetector(
-                      onTap: _pickImage,
+                      onTap: _pickImages,
                       child: Container(
                         decoration: BoxDecoration(
                           color: Colors.grey.shade200,
@@ -155,16 +184,20 @@ class _TambahProdukState extends State<TambahProduk> {
                     );
                   }
 
+                  /// 🔥 PREVIEW IMAGE
                   return Stack(
                     children: [
                       ClipRRect(
                         borderRadius: BorderRadius.circular(12),
-                        child: SizedBox(
+                        child: Image.file(
+                          _images[i],
                           width: double.infinity,
                           height: double.infinity,
-                          child: Image.file(_images[i], fit: BoxFit.cover),
+                          fit: BoxFit.cover,
                         ),
                       ),
+
+                      /// 🔥 DELETE BUTTON
                       Positioned(
                         right: 5,
                         top: 5,
@@ -273,11 +306,7 @@ class _TambahProdukState extends State<TambahProduk> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
+          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10),
         ],
       ),
       child: Column(

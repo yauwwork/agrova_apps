@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:agrova_apps/extension/colors/appcolors.dart';
+import 'package:agrova_apps/view/pembeli/produk_pembeli.dart';
 import 'package:flutter/material.dart';
 import 'package:agrova_apps/services/product_service.dart';
 import 'package:agrova_apps/services/favorite_service.dart';
@@ -29,7 +30,6 @@ class _HomePembeliScreenState extends State<HomePembeliScreen> {
   void initState() {
     super.initState();
 
-    /// 🔥 AUTO BANNER SCROLL (FIX STABLE)
     _bannerTimer = Timer.periodic(const Duration(seconds: 3), (timer) {
       if (!_pageController.hasClients) return;
 
@@ -42,7 +42,6 @@ class _HomePembeliScreenState extends State<HomePembeliScreen> {
       );
     });
 
-    /// 🔥 SEARCH LISTENER
     _searchController.addListener(() {
       setState(() {
         _searchQuery = _searchController.text.toLowerCase();
@@ -58,14 +57,12 @@ class _HomePembeliScreenState extends State<HomePembeliScreen> {
     super.dispose();
   }
 
-  /// ================= USER STREAM =================
   Stream<DocumentSnapshot<Map<String, dynamic>>> getUserStream() {
     final uid = FirebaseAuth.instance.currentUser!.uid;
 
     return FirebaseFirestore.instance.collection('users').doc(uid).snapshots();
   }
 
-  /// ================= AMBIL NAMA (ANTI ERROR) =================
   String getNama(Map<String, dynamic>? data) {
     if (data == null) return "User Agrova";
 
@@ -80,7 +77,6 @@ class _HomePembeliScreenState extends State<HomePembeliScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.softMint,
-
       body: StreamBuilder<List<ProductModel>>(
         stream: ProductService.getProducts(),
         builder: (context, snapshot) {
@@ -90,7 +86,6 @@ class _HomePembeliScreenState extends State<HomePembeliScreen> {
 
           final allProducts = snapshot.data ?? [];
 
-          /// 🔥 SEARCH FILTER
           final products = allProducts.where((p) {
             final name = (p.name ?? "").toLowerCase();
             return name.contains(_searchQuery);
@@ -109,26 +104,36 @@ class _HomePembeliScreenState extends State<HomePembeliScreen> {
                       _buildBanner(),
                       const SizedBox(height: 20),
 
-                      /// ================= SEARCH =================
+                      /// 🔍 SEARCH (FIXED)
                       Container(
+                        height: 48,
                         padding: const EdgeInsets.symmetric(horizontal: 12),
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(24),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 8,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
                         ),
                         child: TextField(
                           controller: _searchController,
+                          textAlignVertical: TextAlignVertical.center,
                           decoration: const InputDecoration(
                             hintText: "Cari produk...",
-                            prefixIcon: Icon(Icons.search),
                             border: InputBorder.none,
+                            isCollapsed: true,
+                            prefixIcon: Icon(Icons.search, size: 20),
                           ),
                         ),
                       ),
 
-                      const SizedBox(height: 15),
+                      const SizedBox(height: 16),
 
-                      /// ================= PRODUK =================
+                      /// 🛍️ PRODUK
                       GridView.builder(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
@@ -159,6 +164,17 @@ class _HomePembeliScreenState extends State<HomePembeliScreen> {
                                   } else {
                                     await FavoriteService.removeFavorite(p.id!);
                                   }
+                                },
+
+                                /// 🔥 NAVIGASI KE DETAIL
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) =>
+                                          DetailProdukSc(product: p),
+                                    ),
+                                  );
                                 },
                               );
                             },
@@ -192,15 +208,12 @@ class _HomePembeliScreenState extends State<HomePembeliScreen> {
             radius: 20,
             backgroundImage: AssetImage("assets/profile.jpg"),
           ),
-
           const SizedBox(width: 10),
 
-          /// 🔥 FIX NAMA USER (ANTI NULL + MULTI KEY)
           StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
             stream: getUserStream(),
             builder: (context, snapshot) {
               final data = snapshot.data?.data();
-
               final nama = getNama(data);
 
               return Column(
@@ -249,7 +262,7 @@ class _HomePembeliScreenState extends State<HomePembeliScreen> {
   }
 }
 
-/// ================= BANNER WIDGET =================
+/// ================= BANNER =================
 class _Banner extends StatelessWidget {
   final String title;
   final String subtitle;

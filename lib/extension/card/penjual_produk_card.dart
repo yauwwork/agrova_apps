@@ -4,8 +4,42 @@ import 'package:agrova_apps/extension/colors/appcolors.dart';
 import 'package:agrova_apps/models/product_model.dart';
 
 /// =======================================================
+/// 🔥 BASE STYLE
+/// =======================================================
+const double _radius = 16;
+const double _imgRadius = 12;
+
+/// =======================================================
+/// 🔥 CATEGORY COLOR SYSTEM
+/// =======================================================
+Color getCategoryColor(String category) {
+  switch (category.toLowerCase()) {
+    case 'buah-buahan':
+    case 'buah':
+      return Colors.orange;
+
+    case 'sayur':
+    case 'sayuran':
+      return Colors.green;
+
+    case 'ikan':
+    case 'seafood':
+      return Colors.blue;
+
+    case 'daging':
+      return Colors.red;
+
+    case 'bumbu':
+    case 'rempah':
+      return Colors.brown;
+
+    default:
+      return Colors.grey;
+  }
+}
+
+/// =======================================================
 /// 🔥 LIST CARD (SELLER LIST)
-/// dipakai buat list vertical produk penjual
 /// =======================================================
 class ListCard extends StatelessWidget {
   final ProductModel produk;
@@ -16,43 +50,45 @@ class ListCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final categoryColor = getCategoryColor(produk.category);
+
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 10),
+      margin: const EdgeInsets.symmetric(vertical: 8),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: const [
+        borderRadius: BorderRadius.circular(_radius),
+        boxShadow: [
           BoxShadow(
-            color: Colors.black12,
-            blurRadius: 10,
-            offset: Offset(0, 4),
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
           ),
         ],
       ),
       child: Row(
         children: [
-          /// 🔥 IMAGE
+          /// IMAGE
           ClipRRect(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(_imgRadius),
             child: produk.imageBase64.isNotEmpty
                 ? Image.memory(
                     base64Decode(produk.imageBase64),
-                    width: 70,
-                    height: 70,
+                    width: 72,
+                    height: 72,
                     fit: BoxFit.cover,
                   )
                 : Container(
-                    width: 70,
-                    height: 70,
-                    color: Colors.grey[300],
-                    child: const Icon(Icons.image),
+                    width: 72,
+                    height: 72,
+                    color: Colors.grey.shade200,
+                    child: const Icon(Icons.image_outlined),
                   ),
           ),
 
-          const SizedBox(width: 16),
+          const SizedBox(width: 12),
 
-          /// 🔥 CONTENT
+          /// CONTENT
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -62,15 +98,32 @@ class ListCard extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
-                const SizedBox(height: 4),
 
-                Text(
-                  produk.category,
-                  style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                const SizedBox(height: 6),
+
+                /// CATEGORY TAG
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 3,
+                  ),
+                  decoration: BoxDecoration(
+                    color: categoryColor.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: categoryColor),
+                  ),
+                  child: Text(
+                    produk.category,
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: categoryColor,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
                 ),
 
                 const SizedBox(height: 6),
@@ -78,37 +131,41 @@ class ListCard extends StatelessWidget {
                 Text(
                   "Rp ${produk.price}",
                   style: const TextStyle(
-                    fontSize: 15,
-                    color: Colors.blue,
+                    fontSize: 14,
                     fontWeight: FontWeight.bold,
+                    color: Colors.green,
                   ),
                 ),
               ],
             ),
           ),
 
-          /// 🔥 ACTION BUTTON
-          Column(
+          /// ACTION
+          Row(
             children: [
-              IconButton(
-                icon: const Icon(Icons.edit, color: Colors.blue),
-                onPressed: onEdit,
-              ),
-              IconButton(
-                icon: const Icon(Icons.delete, color: Colors.red),
-                onPressed: onDelete,
-              ),
+              _iconAction(Icons.edit, Colors.blue, onEdit),
+              _iconAction(Icons.delete, Colors.red, onDelete),
             ],
           ),
         ],
       ),
     );
   }
+
+  Widget _iconAction(IconData icon, Color color, VoidCallback? onTap) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(10),
+      child: Padding(
+        padding: const EdgeInsets.all(6),
+        child: Icon(icon, size: 18, color: color),
+      ),
+    );
+  }
 }
 
 /// =======================================================
-/// 🔥 MENU CARD (DARI HOME PENJUAL)
-/// buat tombol: Tambah, Analitik, Produk
+/// 🔥 MENU CARD
 /// =======================================================
 class MenuCard extends StatelessWidget {
   final IconData icon;
@@ -120,37 +177,33 @@ class MenuCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 95,
+      height: 90,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(_radius),
         boxShadow: [
           BoxShadow(
-            blurRadius: 12,
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 10,
             offset: const Offset(0, 4),
-            color: Colors.black.withOpacity(0.05),
           ),
         ],
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          /// 🔥 ICON BOX
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.15),
-              borderRadius: BorderRadius.circular(14),
+              color: color.withOpacity(0.12),
+              borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(icon, color: color, size: 22),
+            child: Icon(icon, color: color, size: 20),
           ),
-
           const SizedBox(height: 8),
-
-          /// 🔥 TITLE
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w500,
               color: AppColors.textPrimary,
@@ -163,8 +216,7 @@ class MenuCard extends StatelessWidget {
 }
 
 /// =======================================================
-/// 🔥 SELLER GRID PRODUCT CARD
-/// ini yang dipakai di HomePenjual (grid produk)
+/// 🔥 GRID CARD (SELLER)
 /// =======================================================
 class SellerGridProductCard extends StatelessWidget {
   final ProductModel produk;
@@ -180,43 +232,41 @@ class SellerGridProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final categoryColor = getCategoryColor(produk.category);
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: const [
+        borderRadius: BorderRadius.circular(_radius),
+        boxShadow: [
           BoxShadow(
-            blurRadius: 12,
-            offset: Offset(0, 6),
-            color: Colors.black12,
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 14,
+            offset: const Offset(0, 6),
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          /// 🔥 IMAGE + ACTION
+          /// IMAGE
           Stack(
             children: [
               ClipRRect(
                 borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(18),
+                  top: Radius.circular(_radius),
                 ),
                 child: produk.imageBase64.isNotEmpty
                     ? Image.memory(
                         base64Decode(produk.imageBase64),
-                        height: 110,
+                        height: 120,
                         width: double.infinity,
                         fit: BoxFit.cover,
                       )
-                    : Container(
-                        height: 110,
-                        width: double.infinity,
-                        color: Colors.grey,
-                      ),
+                    : Container(height: 120, color: Colors.grey.shade200),
               ),
 
-              /// 🔥 KATEGORI
+              /// CATEGORY TAG (FIXED COLOR)
               Positioned(
                 top: 8,
                 left: 8,
@@ -226,54 +276,74 @@ class SellerGridProductCard extends StatelessWidget {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.9),
+                    color: categoryColor.withOpacity(0.15),
                     borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: categoryColor),
                   ),
-                  child: Text(produk.category),
+                  child: Text(
+                    produk.category,
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: categoryColor,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
                 ),
               ),
 
-              /// 🔥 EDIT + DELETE
+              /// ACTION
               Positioned(
-                top: 6,
-                right: 6,
+                top: 4,
+                right: 4,
                 child: Row(
                   children: [
-                    IconButton(
-                      icon: const Icon(
-                        Icons.edit,
-                        color: Colors.blue,
-                        size: 16,
-                      ),
-                      onPressed: onEdit,
-                    ),
-                    IconButton(
-                      icon: const Icon(
-                        Icons.delete,
-                        color: Colors.red,
-                        size: 16,
-                      ),
-                      onPressed: onDelete,
-                    ),
+                    _smallAction(Icons.edit, Colors.blue, onEdit),
+                    _smallAction(Icons.delete, Colors.red, onDelete),
                   ],
                 ),
               ),
             ],
           ),
 
-          /// 🔥 CONTENT
+          /// CONTENT
           Padding(
             padding: const EdgeInsets.all(10),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(produk.name),
-                Text(produk.location),
-                Text("Rp ${produk.price}"),
+                Text(
+                  produk.name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  produk.location,
+                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  "Rp ${produk.price}",
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green,
+                  ),
+                ),
               ],
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _smallAction(IconData icon, Color color, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.all(6),
+        child: Icon(icon, size: 16, color: color),
       ),
     );
   }
