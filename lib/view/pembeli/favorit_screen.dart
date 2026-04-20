@@ -16,10 +16,12 @@ class _FavoritScreenState extends State<FavoritScreen> {
   String searchQuery = "";
 
   final List<Map<String, dynamic>> kategori = [
-    {"name": "Semua", "icon": Icons.apps, "color": Color(0xff22C55E)},
-    {"name": "Pertanian", "icon": Icons.eco, "color": Color(0xffF59E0B)},
-    {"name": "Perikanan", "icon": Icons.set_meal, "color": Color(0xff3B82F6)},
-    {"name": "Peternakan", "icon": Icons.grass, "color": Color(0xffA16207)},
+    {"icon": Icons.all_inbox, "name": "Semua", "color": Colors.grey},
+    {"icon": Icons.apple, "name": "Buah-buahan", "color": Colors.green},
+    {"icon": Icons.grass, "name": "Sayuran", "color": Colors.lightGreen},
+    {"icon": Icons.set_meal, "name": "Ikan", "color": Colors.blue},
+    {"icon": Icons.lunch_dining, "name": "Daging", "color": Colors.red},
+    {"icon": Icons.egg, "name": "Telur", "color": Colors.orange},
   ];
 
   @override
@@ -30,42 +32,54 @@ class _FavoritScreenState extends State<FavoritScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        centerTitle: true,
+        centerTitle: false,
         title: const Text(
-          "Produk Favorit",
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          "Favorit Saya",
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+          ),
         ),
       ),
 
       body: StreamBuilder<List<ProductModel>>(
         stream: FavoriteService.getFavorites(),
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
+          if (!snapshot.hasData) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          if (snapshot.hasError) {
-            return const Center(child: Text("Gagal load favorit"));
-          }
+          final allProduk = snapshot.data!;
 
-          final favoritProduk = snapshot.data ?? [];
-
-          /// 🔥 FILTER SEARCH
-          final filteredProduk = favoritProduk.where((produk) {
-            return produk.name
-                .toLowerCase()
-                .contains(searchQuery.toLowerCase());
+          /// 🔍 FILTER SEARCH
+          List<ProductModel> filtered = allProduk.where((produk) {
+            return produk.name.toLowerCase().contains(
+              searchQuery.toLowerCase(),
+            );
           }).toList();
 
-          return Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              children: [
-                /// ================= SEARCH =================
-                Container(
+          /// 🔥 FILTER KATEGORI
+          if (selectedKategori != 0) {
+            final selectedName = kategori[selectedKategori]["name"];
+
+            filtered = filtered.where((p) {
+              return p.category.toLowerCase() == selectedName.toLowerCase();
+            }).toList();
+          }
+
+          return Column(
+            children: [
+              const SizedBox(height: 10),
+
+              /// 🔍 SEARCH BAR
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Container(
+                  height: 46,
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(18),
+                    borderRadius: BorderRadius.circular(16),
                   ),
                   child: TextField(
                     onChanged: (value) {
@@ -75,105 +89,119 @@ class _FavoritScreenState extends State<FavoritScreen> {
                       hintText: "Cari produk favorit...",
                       prefixIcon: Icon(Icons.search),
                       border: InputBorder.none,
+                      contentPadding: EdgeInsets.symmetric(vertical: 12),
                     ),
                   ),
                 ),
+              ),
 
-                const SizedBox(height: 16),
+              const SizedBox(height: 14),
 
-                /// ================= KATEGORI =================
-                SizedBox(
-                  height: 42,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: kategori.length,
-                    itemBuilder: (context, index) {
-                      final isSelected = selectedKategori == index;
-                      final item = kategori[index];
+              /// 🔥 KATEGORI (FIX FINAL STYLE - CLEAN KAYAK KATALOG)
+              SizedBox(
+                height: 40,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  itemCount: kategori.length,
+                  itemBuilder: (context, index) {
+                    final isSelected = selectedKategori == index;
+                    final item = kategori[index];
 
-                      return GestureDetector(
-                        onTap: () {
-                          setState(() => selectedKategori = index);
-                        },
-                        child: Container(
-                          margin: const EdgeInsets.only(right: 10),
-                          padding: const EdgeInsets.symmetric(horizontal: 14),
-                          decoration: BoxDecoration(
-                            color: isSelected ? item["color"] : Colors.white,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(
-                                item["icon"],
-                                size: 16,
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          selectedKategori = index;
+                        });
+                      },
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        margin: const EdgeInsets.only(right: 10),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 8,
+                        ),
+
+                        decoration: BoxDecoration(
+                          color: isSelected
+                              ? item["color"]
+                              : item["color"].withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              item["icon"],
+                              size: 16,
+                              color: isSelected ? Colors.white : item["color"],
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              item["name"],
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
                                 color: isSelected
                                     ? Colors.white
                                     : item["color"],
                               ),
-                              const SizedBox(width: 6),
-                              Text(
-                                item["name"],
-                                style: TextStyle(
-                                  color: isSelected
-                                      ? Colors.white
-                                      : Colors.black,
-                                ),
-                              ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                      );
-                    },
-                  ),
+                      ),
+                    );
+                  },
                 ),
+              ),
 
-                const SizedBox(height: 10),
+              const SizedBox(height: 10),
 
-                /// ================= COUNT =================
-                Align(
+              /// 🔢 COUNT
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    "${filteredProduk.length} produk",
-                    style: const TextStyle(color: Colors.grey),
+                    "${filtered.length} produk favorit",
+                    style: const TextStyle(color: Colors.grey, fontSize: 12),
                   ),
                 ),
+              ),
 
-                const SizedBox(height: 10),
+              const SizedBox(height: 10),
 
-                /// ================= GRID =================
-                Expanded(
-                  child: filteredProduk.isEmpty
-                      ? const Center(child: Text("Belum ada produk favorit"))
-                      : GridView.builder(
-                          itemCount: filteredProduk.length,
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            crossAxisSpacing: 12,
-                            mainAxisSpacing: 12,
-                            childAspectRatio: 0.72,
-                          ),
-                          itemBuilder: (context, index) {
-                            final produk = filteredProduk[index];
+              /// 🔥 GRID PRODUK
+              Expanded(
+                child: filtered.isEmpty
+                    ? const Center(child: Text("Belum ada produk favorit"))
+                    : GridView.builder(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        itemCount: filtered.length,
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 12,
+                              mainAxisSpacing: 12,
+                              childAspectRatio: 0.72,
+                            ),
+                        itemBuilder: (context, index) {
+                          final produk = filtered[index];
 
-                            return ProductCard(
-                              produk: produk,
-                              isFavorited: true,
+                          return ProductCard(
+                            produk: produk,
+                            isFavorited: true,
+                            onFavorite: (value) async {
+                              if (produk.id == null) return;
 
-                              /// 🔥 FIX: pakai product.id! (null safe)
-                              onFavorite: (value) async {
-                                if (produk.id == null) return;
-
-                                await FavoriteService.removeFavorite(
-                                    produk.id!);
-                              },
-                            );
-                          },
-                        ),
-                ),
-              ],
-            ),
+                              await FavoriteService.removeFavorite(produk.id!);
+                            },
+                          );
+                        },
+                      ),
+              ),
+            ],
           );
         },
       ),

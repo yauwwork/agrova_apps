@@ -6,6 +6,7 @@ import 'package:agrova_apps/view/penjual/bottom_navigation_penjual.dart';
 import 'package:amicons/amicons.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class ProfilPembeli extends StatefulWidget {
   const ProfilPembeli({super.key});
@@ -15,12 +16,16 @@ class ProfilPembeli extends StatefulWidget {
 }
 
 class _ProfilPembeliState extends State<ProfilPembeli> {
+  final user = FirebaseAuth.instance.currentUser;
+
   @override
   Widget build(BuildContext context) {
+    String nama = user?.displayName ?? "User Agrova";
+    String email = user?.email ?? "-";
+
     return Scaffold(
       backgroundColor: AppColors.softMint,
 
-      /// 🔥 APPBAR (SAMA PERSIS KAYA PENJUAL)
       appBar: AppBar(
         elevation: 0,
         automaticallyImplyLeading: false,
@@ -45,9 +50,7 @@ class _ProfilPembeliState extends State<ProfilPembeli> {
         padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
         child: Column(
           children: [
-            /// =====================================
-            /// 🔥 PROFILE CARD (IDENTIK)
-            /// =====================================
+            /// PROFILE CARD (UI LU TETEP)
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -61,56 +64,34 @@ class _ProfilPembeliState extends State<ProfilPembeli> {
               ),
               child: Column(
                 children: [
-                  /// FOTO + EDIT
-                  Stack(
-                    children: [
-                      const CircleAvatar(
-                        radius: 45,
-                        backgroundImage: AssetImage(
-                          "assets/images/gambarlain/download (1).jpg",
-                        ),
-                      ),
-                      Positioned(
-                        bottom: 0,
-                        right: 0,
-                        child: Container(
-                          padding: const EdgeInsets.all(6),
-                          decoration: const BoxDecoration(
-                            color: Color(0xff3B82F6),
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            Icons.camera_alt,
-                            size: 16,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ],
+                  const CircleAvatar(
+                    radius: 45,
+                    backgroundImage: AssetImage(
+                      "assets/images/gambarlain/download (1).jpg",
+                    ),
                   ),
 
                   const SizedBox(height: 12),
 
-                  /// NAMA
-                  const Text(
-                    "Radit Karbu",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  /// 🔥 FIREBASE NAME
+                  Text(
+                    nama,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
                   ),
 
                   const SizedBox(height: 6),
 
-                  /// ROLE (BEDANYA CUMA DISINI)
-                  const Text(
-                    "Pembeli Agrova",
-                    style: TextStyle(color: Colors.grey),
-                  ),
+                  /// 🔥 EMAIL FIREBASE
+                  Text(email, style: const TextStyle(color: Colors.grey)),
 
                   const SizedBox(height: 10),
 
-                  /// 🔥 LOKASI (SAMA PERSIS)
-                  Row(
+                  const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
+                    children: [
                       Icon(Icons.location_on, size: 14, color: Colors.red),
                       SizedBox(width: 4),
                       Text(
@@ -129,9 +110,6 @@ class _ProfilPembeliState extends State<ProfilPembeli> {
 
             const SizedBox(height: 20),
 
-            /// =====================================
-            /// 🔥 AKTIVITAS
-            /// =====================================
             _sectionTitle("Aktivitas Saya"),
             const SizedBox(height: 10),
 
@@ -166,9 +144,6 @@ class _ProfilPembeliState extends State<ProfilPembeli> {
 
             const SizedBox(height: 20),
 
-            /// =====================================
-            /// 🔥 LAINNYA
-            /// =====================================
             _sectionTitle("Lainnya"),
             const SizedBox(height: 10),
 
@@ -187,11 +162,15 @@ class _ProfilPembeliState extends State<ProfilPembeli> {
                 title: "Pusat Bantuan",
                 onTap: () {},
               ),
+
+              /// 🔥 FIX LOGOUT (SAMA KAYAK PENJUAL)
               _menuItem(
                 icon: Amicons.lucide_log_out,
                 color: Colors.red,
                 title: "Keluar Akun",
                 onTap: () async {
+                  await FirebaseAuth.instance.signOut();
+
                   SharedPreferences prefs =
                       await SharedPreferences.getInstance();
                   await prefs.clear();
@@ -210,7 +189,6 @@ class _ProfilPembeliState extends State<ProfilPembeli> {
     );
   }
 
-  /// 🔥 TITLE
   Widget _sectionTitle(String text) {
     return Align(
       alignment: Alignment.centerLeft,
@@ -221,7 +199,6 @@ class _ProfilPembeliState extends State<ProfilPembeli> {
     );
   }
 
-  /// 🔥 CARD
   Widget _menuCard(List<Widget> children) {
     return Container(
       decoration: BoxDecoration(
@@ -232,7 +209,6 @@ class _ProfilPembeliState extends State<ProfilPembeli> {
     );
   }
 
-  /// 🔥 ITEM
   Widget _menuItem({
     required IconData icon,
     required Color color,

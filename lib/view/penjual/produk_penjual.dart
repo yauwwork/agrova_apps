@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:agrova_apps/services/product_service.dart';
 import 'package:agrova_apps/models/product_model.dart';
 import 'package:agrova_apps/view/penjual/edit_produk.dart';
-import 'package:amicons/amicons.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class ProdukPenjual extends StatefulWidget {
   const ProdukPenjual({super.key});
@@ -16,23 +16,16 @@ class ProdukPenjual extends StatefulWidget {
 class _ProdukPenjualState extends State<ProdukPenjual> {
   int selectedKategori = 0;
 
+  final user = FirebaseAuth.instance.currentUser;
+
+  /// 🔥 SAMAIN DENGAN DATABASE
   final List<Map<String, dynamic>> kategori = [
-    {"icon": Amicons.remix_plant, "name": "Pertanian", "color": Colors.green},
-    {
-      "icon": Amicons.flaticon_fish_rounded,
-      "name": "Perikanan",
-      "color": Colors.blue,
-    },
-    {
-      "icon": Amicons.flaticon_cow_rounded,
-      "name": "Peternakan",
-      "color": Colors.brown,
-    },
-    {
-      "icon": Amicons.lucide_tree_palm,
-      "name": "Perkebunan",
-      "color": Colors.teal,
-    },
+    {"icon": Icons.all_inbox, "name": "Semua", "color": Colors.grey},
+    {"icon": Icons.apple, "name": "Buah-buahan", "color": Colors.green},
+    {"icon": Icons.grass, "name": "Sayuran", "color": Colors.lightGreen},
+    {"icon": Icons.set_meal, "name": "Ikan", "color": Colors.blue},
+    {"icon": Icons.lunch_dining, "name": "Daging", "color": Colors.red},
+    {"icon": Icons.egg, "name": "Telur", "color": Colors.orange},
   ];
 
   @override
@@ -51,11 +44,10 @@ class _ProdukPenjualState extends State<ProdukPenjual> {
           ),
         ),
       ),
-
       body: SafeArea(
         child: Column(
           children: [
-            /// SEARCH
+            /// 🔍 SEARCH
             Padding(
               padding: const EdgeInsets.all(16),
               child: Row(
@@ -89,7 +81,7 @@ class _ProdukPenjualState extends State<ProdukPenjual> {
               ),
             ),
 
-            /// KATEGORI
+            /// 🔥 KATEGORI
             SizedBox(
               height: 50,
               child: ListView.builder(
@@ -129,9 +121,7 @@ class _ProdukPenjualState extends State<ProdukPenjual> {
                           Text(
                             item["name"],
                             style: TextStyle(
-                              color: isSelected
-                                  ? Colors.white
-                                  : Colors.black54,
+                              color: isSelected ? Colors.white : Colors.black54,
                             ),
                           ),
                         ],
@@ -144,28 +134,30 @@ class _ProdukPenjualState extends State<ProdukPenjual> {
 
             const SizedBox(height: 10),
 
-            /// 🔥 GRID PRODUK FIREBASE
+            /// 🔥 GRID PRODUK (HANYA MILIK USER)
             Expanded(
               child: StreamBuilder<List<ProductModel>>(
-                stream: ProductService.getMyProducts(),
+                stream: ProductService.getMyProducts(), // ✅ FIX UTAMA
                 builder: (context, snapshot) {
-                  if (!snapshot.hasData) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
                   }
 
-                  final allProducts = snapshot.data!;
+                  if (snapshot.hasError) {
+                    return Center(child: Text("Error: ${snapshot.error}"));
+                  }
+
+                  final allProducts = snapshot.data ?? [];
 
                   /// 🔥 FILTER KATEGORI
                   List<ProductModel> filtered = allProducts;
 
                   if (selectedKategori != 0) {
-                    final selectedName =
-                        kategori[selectedKategori]["name"];
+                    final selectedName = kategori[selectedKategori]["name"];
 
                     filtered = allProducts.where((p) {
-                      return p.category
-                          .toLowerCase()
-                          .contains(selectedName.toLowerCase());
+                      return p.category.toLowerCase() ==
+                          selectedName.toLowerCase();
                     }).toList();
                   }
 
@@ -178,29 +170,30 @@ class _ProdukPenjualState extends State<ProdukPenjual> {
                     itemCount: filtered.length,
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 14,
-                      mainAxisSpacing: 14,
-                      childAspectRatio: 0.68,
-                    ),
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 14,
+                          mainAxisSpacing: 14,
+                          childAspectRatio: 0.68,
+                        ),
                     itemBuilder: (context, index) {
                       final produk = filtered[index];
 
                       return SellerGridProductCard(
                         produk: produk,
 
-                        /// DELETE
+                        /// 🔥 DELETE AMAN
                         onDelete: () async {
-                          await ProductService.deleteProduct(produk.id!);
+                          if (produk.id != null) {
+                            await ProductService.deleteProduct(produk.id!);
+                          }
                         },
 
-                        /// EDIT
+                        /// 🔥 EDIT
                         onEdit: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) =>
-                                  EditProduk(produk: produk),
+                              builder: (_) => EditProduk(produk: produk),
                             ),
                           );
                         },

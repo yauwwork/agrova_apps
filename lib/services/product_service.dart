@@ -16,25 +16,19 @@ class ProductService {
       throw Exception("User belum login");
     }
 
-    /// 🔥 FORCE userId dari Firebase Auth
-    final newProduct = ProductModel(
-      id: product.id,
-      userId: user.uid, // ✅ FIX PENTING
-      name: product.name,
-      category: product.category,
-      price: product.price,
-      stock: product.stock,
-      description: product.description,
-      location: product.location,
-      imageBase64: product.imageBase64,
-      createdAt: product.createdAt,
-    );
+    final data = product.toMap();
 
-    await _firestore.collection("products").add(newProduct.toMap());
+    /// 🔥 FORCE USER ID (WAJIB)
+    data["userId"] = user.uid;
+
+    /// 🔥 ANTI NULL
+    data.removeWhere((key, value) => value == null);
+
+    await _firestore.collection("products").add(data);
   }
 
   /// =====================
-  /// GET ALL PRODUCTS
+  /// GET ALL PRODUCTS (UNTUK PEMBELI)
   /// =====================
   static Stream<List<ProductModel>> getProducts() {
     return _firestore
@@ -42,49 +36,84 @@ class ProductService {
         .orderBy("createdAt", descending: true)
         .snapshots()
         .map((snapshot) {
-          return snapshot.docs.map((e) {
-            return ProductModel.fromMap(e.data(), e.id);
-          }).toList();
+          return snapshot.docs
+              .map((e) => ProductModel.fromMap(e.data(), e.id))
+              .toList();
         });
   }
 
   /// =====================
-  /// GET MY PRODUCTS
+  /// GET MY PRODUCTS (KHUSUS PENJUAL)
   /// =====================
   static Stream<List<ProductModel>> getMyProducts() {
     final user = _auth.currentUser;
 
     if (user == null) {
-      /// 🔥 HANDLE BIAR GAK ERROR
       return const Stream.empty();
     }
 
     return _firestore
         .collection("products")
         .where("userId", isEqualTo: user.uid)
-        .orderBy("createdAt", descending: true) // ✅ biar rapi
+        .orderBy("createdAt", descending: true) // 🔥 WAJIB BUAT RAPI
         .snapshots()
         .map((snapshot) {
-          return snapshot.docs.map((e) {
-            return ProductModel.fromMap(e.data(), e.id);
-          }).toList();
+          return snapshot.docs
+              .map((e) => ProductModel.fromMap(e.data(), e.id))
+              .toList();
         });
   }
 
   /// =====================
-  /// UPDATE PRODUCT
+  /// UPDATE PRODUCT (AMAN)
   /// =====================
   static Future<void> updateProduct(
     String id,
     Map<String, dynamic> data,
   ) async {
+    final user = _auth.currentUser;
+
+    if (user == null) {
+      throw Exception("User belum login");
+    }
+
+    final doc = await _firestore.collection("products").doc(id).get();
+
+    if (!doc.exists) {
+      throw Exception("Produk tidak ditemukan");
+    }
+
+    /// 🔥 CEK OWNER
+    if (doc["userId"] != user.uid) {
+      throw Exception("Tidak punya akses");
+    }
+
+    data.removeWhere((key, value) => value == null);
+
     await _firestore.collection("products").doc(id).update(data);
   }
 
   /// =====================
-  /// DELETE PRODUCT
+  /// DELETE PRODUCT (AMAN)
   /// =====================
   static Future<void> deleteProduct(String id) async {
+    final user = _auth.currentUser;
+
+    if (user == null) {
+      throw Exception("User belum login");
+    }
+
+    final doc = await _firestore.collection("products").doc(id).get();
+
+    if (!doc.exists) {
+      throw Exception("Produk tidak ditemukan");
+    }
+
+    /// 🔥 CEK OWNER
+    if (doc["userId"] != user.uid) {
+      throw Exception("Tidak punya akses");
+    }
+
     await _firestore.collection("products").doc(id).delete();
   }
 }

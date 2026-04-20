@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:agrova_apps/services/product_service.dart';
 import 'package:agrova_apps/models/product_model.dart';
 import 'package:agrova_apps/extension/card/penjual_produk_card.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class HomePenjual extends StatefulWidget {
   const HomePenjual({super.key});
@@ -15,6 +16,8 @@ class HomePenjual extends StatefulWidget {
 }
 
 class _HomePenjualState extends State<HomePenjual> {
+  final user = FirebaseAuth.instance.currentUser;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,31 +41,46 @@ class _HomePenjualState extends State<HomePenjual> {
                     ),
                   ),
                   child: Row(
-                    children: const [
+                    children: [
+                      /// 🔥 FOTO PROFILE (AMAN)
                       CircleAvatar(
                         radius: 22,
-                        backgroundImage: AssetImage("assets/profile.jpg"),
+                        backgroundImage: user?.photoURL != null
+                            ? NetworkImage(user!.photoURL!)
+                            : null,
+                        child: user?.photoURL == null
+                            ? const Icon(Icons.person)
+                            : null,
                       ),
-                      SizedBox(width: 10),
+
+                      const SizedBox(width: 10),
+
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text("Dashboard Penjual 🏪",
-                              style: TextStyle(color: Colors.white70)),
+                          const Text(
+                            "Dashboard Penjual 🏪",
+                            style: TextStyle(color: Colors.white70),
+                          ),
+
+                          /// 🔥 NAMA DARI FIREBASE
                           Text(
-                            "Andi Wijaya",
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold),
+                            user?.displayName ?? "User",
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ],
                       ),
-                      Spacer(),
-                      Icon(Icons.notifications, color: Colors.white),
+
+                      const Spacer(),
+                      const Icon(Icons.notifications, color: Colors.white),
                     ],
                   ),
                 ),
 
+                /// 🔥 STAT CARD
                 Positioned(
                   bottom: -40,
                   left: 16,
@@ -73,15 +91,40 @@ class _HomePenjualState extends State<HomePenjual> {
                       color: AppColors.card,
                       borderRadius: BorderRadius.circular(20),
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: const [
-                        StatItem(Icons.inventory, "12", "Produk",
-                            AppColors.mintGreen),
-                        StatItem(Icons.remove_red_eye, "15.7k", "Dilihat",
-                            AppColors.skyBlue),
-                        StatItem(Icons.favorite, "892", "Favorit", Colors.pink),
-                      ],
+                    child: StreamBuilder<List<ProductModel>>(
+                      stream: ProductService.getProducts(),
+                      builder: (context, snapshot) {
+                        final all = snapshot.data ?? [];
+
+                        /// 🔥 FILTER PRODUK MILIK USER
+                        final myProducts = all.where((p) {
+                          return p.userId == user?.uid;
+                        }).toList();
+
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            StatItem(
+                              Icons.inventory,
+                              "${myProducts.length}",
+                              "Produk",
+                              AppColors.mintGreen,
+                            ),
+                            const StatItem(
+                              Icons.remove_red_eye,
+                              "15.7k",
+                              "Dilihat",
+                              AppColors.skyBlue,
+                            ),
+                            const StatItem(
+                              Icons.favorite,
+                              "892",
+                              "Favorit",
+                              Colors.pink,
+                            ),
+                          ],
+                        );
+                      },
                     ),
                   ),
                 ),
@@ -110,13 +153,19 @@ class _HomePenjualState extends State<HomePenjual> {
                         );
                       },
                       child: const MenuCard(
-                          Icons.show_chart, "Analitik", AppColors.skyBlue),
+                        Icons.show_chart,
+                        "Analitik",
+                        AppColors.skyBlue,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 10),
                   const Expanded(
                     child: MenuCard(
-                        Icons.inventory_2, "Produk", AppColors.secondary),
+                      Icons.inventory_2,
+                      "Produk",
+                      AppColors.secondary,
+                    ),
                   ),
                 ],
               ),
@@ -130,18 +179,19 @@ class _HomePenjualState extends State<HomePenjual> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("Produk Saya",
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  Text(
+                    "Produk Saya",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
                 ],
               ),
             ),
 
             const SizedBox(height: 12),
 
-            /// ================= 🔥 PRODUK FIREBASE =================
+            /// ================= PRODUK =================
             StreamBuilder<List<ProductModel>>(
-              stream: ProductService.getMyProducts(),
+              stream: ProductService.getProducts(), // ✅ FIX
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Padding(
@@ -150,37 +200,45 @@ class _HomePenjualState extends State<HomePenjual> {
                   );
                 }
 
-                if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                final allProducts = snapshot.data ?? [];
+
+                /// 🔥 FILTER PRODUK USER (TANPA INDEX)
+                final myProducts = allProducts.where((p) {
+                  return p.userId == user?.uid;
+                }).toList();
+
+                if (myProducts.isEmpty) {
                   return const Padding(
                     padding: EdgeInsets.all(20),
                     child: Text("Belum ada produk"),
                   );
                 }
 
-                final products = snapshot.data!;
-
                 return GridView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   padding: const EdgeInsets.all(16),
-                  itemCount: products.length,
-                  gridDelegate:
-                      const SliverGridDelegateWithFixedCrossAxisCount(
+                  itemCount: myProducts.length,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
                     crossAxisSpacing: 12,
                     mainAxisSpacing: 12,
                     childAspectRatio: 0.75,
                   ),
                   itemBuilder: (context, index) {
-                    final p = products[index];
+                    final p = myProducts[index];
 
                     return SellerGridProductCard(
                       produk: p,
+
                       onEdit: () {
-                        /// nanti arah ke edit screen
+                        /// TODO: arahkan ke edit screen
                       },
+
                       onDelete: () async {
-                        await ProductService.deleteProduct(p.id!);
+                        if (p.id != null) {
+                          await ProductService.deleteProduct(p.id!);
+                        }
                       },
                     );
                   },

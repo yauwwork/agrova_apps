@@ -25,27 +25,24 @@ class ProductModel {
     this.createdAt,
   });
 
-  /// 🔥 TO MAP (SAVE KE FIRESTORE)
+  /// 🔥 FIX TOTAL (NO MIX TYPE)
   Map<String, dynamic> toMap() {
     return {
-      "userId": userId,
-      "name": name,
-      "category": category,
+      "userId": userId.trim(),
+      "name": name.trim(),
+      "category": category.trim(),
       "price": price,
       "stock": stock,
-      "description": description,
-      "location": location,
+      "description": description.trim(),
+      "location": location.trim(),
       "imageBase64": imageBase64,
-      "createdAt": createdAt ?? FieldValue.serverTimestamp(),
+      "createdAt": FieldValue.serverTimestamp(), // 🔥 FIX
     };
   }
 
-  /// 🔥 FROM MAP (AMBIL DARI FIRESTORE)
   factory ProductModel.fromMap(Map<String, dynamic> map, String id) {
     return ProductModel(
       id: id,
-
-      /// SAFE STRING
       userId: map["userId"] ?? "",
       name: map["name"] ?? "",
       category: map["category"] ?? "",
@@ -53,7 +50,7 @@ class ProductModel {
       location: map["location"] ?? "",
       imageBase64: map["imageBase64"] ?? "",
 
-      /// 🔥 SAFE INT (ANTI ERROR DOUBLE)
+      /// 🔥 ANTI ERROR DOUBLE
       price: (map["price"] ?? 0) is int
           ? map["price"]
           : (map["price"] ?? 0).toInt(),
@@ -62,7 +59,7 @@ class ProductModel {
           ? map["stock"]
           : (map["stock"] ?? 0).toInt(),
 
-      /// 🔥 SAFE DATE
+      /// 🔥 SAFE TIMESTAMP
       createdAt: map["createdAt"] != null
           ? (map["createdAt"] as Timestamp).toDate()
           : null,

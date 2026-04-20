@@ -1,6 +1,7 @@
 import 'package:agrova_apps/extension/colors/appcolors.dart';
 import 'package:flutter/material.dart';
 import 'package:agrova_apps/services/product_service.dart';
+import 'package:agrova_apps/services/favorite_service.dart';
 import 'package:agrova_apps/models/product_model.dart';
 import 'package:agrova_apps/view/pembeli/produk_pembeli.dart';
 import 'package:agrova_apps/extension/card/pembeli_produk_card.dart';
@@ -23,11 +24,14 @@ class KategoriSc extends StatefulWidget {
 class _KategoriScState extends State<KategoriSc> {
   int selectedKategori = 0;
 
+  /// 🔥 HARUS SAMA PERSIS DENGAN PENJUAL & DATABASE
   final List<KategoriModel> kategori = [
-    KategoriModel("Semua", Icons.grid_view, Colors.green),
-    KategoriModel("Pertanian", Icons.eco, Colors.green),
-    KategoriModel("Perikanan", Icons.set_meal, Colors.blue),
-    KategoriModel("Peternakan", Icons.grass, Colors.orange),
+    KategoriModel("Semua", Icons.all_inbox, Colors.grey),
+    KategoriModel("Buah-buahan", Icons.apple, Colors.green),
+    KategoriModel("Sayuran", Icons.grass, Colors.lightGreen),
+    KategoriModel("Ikan", Icons.set_meal, Colors.blue),
+    KategoriModel("Daging", Icons.lunch_dining, Colors.red),
+    KategoriModel("Telur", Icons.egg, Colors.orange),
   ];
 
   @override
@@ -46,7 +50,7 @@ class _KategoriScState extends State<KategoriSc> {
       body: SafeArea(
         child: Column(
           children: [
-            /// SEARCH
+            /// 🔍 SEARCH
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
@@ -63,8 +67,10 @@ class _KategoriScState extends State<KategoriSc> {
                         children: [
                           Icon(Icons.search, color: Colors.grey),
                           SizedBox(width: 8),
-                          Text("Cari produk...",
-                              style: TextStyle(color: Colors.grey)),
+                          Text(
+                            "Cari produk...",
+                            style: TextStyle(color: Colors.grey),
+                          ),
                         ],
                       ),
                     ),
@@ -74,7 +80,7 @@ class _KategoriScState extends State<KategoriSc> {
                     height: 48,
                     width: 48,
                     decoration: BoxDecoration(
-                      color: const Color(0xffEAECEF),
+                      color: Color(0xffEAECEF),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: const Icon(Icons.tune, color: Colors.black54),
@@ -85,7 +91,7 @@ class _KategoriScState extends State<KategoriSc> {
 
             const SizedBox(height: 16),
 
-            /// KATEGORI CHIP
+            /// 🔥 KATEGORI (UI PEMBELI, DATA PENJUAL)
             SizedBox(
               height: 40,
               child: ListView.builder(
@@ -105,7 +111,9 @@ class _KategoriScState extends State<KategoriSc> {
                       duration: const Duration(milliseconds: 200),
                       margin: const EdgeInsets.only(right: 10),
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 14, vertical: 8),
+                        horizontal: 14,
+                        vertical: 8,
+                      ),
                       decoration: BoxDecoration(
                         color: isSelected
                             ? kategori[index].color
@@ -139,59 +147,9 @@ class _KategoriScState extends State<KategoriSc> {
               ),
             ),
 
-            const SizedBox(height: 16),
-
-            /// SORT UI (tetap)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: const Color(0xffEAECEF),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: const Row(
-                      children: [
-                        Text("Relevansi"),
-                        SizedBox(width: 4),
-                        Icon(Icons.keyboard_arrow_down, size: 18),
-                      ],
-                    ),
-                  ),
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: const Color(0xff2BB673),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Icon(Icons.grid_view,
-                            size: 18, color: Colors.white),
-                      ),
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: const Color(0xffEAECEF),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Icon(Icons.list,
-                            size: 18, color: Colors.black54),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-
             const SizedBox(height: 12),
 
-            /// 🔥 PRODUK FIREBASE
+            /// 🔥 PRODUK + FAVORITE
             Expanded(
               child: StreamBuilder<List<ProductModel>>(
                 stream: ProductService.getProducts(),
@@ -202,17 +160,16 @@ class _KategoriScState extends State<KategoriSc> {
 
                   final allProducts = snapshot.data!;
 
-                  /// 🔥 FILTER KATEGORI
+                  /// 🔥 FILTER EXACT MATCH (INI KUNCI UTAMA)
                   List<ProductModel> filtered = allProducts;
 
                   if (selectedKategori != 0) {
-                    final selectedName =
-                        kategori[selectedKategori].name;
+                    final selectedName = kategori[selectedKategori].name
+                        .toLowerCase()
+                        .trim();
 
                     filtered = allProducts.where((p) {
-                      return p.category
-                          .toLowerCase()
-                          .contains(selectedName.toLowerCase());
+                      return p.category.toLowerCase().trim() == selectedName;
                     }).toList();
                   }
 
@@ -225,33 +182,52 @@ class _KategoriScState extends State<KategoriSc> {
                     itemCount: filtered.length,
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 12,
-                      mainAxisSpacing: 12,
-                      childAspectRatio: 0.72,
-                    ),
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 12,
+                          mainAxisSpacing: 12,
+                          childAspectRatio: 0.72,
+                        ),
                     itemBuilder: (context, index) {
                       final produk = filtered[index];
 
-                      return GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => DetailProdukSc(
-                                title: produk.name,
-                                price: "Rp ${produk.price}",
-                                imageBase64: produk.imageBase64,
-                                penjual: produk.userId,
-                                location: produk.location,
-                                deskripsi: produk.description,
-                              ),
+                      return StreamBuilder<bool>(
+                        stream: FavoriteService.isFavorited(produk.id),
+                        builder: (context, favSnap) {
+                          final isFav = favSnap.data ?? false;
+
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => DetailProdukSc(
+                                    title: produk.name,
+                                    price: "Rp ${produk.price}",
+                                    imageBase64: produk.imageBase64,
+                                    penjual: produk.userId,
+                                    location: produk.location,
+                                    deskripsi: produk.description,
+                                  ),
+                                ),
+                              );
+                            },
+                            child: ProductCard(
+                              produk: produk,
+                              isFavorited: isFav,
+                              onFavorite: (value) async {
+                                if (produk.id == null) return;
+
+                                if (value) {
+                                  await FavoriteService.addFavorite(produk);
+                                } else {
+                                  await FavoriteService.removeFavorite(
+                                    produk.id!,
+                                  );
+                                }
+                              },
                             ),
                           );
                         },
-
-                        /// 🔥 CARD AKTIF
-                        child: ProductCard(produk: produk),
                       );
                     },
                   );

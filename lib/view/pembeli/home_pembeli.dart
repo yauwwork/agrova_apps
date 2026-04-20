@@ -1,9 +1,14 @@
+import 'dart:async';
+
 import 'package:agrova_apps/extension/colors/appcolors.dart';
 import 'package:flutter/material.dart';
 import 'package:agrova_apps/services/product_service.dart';
 import 'package:agrova_apps/services/favorite_service.dart';
 import 'package:agrova_apps/models/product_model.dart';
 import 'package:agrova_apps/extension/card/pembeli_produk_card.dart';
+
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class HomePembeliScreen extends StatefulWidget {
   const HomePembeliScreen({super.key});
@@ -15,11 +20,60 @@ class HomePembeliScreen extends StatefulWidget {
 class _HomePembeliScreenState extends State<HomePembeliScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
+  Timer? _bannerTimer;
+
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = "";
+
+  @override
+  void initState() {
+    super.initState();
+
+    /// 🔥 AUTO BANNER SCROLL (FIX STABLE)
+    _bannerTimer = Timer.periodic(const Duration(seconds: 3), (timer) {
+      if (!_pageController.hasClients) return;
+
+      _currentPage = (_currentPage + 1) % 3;
+
+      _pageController.animateToPage(
+        _currentPage,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+      );
+    });
+
+    /// 🔥 SEARCH LISTENER
+    _searchController.addListener(() {
+      setState(() {
+        _searchQuery = _searchController.text.toLowerCase();
+      });
+    });
+  }
 
   @override
   void dispose() {
+    _bannerTimer?.cancel();
     _pageController.dispose();
+    _searchController.dispose();
     super.dispose();
+  }
+
+  /// ================= USER STREAM =================
+  Stream<DocumentSnapshot<Map<String, dynamic>>> getUserStream() {
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+
+    return FirebaseFirestore.instance.collection('users').doc(uid).snapshots();
+  }
+
+  /// ================= AMBIL NAMA (ANTI ERROR) =================
+  String getNama(Map<String, dynamic>? data) {
+    if (data == null) return "User Agrova";
+
+    return data['nama'] ??
+        data['name'] ??
+        data['fullName'] ??
+        data['username'] ??
+        "User Agrova";
   }
 
   @override
@@ -30,15 +84,17 @@ class _HomePembeliScreenState extends State<HomePembeliScreen> {
       body: StreamBuilder<List<ProductModel>>(
         stream: ProductService.getProducts(),
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
+          if (!snapshot.hasData) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          if (snapshot.hasError) {
-            return const Center(child: Text("Terjadi error Firebase"));
-          }
+          final allProducts = snapshot.data ?? [];
 
-          final products = snapshot.data ?? [];
+          /// 🔥 SEARCH FILTER
+          final products = allProducts.where((p) {
+            final name = (p.name ?? "").toLowerCase();
+            return name.contains(_searchQuery);
+          }).toList();
 
           return SingleChildScrollView(
             child: Column(
@@ -50,69 +106,40 @@ class _HomePembeliScreenState extends State<HomePembeliScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildKategori(),
-                      const SizedBox(height: 16),
                       _buildBanner(),
                       const SizedBox(height: 20),
 
-                      /// ================= PRODUK UNGGULAN =================
-                      _sectionTitle("Produk Unggulan"),
-                      const SizedBox(height: 10),
-
-                      SizedBox(
-                        height: 230,
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: products.length,
-                          itemBuilder: (context, index) {
-                            final p = products[index];
-
-                            return Container(
-                              width: 160,
-                              margin: const EdgeInsets.only(right: 12),
-
-                              child: StreamBuilder<bool>(
-                                stream: FavoriteService.isFavorited(p.id),
-                                builder: (context, favSnap) {
-                                  final isFav = favSnap.data ?? false;
-
-                                  return ProductCard(
-                                    produk: p,
-                                    isFavorited: isFav,
-                                    onFavorite: (value) async {
-                                      if (p.id == null) return;
-
-                                      if (value) {
-                                        await FavoriteService.addFavorite(p);
-                                      } else {
-                                        await FavoriteService.removeFavorite(p.id!);
-                                      }
-                                    },
-                                  );
-                                },
-                              ),
-                            );
-                          },
+                      /// ================= SEARCH =================
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: TextField(
+                          controller: _searchController,
+                          decoration: const InputDecoration(
+                            hintText: "Cari produk...",
+                            prefixIcon: Icon(Icons.search),
+                            border: InputBorder.none,
+                          ),
                         ),
                       ),
 
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 15),
 
-                      /// ================= SEMUA PRODUK =================
-                      _sectionTitle("Semua Produk"),
-                      const SizedBox(height: 10),
-
+                      /// ================= PRODUK =================
                       GridView.builder(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
                         itemCount: products.length,
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 12,
-                          mainAxisSpacing: 12,
-                          childAspectRatio: 0.72,
-                        ),
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 12,
+                              mainAxisSpacing: 12,
+                              childAspectRatio: 0.72,
+                            ),
                         itemBuilder: (context, index) {
                           final p = products[index];
 
@@ -159,117 +186,70 @@ class _HomePembeliScreenState extends State<HomePembeliScreen> {
         ),
         borderRadius: BorderRadius.vertical(bottom: Radius.circular(24)),
       ),
-      child: Column(
+      child: Row(
         children: [
-          Row(
-            children: const [
-              CircleAvatar(radius: 20, backgroundImage: AssetImage("assets/profile.jpg")),
-              SizedBox(width: 10),
-              Column(
+          const CircleAvatar(
+            radius: 20,
+            backgroundImage: AssetImage("assets/profile.jpg"),
+          ),
+
+          const SizedBox(width: 10),
+
+          /// 🔥 FIX NAMA USER (ANTI NULL + MULTI KEY)
+          StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+            stream: getUserStream(),
+            builder: (context, snapshot) {
+              final data = snapshot.data?.data();
+
+              final nama = getNama(data);
+
+              return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("Selamat pagi 👋", style: TextStyle(color: Colors.white70)),
-                  Text("Ahmad",
-                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  const Text(
+                    "Selamat datang 👋",
+                    style: TextStyle(color: Colors.white70),
+                  ),
+                  Text(
+                    nama,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ],
-              ),
-              Spacer(),
-              Icon(Icons.notifications, color: Colors.white),
-            ],
+              );
+            },
           ),
-          const SizedBox(height: 16),
 
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: const TextField(
-              decoration: InputDecoration(
-                hintText: "Cari produk...",
-                prefixIcon: Icon(Icons.search),
-                border: InputBorder.none,
-              ),
-            ),
-          ),
+          const Spacer(),
+          const Icon(Icons.notifications, color: Colors.white),
         ],
       ),
     );
   }
 
-  Widget _buildKategori() {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: const [
-          _KategoriItem(Icons.eco, "Pertanian", Colors.green),
-          _KategoriItem(Icons.set_meal, "Perikanan", Colors.blue),
-          _KategoriItem(Icons.grass, "Peternakan", Colors.orange),
-          _KategoriItem(Icons.inventory, "Komoditas", Colors.purple),
-        ],
-      ),
-    );
-  }
-
+  /// ================= BANNER =================
   Widget _buildBanner() {
     return SizedBox(
       height: 160,
       child: PageView(
         controller: _pageController,
-        onPageChanged: (i) => setState(() => _currentPage = i),
         children: const [
-          _Banner("Produk Segar", "Langsung dari petani terbaik", Icons.eco),
-          _Banner("Harga Terjangkau", "Kualitas terbaik", Icons.shopping_bag),
-          _Banner("Pengiriman Cepat", "Aman sampai rumah", Icons.local_shipping),
+          _Banner("Produk Segar", "Langsung dari petani", Icons.eco),
+          _Banner("Harga Murah", "Kualitas terbaik", Icons.shopping_bag),
+          _Banner(
+            "Pengiriman Cepat",
+            "Aman sampai rumah",
+            Icons.local_shipping,
+          ),
         ],
       ),
     );
   }
-
-  Widget _sectionTitle(String title) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(title,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-        const Text("Lihat Semua", style: TextStyle(color: Colors.blue)),
-      ],
-    );
-  }
 }
 
-class _KategoriItem extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final Color color;
-
-  const _KategoriItem(this.icon, this.title, this.color);
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: color.withOpacity(0.15),
-            shape: BoxShape.circle,
-          ),
-          child: Icon(icon, color: color),
-        ),
-        const SizedBox(height: 6),
-        Text(title, style: const TextStyle(fontSize: 12)),
-      ],
-    );
-  }
-}
-
+/// ================= BANNER WIDGET =================
 class _Banner extends StatelessWidget {
   final String title;
   final String subtitle;
@@ -280,7 +260,7 @@ class _Banner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(right: 4),
+      margin: const EdgeInsets.only(right: 8),
       padding: const EdgeInsets.all(16),
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -292,15 +272,18 @@ class _Banner extends StatelessWidget {
         children: [
           Expanded(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title,
-                    style: const TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.bold)),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 const SizedBox(height: 6),
-                Text(subtitle,
-                    style: const TextStyle(color: Colors.white70)),
+                Text(subtitle, style: const TextStyle(color: Colors.white70)),
               ],
             ),
           ),

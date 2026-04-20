@@ -7,10 +7,8 @@ import 'package:agrova_apps/view/penjual/produk_penjual.dart';
 import 'package:amicons/amicons.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-/// =======================================================
-/// 🔥 SCREEN PROFIL PENJUAL
-/// =======================================================
 class ProfilPenjualScreen extends StatefulWidget {
   const ProfilPenjualScreen({super.key});
 
@@ -19,8 +17,13 @@ class ProfilPenjualScreen extends StatefulWidget {
 }
 
 class _ProfilPenjualScreenState extends State<ProfilPenjualScreen> {
+  final user = FirebaseAuth.instance.currentUser;
+
   @override
   Widget build(BuildContext context) {
+    String nama = user?.displayName ?? "User Agrova";
+    String email = user?.email ?? "-";
+
     return Scaffold(
       backgroundColor: AppColors.bgpenjual,
 
@@ -45,14 +48,11 @@ class _ProfilPenjualScreenState extends State<ProfilPenjualScreen> {
         ),
       ),
 
-      /// 🔥 BODY
       body: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
         child: Column(
           children: [
-            /// =====================================
-            /// 🔥 PROFILE CARD
-            /// =====================================
+            /// ================= PROFILE CARD =================
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -72,8 +72,8 @@ class _ProfilPenjualScreenState extends State<ProfilPenjualScreen> {
                       const CircleAvatar(
                         radius: 45,
                         backgroundImage: AssetImage(
-                          "assets/images/gambarlain/download (1).jpg",
-                        ),
+                          "assets/profile.jpg",
+                        ), // 🔥 pastiin ada
                       ),
                       Positioned(
                         bottom: 0,
@@ -96,32 +96,30 @@ class _ProfilPenjualScreenState extends State<ProfilPenjualScreen> {
 
                   const SizedBox(height: 12),
 
-                  /// NAMA
-                  const Text(
-                    "Radit Karbu",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  /// 🔥 NAMA DARI FIREBASE
+                  Text(
+                    nama,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
                   ),
 
                   const SizedBox(height: 4),
 
-                  /// ROLE
-                  const Text(
-                    "Petani Agrova",
-                    style: TextStyle(color: Colors.grey),
-                  ),
+                  /// 🔥 EMAIL
+                  Text(email, style: const TextStyle(color: Colors.grey)),
 
                   const SizedBox(height: 10),
 
-                  /// =====================================
-                  /// 🔥 LOKASI (VERSI SIMPLE, NO CONTAINER)
-                  /// =====================================
+                  /// 🔥 LOKASI (sementara static, bisa lo ambil dari Firestore nanti)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: const [
                       Icon(Icons.location_on, size: 14, color: Colors.red),
                       SizedBox(width: 4),
                       Text(
-                        "Blok M, Jakarta Selatan",
+                        "Indonesia",
                         style: TextStyle(
                           fontSize: 12,
                           color: Colors.black87,
@@ -136,9 +134,7 @@ class _ProfilPenjualScreenState extends State<ProfilPenjualScreen> {
 
             const SizedBox(height: 20),
 
-            /// =====================================
-            /// 🔥 AKTIVITAS
-            /// =====================================
+            /// ================= AKTIVITAS =================
             _sectionTitle("Aktivitas Saya"),
             const SizedBox(height: 10),
 
@@ -178,9 +174,7 @@ class _ProfilPenjualScreenState extends State<ProfilPenjualScreen> {
 
             const SizedBox(height: 20),
 
-            /// =====================================
-            /// 🔥 LAINNYA
-            /// =====================================
+            /// ================= LAINNYA =================
             _sectionTitle("Lainnya"),
             const SizedBox(height: 10),
 
@@ -204,6 +198,9 @@ class _ProfilPenjualScreenState extends State<ProfilPenjualScreen> {
                 color: Colors.red,
                 title: "Keluar Akun",
                 onTap: () async {
+                  /// 🔥 FIX LOGOUT TOTAL
+                  await FirebaseAuth.instance.signOut();
+
                   SharedPreferences prefs =
                       await SharedPreferences.getInstance();
                   await prefs.clear();
@@ -222,7 +219,7 @@ class _ProfilPenjualScreenState extends State<ProfilPenjualScreen> {
     );
   }
 
-  /// 🔥 TITLE
+  /// ================= UI =================
   Widget _sectionTitle(String text) {
     return Align(
       alignment: Alignment.centerLeft,
@@ -233,7 +230,6 @@ class _ProfilPenjualScreenState extends State<ProfilPenjualScreen> {
     );
   }
 
-  /// 🔥 CARD
   Widget _menuCard(List<Widget> children) {
     return Container(
       decoration: BoxDecoration(
@@ -244,7 +240,6 @@ class _ProfilPenjualScreenState extends State<ProfilPenjualScreen> {
     );
   }
 
-  /// 🔥 ITEM
   Widget _menuItem({
     required IconData icon,
     required Color color,

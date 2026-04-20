@@ -17,7 +17,6 @@ class TambahProduk extends StatefulWidget {
 }
 
 class _TambahProdukState extends State<TambahProduk> {
-  // CONTROLLERS
   final _namaController = TextEditingController();
   final _hargaController = TextEditingController();
   final _stokController = TextEditingController();
@@ -44,10 +43,14 @@ class _TambahProdukState extends State<TambahProduk> {
   Future<void> _pickImage() async {
     if (_images.length >= 5) return;
 
-    final XFile? file = await _picker.pickImage(source: ImageSource.gallery);
-    if (file == null) return;
+    final XFile? file = await _picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 20, // 🔥 compress
+      maxWidth: 800, // 🔥 kecilin ukuran
+      maxHeight: 800, // 🔥 kecilin ukuran
+    );
 
-    if (!mounted) return;
+    if (file == null) return;
 
     setState(() {
       _images.add(File(file.path));
@@ -70,29 +73,23 @@ class _TambahProdukState extends State<TambahProduk> {
     setState(() => _isLoading = true);
 
     try {
-      // convert images
       List<String> imagesBase64 = [];
       for (final img in _images) {
         imagesBase64.add(await _toBase64(img));
       }
 
-      final price = int.tryParse(_hargaController.text) ?? 0;
-      final stock = int.tryParse(_stokController.text) ?? 0;
-
       final product = ProductModel(
         userId: "TODO_USER_ID",
         name: _namaController.text,
         category: _kategori,
-        price: price,
-        stock: stock,
+        price: int.tryParse(_hargaController.text) ?? 0,
+        stock: int.tryParse(_stokController.text) ?? 0,
         description: _deskripsiController.text,
         location: _lokasiController.text,
         imageBase64: imagesBase64.isNotEmpty ? imagesBase64.first : "",
       );
 
       await ProductService.addProduct(product);
-
-      if (!mounted) return;
 
       _showSnack("Produk berhasil ditambahkan");
 
@@ -101,16 +98,14 @@ class _TambahProdukState extends State<TambahProduk> {
         MaterialPageRoute(builder: (_) => const BottomNavigatorPenjual()),
       );
     } catch (e) {
-      if (mounted) _showSnack("Error: $e");
+      _showSnack("Error: $e");
     } finally {
-      if (mounted) setState(() => _isLoading = false);
+      setState(() => _isLoading = false);
     }
   }
 
   void _showSnack(String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(msg)),
-    );
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
   }
 
   @override
@@ -118,6 +113,8 @@ class _TambahProdukState extends State<TambahProduk> {
     return Scaffold(
       backgroundColor: AppColors.bgpenjual,
       appBar: AppBar(
+        centerTitle: true,
+        elevation: 0,
         title: const Text("Tambah Produk"),
         flexibleSpace: Container(
           decoration: const BoxDecoration(
@@ -131,6 +128,7 @@ class _TambahProdukState extends State<TambahProduk> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
+            /// ================= FOTO =================
             _buildCard(
               title: "Foto Produk",
               child: GridView.builder(
@@ -141,6 +139,7 @@ class _TambahProdukState extends State<TambahProduk> {
                   crossAxisCount: 3,
                   crossAxisSpacing: 10,
                   mainAxisSpacing: 10,
+                  childAspectRatio: 1, // 🔥 FIX RATIO
                 ),
                 itemBuilder: (context, i) {
                   if (i == _images.length) {
@@ -160,7 +159,11 @@ class _TambahProdukState extends State<TambahProduk> {
                     children: [
                       ClipRRect(
                         borderRadius: BorderRadius.circular(12),
-                        child: Image.file(_images[i], fit: BoxFit.cover),
+                        child: SizedBox(
+                          width: double.infinity,
+                          height: double.infinity,
+                          child: Image.file(_images[i], fit: BoxFit.cover),
+                        ),
                       ),
                       Positioned(
                         right: 5,
@@ -175,7 +178,7 @@ class _TambahProdukState extends State<TambahProduk> {
                             child: Icon(Icons.close, size: 12),
                           ),
                         ),
-                      )
+                      ),
                     ],
                   );
                 },
@@ -184,6 +187,7 @@ class _TambahProdukState extends State<TambahProduk> {
 
             const SizedBox(height: 16),
 
+            /// ================= FORM =================
             _buildCard(
               title: "Informasi Produk",
               child: Column(
@@ -193,9 +197,16 @@ class _TambahProdukState extends State<TambahProduk> {
 
                   DropdownButtonFormField<String>(
                     value: _kategori,
+                    decoration: _inputDecoration("Kategori"),
                     items: const [
-                      DropdownMenuItem(value: "Buah-buahan", child: Text("Buah-buahan")),
-                      DropdownMenuItem(value: "Sayuran", child: Text("Sayuran")),
+                      DropdownMenuItem(
+                        value: "Buah-buahan",
+                        child: Text("Buah-buahan"),
+                      ),
+                      DropdownMenuItem(
+                        value: "Sayuran",
+                        child: Text("Sayuran"),
+                      ),
                       DropdownMenuItem(value: "Ikan", child: Text("Ikan")),
                       DropdownMenuItem(value: "Daging", child: Text("Daging")),
                       DropdownMenuItem(value: "Telur", child: Text("Telur")),
@@ -207,9 +218,13 @@ class _TambahProdukState extends State<TambahProduk> {
 
                   Row(
                     children: [
-                      Expanded(child: _input(_hargaController, "Harga", number: true)),
+                      Expanded(
+                        child: _input(_hargaController, "Harga", number: true),
+                      ),
                       const SizedBox(width: 10),
-                      Expanded(child: _input(_stokController, "Stok", number: true)),
+                      Expanded(
+                        child: _input(_stokController, "Stok", number: true),
+                      ),
                     ],
                   ),
 
@@ -224,27 +239,46 @@ class _TambahProdukState extends State<TambahProduk> {
 
             const SizedBox(height: 20),
 
+            /// ================= BUTTON =================
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: _isLoading ? null : _submit,
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  backgroundColor: AppColors.skyBlue,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
                 child: _isLoading
                     ? const CircularProgressIndicator(color: Colors.white)
-                    : const Text("Tambah Produk"),
+                    : const Text(
+                        "Tambah Produk",
+                        style: TextStyle(color: Colors.white),
+                      ),
               ),
-            )
+            ),
           ],
         ),
       ),
     );
   }
 
+  /// ================= CARD =================
   Widget _buildCard({required String title, required Widget child}) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -257,17 +291,29 @@ class _TambahProdukState extends State<TambahProduk> {
     );
   }
 
-  Widget _input(TextEditingController c, String hint,
-      {bool number = false, int maxLines = 1}) {
+  /// ================= INPUT =================
+  Widget _input(
+    TextEditingController c,
+    String hint, {
+    bool number = false,
+    int maxLines = 1,
+  }) {
     return TextField(
       controller: c,
       keyboardType: number ? TextInputType.number : TextInputType.text,
       maxLines: maxLines,
-      decoration: InputDecoration(
-        hintText: hint,
-        filled: true,
-        fillColor: Colors.grey.shade100,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+      decoration: _inputDecoration(hint),
+    );
+  }
+
+  InputDecoration _inputDecoration(String hint) {
+    return InputDecoration(
+      hintText: hint,
+      filled: true,
+      fillColor: Colors.grey.shade100,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide.none,
       ),
     );
   }
