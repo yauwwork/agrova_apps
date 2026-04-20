@@ -81,8 +81,11 @@ class FirebaseService {
   /// =========================
   static Future<void> updateUserData(String uid, Map<String, dynamic> data) async {
     try {
-      // Update Firestore
-      await _firestore.collection('users').doc(uid).update(data);
+      // Gunakan set dengan merge agar jika dokumen belum ada, dia akan membuat baru
+      await _firestore.collection('users').doc(uid).set(
+            data,
+            SetOptions(merge: true),
+          );
 
       // If updating username, also update Auth Profile
       if (data.containsKey('username')) {

@@ -132,30 +132,6 @@ class _ProfilPenjualScreenState extends State<ProfilPenjualScreen> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 16),
-                      SizedBox(
-                        width: 120,
-                        height: 32,
-                        child: OutlinedButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (_) => const EditProfilPenjual()),
-                            );
-                          },
-                          style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: Color(0xff3B82F6)),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            padding: EdgeInsets.zero,
-                          ),
-                          child: const Text(
-                            "Edit Profil",
-                            style: TextStyle(fontSize: 12, color: Color(0xff3B82F6)),
-                          ),
-                        ),
-                      ),
                     ],
                   ),
                 ),
