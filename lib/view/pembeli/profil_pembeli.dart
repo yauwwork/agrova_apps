@@ -111,12 +111,6 @@ class _ProfilPembeliState extends State<ProfilPembeli> {
                 const SizedBox(height: 10),
                 _menuCard([
                   _menuItem(
-                    icon: Amicons.flaticon_comment_rounded,
-                    color: Colors.green,
-                    title: "Ulasan Saya",
-                    onTap: () {},
-                  ),
-                  _menuItem(
                     icon: Amicons.iconly_profile_sharp,
                     color: Colors.orange,
                     title: "Edit Profil",
@@ -153,12 +147,6 @@ class _ProfilPembeliState extends State<ProfilPembeli> {
                     onTap: () {
                       context.push(const PengaturanPembeli());
                     },
-                  ),
-                  _menuItem(
-                    icon: Amicons.remix_question,
-                    color: Colors.blue,
-                    title: "Pusat Bantuan",
-                    onTap: () {},
                   ),
                   _menuItem(
                     icon: Amicons.lucide_log_out,

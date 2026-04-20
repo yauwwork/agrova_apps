@@ -71,40 +71,12 @@ class _ProfilPenjualScreenState extends State<ProfilPenjualScreen> {
                   ),
                   child: Column(
                     children: [
-                      Stack(
-                        children: [
-                          CircleAvatar(
-                            radius: 45,
-                            backgroundColor: Colors.grey[200],
-                            backgroundImage: photoBase64 != null
-                                ? MemoryImage(base64Decode(photoBase64))
-                                : const AssetImage("assets/profile.jpg") as ImageProvider,
-                          ),
-                          Positioned(
-                            bottom: 0,
-                            right: 0,
-                            child: GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (_) => const EditProfilPenjual()),
-                                );
-                              },
-                              child: Container(
-                                padding: const EdgeInsets.all(6),
-                                decoration: const BoxDecoration(
-                                  color: Color(0xff3B82F6),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: const Icon(
-                                  Icons.camera_alt,
-                                  size: 16,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
+                      CircleAvatar(
+                        radius: 45,
+                        backgroundColor: Colors.grey[200],
+                        backgroundImage: photoBase64 != null
+                            ? MemoryImage(base64Decode(photoBase64))
+                            : const AssetImage("assets/profile.jpg") as ImageProvider,
                       ),
                       const SizedBox(height: 12),
                       Text(
@@ -187,12 +159,6 @@ class _ProfilPenjualScreenState extends State<ProfilPenjualScreen> {
                     onTap: () {
                       context.push(const PengaturanPenjual());
                     },
-                  ),
-                  _menuItem(
-                    icon: Amicons.remix_question,
-                    color: Colors.blue,
-                    title: "Pusat Bantuan",
-                    onTap: () {},
                   ),
                   _menuItem(
                     icon: Amicons.lucide_log_out,

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:agrova_apps/extension/card/role_card.dart';
 import 'package:flutter/material.dart';
 import 'package:agrova_apps/models/product_model.dart';
 
@@ -279,7 +280,18 @@ class _DetailProdukScState extends State<DetailProdukSc> {
                         style: TextStyle(color: Colors.grey[700], height: 1.5),
                       ),
 
-                      const SizedBox(height: 50),
+                      const SizedBox(height: 24),
+
+                      const Text(
+                        "Penjual",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+
+                      const SizedBox(height: 12),
+
+                      SellerCard(userId: p.userId),
+
+                      const SizedBox(height: 80),
                     ],
                   ),
                 ),
