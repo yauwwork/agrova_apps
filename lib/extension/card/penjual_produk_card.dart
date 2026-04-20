@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:agrova_apps/extension/colors/appcolors.dart';
 import 'package:agrova_apps/models/product_model.dart';
@@ -10,31 +11,34 @@ const double _radius = 16;
 const double _imgRadius = 12;
 
 /// =======================================================
-/// 🔥 CATEGORY COLOR SYSTEM
+/// 🔥 CATEGORY COLOR SYSTEM (UPGRADED)
 /// =======================================================
 Color getCategoryColor(String category) {
   switch (category.toLowerCase()) {
-    case 'buah-buahan':
     case 'buah':
-      return Colors.orange;
+    case 'buah-buahan':
+      return const Color(0xffFB923C);
 
     case 'sayur':
     case 'sayuran':
-      return Colors.green;
+      return const Color(0xff22C55E);
 
     case 'ikan':
     case 'seafood':
-      return Colors.blue;
+      return const Color(0xff3B82F6);
 
     case 'daging':
-      return Colors.red;
+      return const Color(0xffEF4444);
+
+    case 'telur':
+      return const Color(0xffFACC15);
 
     case 'bumbu':
     case 'rempah':
-      return Colors.brown;
+      return const Color(0xffA16207);
 
     default:
-      return Colors.grey;
+      return const Color(0xff6B7280);
   }
 }
 
@@ -52,102 +56,114 @@ class ListCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final categoryColor = getCategoryColor(produk.category);
 
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(_radius),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          /// IMAGE
-          ClipRRect(
-            borderRadius: BorderRadius.circular(_imgRadius),
-            child: produk.imageBase64.isNotEmpty
-                ? Image.memory(
-                    base64Decode(produk.imageBase64),
-                    width: 72,
-                    height: 72,
-                    fit: BoxFit.cover,
-                  )
-                : Container(
-                    width: 72,
-                    height: 72,
-                    color: Colors.grey.shade200,
-                    child: const Icon(Icons.image_outlined),
-                  ),
-          ),
+    return GestureDetector(
+      onTap: onEdit,
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 8),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(_radius),
+          border: Border.all(color: Colors.grey.shade100),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 20,
+              offset: const Offset(0, 10),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            /// IMAGE
+            ClipRRect(
+              borderRadius: BorderRadius.circular(_imgRadius),
+              child: produk.imageBase64.isNotEmpty
+                  ? Image.memory(
+                      base64Decode(produk.imageBase64),
+                      width: 72,
+                      height: 72,
+                      fit: BoxFit.cover,
+                    )
+                  : Container(
+                      width: 72,
+                      height: 72,
+                      color: Colors.grey.shade100,
+                      child: const Icon(Icons.image_outlined, color: Colors.grey),
+                    ),
+            ),
+            const SizedBox(width: 14),
 
-          const SizedBox(width: 12),
-
-          /// CONTENT
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  produk.name,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-
-                const SizedBox(height: 6),
-
-                /// CATEGORY TAG
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 3,
-                  ),
-                  decoration: BoxDecoration(
-                    color: categoryColor.withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: categoryColor),
-                  ),
-                  child: Text(
-                    produk.category,
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: categoryColor,
-                      fontWeight: FontWeight.w500,
+            /// CONTENT
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    produk.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                ),
 
-                const SizedBox(height: 6),
-
-                Text(
-                  "Rp ${produk.price}",
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.green,
+                  /// garis aksen
+                  Container(
+                    margin: const EdgeInsets.only(top: 4),
+                    height: 2,
+                    width: 30,
+                    decoration: BoxDecoration(
+                      color: categoryColor,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
-                ),
-              ],
-            ),
-          ),
 
-          /// ACTION
-          Row(
-            children: [
-              _iconAction(Icons.edit, Colors.blue, onEdit),
-              _iconAction(Icons.delete, Colors.red, onDelete),
-            ],
-          ),
-        ],
+                  const SizedBox(height: 6),
+
+                  /// CATEGORY
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: categoryColor.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      produk.category,
+                      style: TextStyle(
+                        fontSize: 10,
+                        color: categoryColor,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 8),
+
+                  /// PRICE
+                  Row(
+                    children: [
+                      const Icon(Icons.sell, size: 14, color: Color(0xff22C55E)),
+                      const SizedBox(width: 4),
+                      Text(
+                        "Rp ${produk.price}",
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xff22C55E),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+
+            /// DELETE
+            _iconAction(Icons.delete_outline_rounded, Colors.redAccent, onDelete),
+          ],
+        ),
       ),
     );
   }
@@ -155,10 +171,14 @@ class ListCard extends StatelessWidget {
   Widget _iconAction(IconData icon, Color color, VoidCallback? onTap) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(10),
-      child: Padding(
-        padding: const EdgeInsets.all(6),
-        child: Icon(icon, size: 18, color: color),
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
+          shape: BoxShape.circle,
+        ),
+        child: Icon(icon, size: 20, color: color),
       ),
     );
   }
@@ -205,7 +225,7 @@ class MenuCard extends StatelessWidget {
             title,
             style: TextStyle(
               fontSize: 12,
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.w600,
               color: AppColors.textPrimary,
             ),
           ),
@@ -216,7 +236,7 @@ class MenuCard extends StatelessWidget {
 }
 
 /// =======================================================
-/// 🔥 GRID CARD (SELLER)
+/// 🔥 GRID CARD (SELLER) - PREMIUM VERSION
 /// =======================================================
 class SellerGridProductCard extends StatelessWidget {
   final ProductModel produk;
@@ -234,116 +254,174 @@ class SellerGridProductCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final categoryColor = getCategoryColor(produk.category);
 
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(_radius),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 14,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          /// IMAGE
-          Stack(
-            children: [
-              ClipRRect(
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(_radius),
+    return GestureDetector(
+      onTap: onEdit,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(_radius),
+          border: Border.all(color: Colors.grey.shade100),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.06),
+              blurRadius: 18,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            /// IMAGE + EFFECT
+            Stack(
+              children: [
+                ClipRRect(
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(_radius),
+                  ),
+                  child: produk.imageBase64.isNotEmpty
+                      ? Image.memory(
+                          base64Decode(produk.imageBase64),
+                          height: 120,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        )
+                      : Container(
+                          height: 120,
+                          color: Colors.grey.shade100,
+                          child: const Center(
+                              child: Icon(Icons.image_outlined, color: Colors.grey)),
+                        ),
                 ),
-                child: produk.imageBase64.isNotEmpty
-                    ? Image.memory(
-                        base64Decode(produk.imageBase64),
-                        height: 120,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-                      )
-                    : Container(height: 120, color: Colors.grey.shade200),
-              ),
 
-              /// CATEGORY TAG (FIXED COLOR)
-              Positioned(
-                top: 8,
-                left: 8,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: categoryColor.withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: categoryColor),
-                  ),
-                  child: Text(
-                    produk.category,
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: categoryColor,
-                      fontWeight: FontWeight.w500,
+                /// GRADIENT OVERLAY
+                Positioned.fill(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(_radius),
+                      ),
+                      gradient: LinearGradient(
+                        begin: Alignment.bottomCenter,
+                        end: Alignment.topCenter,
+                        colors: [
+                          Colors.black.withOpacity(0.25),
+                          Colors.transparent,
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
 
-              /// ACTION
-              Positioned(
-                top: 4,
-                right: 4,
-                child: Row(
-                  children: [
-                    _smallAction(Icons.edit, Colors.blue, onEdit),
-                    _smallAction(Icons.delete, Colors.red, onDelete),
-                  ],
+                /// CATEGORY TAG (COLOR BASED)
+                Positioned(
+                  top: 8,
+                  left: 8,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        color: categoryColor.withOpacity(0.85),
+                        child: Text(
+                          produk.category,
+                          style: const TextStyle(
+                            fontSize: 9,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-            ],
-          ),
 
-          /// CONTENT
-          Padding(
-            padding: const EdgeInsets.all(10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  produk.name,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontWeight: FontWeight.w600),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  produk.location,
-                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  "Rp ${produk.price}",
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.green,
+                /// DELETE BUTTON (SOFT STYLE)
+                Positioned(
+                  top: 4,
+                  right: 4,
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: onDelete,
+                      borderRadius: BorderRadius.circular(20),
+                      child: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: Colors.red.withOpacity(0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.delete_rounded, size: 16, color: Colors.red),
+                      ),
+                    ),
                   ),
                 ),
               ],
             ),
-          ),
-        ],
-      ),
-    );
-  }
 
-  Widget _smallAction(IconData icon, Color color, VoidCallback onTap) {
-    return InkWell(
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.all(6),
-        child: Icon(icon, size: 16, color: color),
+            /// CONTENT
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    produk.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                  ),
+
+                  /// aksen garis
+                  Container(
+                    margin: const EdgeInsets.only(top: 4),
+                    height: 2,
+                    width: 30,
+                    decoration: BoxDecoration(
+                      color: categoryColor,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+
+                  const SizedBox(height: 6),
+
+                  Row(
+                    children: [
+                      const Icon(Icons.location_on, size: 10, color: Colors.grey),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Text(
+                          produk.location,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(fontSize: 11, color: Colors.grey.shade500),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  Row(
+                    children: [
+                      const Icon(Icons.sell, size: 14, color: Color(0xff22C55E)),
+                      const SizedBox(width: 4),
+                      Text(
+                        "Rp ${produk.price}",
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                          color: Color(0xff22C55E),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

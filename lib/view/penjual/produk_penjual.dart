@@ -69,24 +69,24 @@ class _ProdukPenjualState extends State<ProdukPenjual> {
                     ),
                   ),
                   const SizedBox(width: 10),
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: AppColors.skyBlue,
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: const Icon(Icons.tune, color: Colors.white),
-                  ),
+                  // Container(
+                  //   padding: const EdgeInsets.all(12),
+                  //   decoration: BoxDecoration(
+                  //     color: AppColors.skyBlue,
+                  //     borderRadius: BorderRadius.circular(14),
+                  //   ),
+                  //   child: const Icon(Icons.tune, color: Colors.white),
+                  // ),
                 ],
               ),
             ),
 
             /// 🔥 KATEGORI
             SizedBox(
-              height: 50,
+              height: 45,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+                padding: const EdgeInsets.only(left: 16),
                 itemCount: kategori.length,
                 itemBuilder: (context, index) {
                   final isSelected = selectedKategori == index;
@@ -98,30 +98,32 @@ class _ProdukPenjualState extends State<ProdukPenjual> {
                         selectedKategori = index;
                       });
                     },
-                    child: Container(
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
                       margin: const EdgeInsets.only(right: 10),
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
+                        horizontal: 14,
                         vertical: 8,
                       ),
                       decoration: BoxDecoration(
                         color: isSelected
                             ? item["color"]
-                            : Colors.grey.shade200,
-                        borderRadius: BorderRadius.circular(30),
+                            : item["color"].withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(20),
                       ),
                       child: Row(
                         children: [
                           Icon(
                             item["icon"],
                             size: 16,
-                            color: isSelected ? Colors.white : Colors.black54,
+                            color: isSelected ? Colors.white : item["color"],
                           ),
                           const SizedBox(width: 6),
                           Text(
                             item["name"],
                             style: TextStyle(
-                              color: isSelected ? Colors.white : Colors.black54,
+                              fontWeight: FontWeight.w600,
+                              color: isSelected ? Colors.white : item["color"],
                             ),
                           ),
                         ],
@@ -183,7 +185,52 @@ class _ProdukPenjualState extends State<ProdukPenjual> {
 
                         /// 🔥 DELETE AMAN
                         onDelete: () async {
-                          if (produk.id != null) {
+                          final confirm = await showDialog(
+                            context: context,
+                            builder: (_) => AlertDialog(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              title: const Row(
+                                children: [
+                                  Icon(
+                                    Icons.warning_amber_rounded,
+                                    color: Colors.red,
+                                  ),
+                                  SizedBox(width: 10),
+                                  Text("Hapus Produk"),
+                                ],
+                              ),
+                              content: const Text(
+                                "Apakah Anda yakin ingin menghapus produk ini? Tindakan ini tidak dapat dibatalkan.",
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () =>
+                                      Navigator.pop(context, false),
+                                  child: const Text(
+                                    "Batal",
+                                    style: TextStyle(color: Colors.grey),
+                                  ),
+                                ),
+                                ElevatedButton(
+                                  onPressed: () => Navigator.pop(context, true),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.red,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                  ),
+                                  child: const Text(
+                                    "Hapus",
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+
+                          if (confirm == true && produk.id != null) {
                             await ProductService.deleteProduct(produk.id!);
                           }
                         },

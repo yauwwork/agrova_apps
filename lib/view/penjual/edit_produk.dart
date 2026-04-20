@@ -303,7 +303,7 @@ class _EditProdukState extends State<EditProduk> {
                 ),
                 child: isLoading
                     ? const CircularProgressIndicator(color: Colors.white)
-                    : const Text("Simpan Perubahan"),
+                    : const Text("Simpan Perubahan", style: TextStyle(color: Colors.white),),
               ),
             ),
 

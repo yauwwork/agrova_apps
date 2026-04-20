@@ -263,28 +263,35 @@ class _HomePenjualState extends State<HomePenjual> {
 
                     return SellerGridProductCard(
                       produk: p,
-                      onEdit: () async {
-                        await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => EditProduk(produk: p),
-                          ),
-                        );
-                      },
                       onDelete: () async {
                         final confirm = await showDialog(
                           context: context,
                           builder: (_) => AlertDialog(
-                            title: const Text("Hapus Produk"),
-                            content: const Text("Yakin mau hapus produk ini?"),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            title: const Row(
+                              children: [
+                                Icon(Icons.warning_amber_rounded, color: Colors.red),
+                                SizedBox(width: 10),
+                                Text("Hapus Produk"),
+                              ],
+                            ),
+                            content: const Text("Apakah Anda yakin ingin menghapus produk ini? Tindakan ini tidak dapat dibatalkan."),
                             actions: [
                               TextButton(
                                 onPressed: () => Navigator.pop(context, false),
-                                child: const Text("Batal"),
+                                child: const Text("Batal", style: TextStyle(color: Colors.grey)),
                               ),
-                              TextButton(
+                              ElevatedButton(
                                 onPressed: () => Navigator.pop(context, true),
-                                child: const Text("Hapus"),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                child: const Text("Hapus", style: TextStyle(color: Colors.white)),
                               ),
                             ],
                           ),
@@ -294,6 +301,16 @@ class _HomePenjualState extends State<HomePenjual> {
                           await ProductService.deleteProduct(p.id!);
                         }
                       },
+                      onEdit: () async {
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => EditProduk(produk: p),
+                          ),
+                        );
+                      /// ✅ DELETE FIX
+                      
+                      }
                     );
                   },
                 );
