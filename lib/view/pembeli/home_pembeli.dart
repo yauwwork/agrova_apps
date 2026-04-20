@@ -1,6 +1,9 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:agrova_apps/extension/colors/appcolors.dart';
+import 'package:agrova_apps/models/user_models.dart';
+import 'package:agrova_apps/services/firebase_service.dart';
 import 'package:agrova_apps/view/pembeli/produk_pembeli.dart';
 import 'package:flutter/material.dart';
 import 'package:agrova_apps/services/product_service.dart';
@@ -194,6 +197,9 @@ class _HomePembeliScreenState extends State<HomePembeliScreen> {
 
   /// ================= HEADER =================
   Widget _buildHeader() {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return const SizedBox();
+
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 50, 16, 20),
       decoration: const BoxDecoration(
@@ -202,26 +208,29 @@ class _HomePembeliScreenState extends State<HomePembeliScreen> {
         ),
         borderRadius: BorderRadius.vertical(bottom: Radius.circular(24)),
       ),
-      child: Row(
-        children: [
-          const CircleAvatar(
-            radius: 20,
-            backgroundImage: AssetImage("assets/profile.jpg"),
-          ),
-          const SizedBox(width: 10),
+      child: StreamBuilder<UserModeFirebase?>(
+        stream: FirebaseService.userStream(user.uid),
+        builder: (context, snapshot) {
+          final userData = snapshot.data;
+          final nama = userData?.username ?? user.displayName ?? "User Agrova";
+          final photoBase64 = userData?.photoBase64;
 
-          StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-            stream: getUserStream(),
-            builder: (context, snapshot) {
-              final data = snapshot.data?.data();
-              final nama = getNama(data);
-
-              return Column(
+          return Row(
+            children: [
+              CircleAvatar(
+                radius: 20,
+                backgroundColor: Colors.white24,
+                backgroundImage: photoBase64 != null
+                    ? MemoryImage(base64Decode(photoBase64))
+                    : const AssetImage("assets/profile.jpg") as ImageProvider,
+              ),
+              const SizedBox(width: 10),
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
                     "Selamat datang 👋",
-                    style: TextStyle(color: Colors.white70),
+                    style: TextStyle(color: Colors.white70, fontSize: 12),
                   ),
                   Text(
                     nama,
@@ -231,13 +240,12 @@ class _HomePembeliScreenState extends State<HomePembeliScreen> {
                     ),
                   ),
                 ],
-              );
-            },
-          ),
-
-          const Spacer(),
-          const Icon(Icons.notifications, color: Colors.white),
-        ],
+              ),
+              const Spacer(),
+              const Icon(Icons.notifications, color: Colors.white),
+            ],
+          );
+        },
       ),
     );
   }

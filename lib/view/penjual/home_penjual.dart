@@ -1,5 +1,8 @@
+import 'dart:convert';
 import 'package:agrova_apps/extension/card/stat_item_card.dart';
 import 'package:agrova_apps/extension/colors/appcolors.dart';
+import 'package:agrova_apps/models/user_models.dart';
+import 'package:agrova_apps/services/firebase_service.dart';
 import 'package:agrova_apps/view/penjual/analitik_screen.dart';
 import 'package:agrova_apps/view/penjual/edit_produk.dart';
 import 'package:flutter/material.dart';
@@ -30,48 +33,60 @@ class _HomePenjualState extends State<HomePenjual> {
           Stack(
             clipBehavior: Clip.none,
             children: [
-              Container(
-                padding: const EdgeInsets.fromLTRB(16, 50, 16, 80),
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [AppColors.skyBlue, AppColors.mintGreen],
-                  ),
-                  borderRadius: BorderRadius.vertical(
-                    bottom: Radius.circular(30),
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 22,
-                      backgroundImage: user?.photoURL != null
-                          ? NetworkImage(user!.photoURL!)
-                          : null,
-                      child: user?.photoURL == null
-                          ? const Icon(Icons.person)
-                          : null,
+              StreamBuilder<UserModeFirebase?>(
+                stream: FirebaseService.userStream(user?.uid ?? ""),
+                builder: (context, snapshot) {
+                  final userData = snapshot.data;
+                  final nama = userData?.username ?? user?.displayName ?? "User";
+                  final photoBase64 = userData?.photoBase64;
+
+                  return Container(
+                    padding: const EdgeInsets.fromLTRB(16, 50, 16, 80),
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [AppColors.skyBlue, AppColors.mintGreen],
+                      ),
+                      borderRadius: BorderRadius.vertical(
+                        bottom: Radius.circular(30),
+                      ),
                     ),
-                    const SizedBox(width: 10),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    child: Row(
                       children: [
-                        const Text(
-                          "Dashboard Penjual 🏪",
-                          style: TextStyle(color: Colors.white70),
+                        CircleAvatar(
+                          radius: 22,
+                          backgroundColor: Colors.white24,
+                          backgroundImage: photoBase64 != null
+                              ? MemoryImage(base64Decode(photoBase64))
+                              : (user?.photoURL != null
+                                  ? NetworkImage(user!.photoURL!)
+                                  : null) as ImageProvider?,
+                          child: photoBase64 == null && user?.photoURL == null
+                              ? const Icon(Icons.person, color: Colors.white)
+                              : null,
                         ),
-                        Text(
-                          user?.displayName ?? "User",
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        const SizedBox(width: 10),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "Dashboard Penjual 🏪",
+                              style: TextStyle(color: Colors.white70, fontSize: 12),
+                            ),
+                            Text(
+                              nama,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
                         ),
+                        const Spacer(),
+                        const Icon(Icons.notifications, color: Colors.white),
                       ],
                     ),
-                    const Spacer(),
-                    const Icon(Icons.notifications, color: Colors.white),
-                  ],
-                ),
+                  );
+                },
               ),
 
               /// ================= STAT =================
