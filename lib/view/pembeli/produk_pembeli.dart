@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:agrova_apps/extension/card/role_card.dart';
+import 'package:agrova_apps/services/product_service.dart';
 import 'package:flutter/material.dart';
 import 'package:agrova_apps/models/product_model.dart';
 
@@ -15,6 +16,14 @@ class DetailProdukSc extends StatefulWidget {
 class _DetailProdukScState extends State<DetailProdukSc> {
   int currentIndex = 0;
   final PageController _pageController = PageController();
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.product.id != null) {
+      ProductService.incrementViews(widget.product.id!);
+    }
+  }
 
   @override
   void dispose() {

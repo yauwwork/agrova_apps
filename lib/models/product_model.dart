@@ -17,6 +17,8 @@ class ProductModel {
   final List<String> images;
 
   final DateTime? createdAt;
+  final int views;
+  final int favorites;
 
   ProductModel({
     this.id,
@@ -30,6 +32,8 @@ class ProductModel {
     required this.imageBase64,
     this.images = const [],
     this.createdAt,
+    this.views = 0,
+    this.favorites = 0,
   });
 
   /// =====================
@@ -45,6 +49,8 @@ class ProductModel {
       "description": description.trim(),
       "location": location.trim(),
       "imageBase64": imageBase64,
+      "views": views,
+      "favorites": favorites,
 
       /// 🔥 SIMPAN MULTI IMAGE
       "images": images,
@@ -72,6 +78,8 @@ class ProductModel {
       description: map["description"] ?? "",
       location: map["location"] ?? "",
       imageBase64: map["imageBase64"] ?? "",
+      views: map["views"] ?? 0,
+      favorites: map["favorites"] ?? 0,
 
       /// 🔥 FIX UTAMA DI SINI
       images: imageList,

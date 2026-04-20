@@ -116,6 +116,23 @@ class _HomePenjualState extends State<HomePenjual> {
                     stream: ProductService.getMyProducts(),
                     builder: (context, snapshot) {
                       final myProducts = snapshot.data ?? [];
+                      
+                      // Hitung total views dan favorites
+                      int totalViews = 0;
+                      int totalFavorites = 0;
+                      
+                      for (var p in myProducts) {
+                        totalViews += p.views;
+                        totalFavorites += p.favorites;
+                      }
+
+                      /// 🔥 FORMAT ANGKA BIAR KEREN (Misal 1000 -> 1k)
+                      String formatNumber(int number) {
+                        if (number >= 1000) {
+                          return "${(number / 1000).toStringAsFixed(1)}k";
+                        }
+                        return number.toString();
+                      }
 
                       return Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -126,15 +143,15 @@ class _HomePenjualState extends State<HomePenjual> {
                             "Produk",
                             AppColors.mintGreen,
                           ),
-                          const StatItem(
+                          StatItem(
                             Icons.remove_red_eye,
-                            "15.7k",
+                            formatNumber(totalViews),
                             "Dilihat",
                             AppColors.skyBlue,
                           ),
-                          const StatItem(
+                          StatItem(
                             Icons.favorite,
-                            "892",
+                            formatNumber(totalFavorites),
                             "Favorit",
                             Colors.pink,
                           ),
@@ -308,8 +325,6 @@ class _HomePenjualState extends State<HomePenjual> {
                             builder: (_) => EditProduk(produk: p),
                           ),
                         );
-                      /// ✅ DELETE FIX
-                      
                       }
                     );
                   },

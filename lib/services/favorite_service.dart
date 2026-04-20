@@ -1,17 +1,19 @@
+import 'package:agrova_apps/services/product_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../models/product_model.dart';
 
 class FavoriteService {
   static final FirebaseFirestore _db = FirebaseFirestore.instance;
+  static final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  /// ⚠️ sementara (nanti ganti FirebaseAuth)
-  static const String _userId = "user123";
+  static String? get _userId => _auth.currentUser?.uid;
 
   /// =========================
   /// ❤️ TAMBAH FAVORIT
   /// =========================
   static Future<void> addFavorite(ProductModel product) async {
-    if (product.id == null) return;
+    if (product.id == null || _userId == null) return;
 
     await _db.collection('favorites').doc("${_userId}_${product.id}").set({
       "userId": _userId,
@@ -23,26 +25,32 @@ class FavoriteService {
       "penjual": product.userId,
       "deskripsi": product.description,
       "category": product.category,
-      "stock": product.stock ?? 0, // 🔥 FIX WAJIB
+      "stock": product.stock,
       "createdAt": FieldValue.serverTimestamp(),
     });
+
+    await ProductService.updateFavoriteCount(product.id!, true);
   }
 
   /// =========================
   /// ❌ HAPUS FAVORIT
   /// =========================
   static Future<void> removeFavorite(String productId) async {
+    if (_userId == null) return;
+
     await _db
         .collection('favorites')
         .doc("${_userId}_$productId")
         .delete();
+
+    await ProductService.updateFavoriteCount(productId, false);
   }
 
   /// =========================
   /// ❤️ CEK FAVORIT REALTIME
   /// =========================
   static Stream<bool> isFavorited(String? productId) {
-    if (productId == null) return Stream.value(false);
+    if (productId == null || _userId == null) return Stream.value(false);
 
     return _db
         .collection('favorites')
@@ -55,6 +63,8 @@ class FavoriteService {
   /// 📦 GET FAVORIT LIST
   /// =========================
   static Stream<List<ProductModel>> getFavorites() {
+    if (_userId == null) return Stream.value([]);
+
     return _db
         .collection('favorites')
         .where("userId", isEqualTo: _userId)
@@ -72,7 +82,7 @@ class FavoriteService {
           userId: data['penjual'] ?? "",
           description: data['deskripsi'] ?? "",
           category: data['category'] ?? "",
-          stock: data['stock'] ?? 0, // 🔥 FIX AMAN
+          stock: data['stock'] ?? 0,
         );
       }).toList();
     });

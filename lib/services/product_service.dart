@@ -116,4 +116,30 @@ class ProductService {
 
     await _firestore.collection("products").doc(id).delete();
   }
+
+  /// =====================
+  /// INCREMENT VIEWS
+  /// =====================
+  static Future<void> incrementViews(String productId) async {
+    try {
+      await _firestore.collection("products").doc(productId).update({
+        "views": FieldValue.increment(1),
+      });
+    } catch (e) {
+      print("Gagal increment views: $e");
+    }
+  }
+
+  /// =====================
+  /// UPDATE FAVORITE COUNT
+  /// =====================
+  static Future<void> updateFavoriteCount(String productId, bool isAdded) async {
+    try {
+      await _firestore.collection("products").doc(productId).update({
+        "favorites": FieldValue.increment(isAdded ? 1 : -1),
+      });
+    } catch (e) {
+      print("Gagal update favorite count: $e");
+    }
+  }
 }
