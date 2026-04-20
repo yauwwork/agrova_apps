@@ -1,14 +1,14 @@
 import 'package:agrova_apps/extension/colors/appcolors.dart';
 import 'package:flutter/material.dart';
-import 'package:agrova_apps/database/produk_data.dart';
+import 'package:agrova_apps/services/product_service.dart';
+import 'package:agrova_apps/models/product_model.dart';
 import 'package:agrova_apps/view/pembeli/produk_pembeli.dart';
 import 'package:agrova_apps/extension/card/pembeli_produk_card.dart';
 
-/// 🔥 MODEL KATEGORI (BIAR RAPI & ADA WARNA)
 class KategoriModel {
-  final String name; // nama kategori
-  final IconData icon; // icon kategori
-  final Color color; // warna utama kategori
+  final String name;
+  final IconData icon;
+  final Color color;
 
   KategoriModel(this.name, this.icon, this.color);
 }
@@ -21,10 +21,8 @@ class KategoriSc extends StatefulWidget {
 }
 
 class _KategoriScState extends State<KategoriSc> {
-  /// 🔥 INDEX KATEGORI YANG DIPILIH
   int selectedKategori = 0;
 
-  /// 🔥 DATA KATEGORI + WARNA
   final List<KategoriModel> kategori = [
     KategoriModel("Semua", Icons.grid_view, Colors.green),
     KategoriModel("Pertanian", Icons.eco, Colors.green),
@@ -36,8 +34,6 @@ class _KategoriScState extends State<KategoriSc> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.softMint,
-
-      /// 🔥 APPBAR
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -50,12 +46,11 @@ class _KategoriScState extends State<KategoriSc> {
       body: SafeArea(
         child: Column(
           children: [
-            /// 🔍 SEARCH + FILTER
+            /// SEARCH
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
                 children: [
-                  /// SEARCH BAR
                   Expanded(
                     child: Container(
                       height: 48,
@@ -68,18 +63,13 @@ class _KategoriScState extends State<KategoriSc> {
                         children: [
                           Icon(Icons.search, color: Colors.grey),
                           SizedBox(width: 8),
-                          Text(
-                            "Cari produk...",
-                            style: TextStyle(color: Colors.grey),
-                          ),
+                          Text("Cari produk...",
+                              style: TextStyle(color: Colors.grey)),
                         ],
                       ),
                     ),
                   ),
-
                   const SizedBox(width: 10),
-
-                  /// BUTTON FILTER
                   Container(
                     height: 48,
                     width: 48,
@@ -95,7 +85,7 @@ class _KategoriScState extends State<KategoriSc> {
 
             const SizedBox(height: 16),
 
-            /// 🟢 LIST KATEGORI (BISA DI SCROLL)
+            /// KATEGORI CHIP
             SizedBox(
               height: 40,
               child: ListView.builder(
@@ -108,22 +98,15 @@ class _KategoriScState extends State<KategoriSc> {
                   return GestureDetector(
                     onTap: () {
                       setState(() {
-                        selectedKategori = index; // ganti kategori aktif
+                        selectedKategori = index;
                       });
                     },
-
-                    /// 🔥 CHIP KATEGORI
                     child: AnimatedContainer(
-                      duration: const Duration(
-                        milliseconds: 200,
-                      ), // animasi smooth
+                      duration: const Duration(milliseconds: 200),
                       margin: const EdgeInsets.only(right: 10),
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 8,
-                      ),
+                          horizontal: 14, vertical: 8),
                       decoration: BoxDecoration(
-                        /// warna beda kalau dipilih
                         color: isSelected
                             ? kategori[index].color
                             : kategori[index].color.withOpacity(0.15),
@@ -131,7 +114,6 @@ class _KategoriScState extends State<KategoriSc> {
                       ),
                       child: Row(
                         children: [
-                          /// ICON
                           Icon(
                             kategori[index].icon,
                             size: 16,
@@ -139,10 +121,7 @@ class _KategoriScState extends State<KategoriSc> {
                                 ? Colors.white
                                 : kategori[index].color,
                           ),
-
                           const SizedBox(width: 6),
-
-                          /// TEXT
                           Text(
                             kategori[index].name,
                             style: TextStyle(
@@ -162,18 +141,15 @@ class _KategoriScState extends State<KategoriSc> {
 
             const SizedBox(height: 16),
 
-            /// 🔽 SORT + VIEW MODE
+            /// SORT UI (tetap)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  /// SORT BUTTON
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 8,
-                    ),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                     decoration: BoxDecoration(
                       color: const Color(0xffEAECEF),
                       borderRadius: BorderRadius.circular(16),
@@ -186,8 +162,6 @@ class _KategoriScState extends State<KategoriSc> {
                       ],
                     ),
                   ),
-
-                  /// TOGGLE GRID / LIST
                   Row(
                     children: [
                       Container(
@@ -196,11 +170,8 @@ class _KategoriScState extends State<KategoriSc> {
                           color: const Color(0xff2BB673),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: const Icon(
-                          Icons.grid_view,
-                          size: 18,
-                          color: Colors.white,
-                        ),
+                        child: const Icon(Icons.grid_view,
+                            size: 18, color: Colors.white),
                       ),
                       const SizedBox(width: 8),
                       Container(
@@ -209,11 +180,8 @@ class _KategoriScState extends State<KategoriSc> {
                           color: const Color(0xffEAECEF),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: const Icon(
-                          Icons.list,
-                          size: 18,
-                          color: Colors.black54,
-                        ),
+                        child: const Icon(Icons.list,
+                            size: 18, color: Colors.black54),
                       ),
                     ],
                   ),
@@ -223,80 +191,71 @@ class _KategoriScState extends State<KategoriSc> {
 
             const SizedBox(height: 12),
 
-            /// 📦 JUMLAH PRODUK
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "${daftarProduk.length} produk ditemukan",
-                  style: const TextStyle(color: Colors.grey),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 12),
-
-            /// 🧱 GRID PRODUK
+            /// 🔥 PRODUK FIREBASE
             Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: GridView.builder(
-                  itemCount: daftarProduk.length,
+              child: StreamBuilder<List<ProductModel>>(
+                stream: ProductService.getProducts(),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
 
-                  /// GRID SETTING
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2, // 2 kolom
-                    crossAxisSpacing: 12, // jarak samping
-                    mainAxisSpacing: 12, // jarak atas bawah
-                    childAspectRatio: 0.72, // rasio card
-                  ),
+                  final allProducts = snapshot.data!;
 
-                  itemBuilder: (context, index) {
-                    final produk = daftarProduk[index];
+                  /// 🔥 FILTER KATEGORI
+                  List<ProductModel> filtered = allProducts;
 
-                    return GestureDetector(
-                      onTap: () {
-                        /// NAVIGATE KE DETAIL
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => DetailProdukSc(
-                              title: produk.nama,
-                              price: "Rp ${produk.harga}/kg",
-                              image: produk.image,
-                              penjual: produk.penjual,
-                              location: produk.lokasi,
-                              deskripsi: produk.deskripsi,
+                  if (selectedKategori != 0) {
+                    final selectedName =
+                        kategori[selectedKategori].name;
+
+                    filtered = allProducts.where((p) {
+                      return p.category
+                          .toLowerCase()
+                          .contains(selectedName.toLowerCase());
+                    }).toList();
+                  }
+
+                  if (filtered.isEmpty) {
+                    return const Center(child: Text("Produk tidak ada"));
+                  }
+
+                  return GridView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: filtered.length,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 12,
+                      mainAxisSpacing: 12,
+                      childAspectRatio: 0.72,
+                    ),
+                    itemBuilder: (context, index) {
+                      final produk = filtered[index];
+
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => DetailProdukSc(
+                                title: produk.name,
+                                price: "Rp ${produk.price}",
+                                imageBase64: produk.imageBase64,
+                                penjual: produk.userId,
+                                location: produk.location,
+                                deskripsi: produk.description,
+                              ),
                             ),
-                          ),
-                        );
-                      },
-
-                      /// 🔥 PAKE PRODUCT CARD LO
-                      child: ProductCard(
-                        title: produk.nama,
-                        price: "Rp ${produk.harga}/kg",
-                        image: produk.image,
-                        seller: produk.penjual,
-                        location: produk.lokasi,
-                        rating: 4.5,
-
-                        /// FAVORIT LOGIC
-                        isFavorited: favoritProduk.contains(produk),
-                        onFavorite: () {
-                          setState(() {
-                            if (favoritProduk.contains(produk)) {
-                              favoritProduk.remove(produk);
-                            } else {
-                              favoritProduk.add(produk);
-                            }
-                          });
+                          );
                         },
-                      ),
-                    );
-                  },
-                ),
+
+                        /// 🔥 CARD AKTIF
+                        child: ProductCard(produk: produk),
+                      );
+                    },
+                  );
+                },
               ),
             ),
           ],

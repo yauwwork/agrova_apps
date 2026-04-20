@@ -1,7 +1,8 @@
-import 'package:agrova_apps/database/produk_data.dart';
 import 'package:agrova_apps/extension/card/penjual_produk_card.dart';
 import 'package:agrova_apps/extension/colors/appcolors.dart';
 import 'package:flutter/material.dart';
+import 'package:agrova_apps/services/product_service.dart';
+import 'package:agrova_apps/models/product_model.dart';
 import 'package:agrova_apps/view/penjual/edit_produk.dart';
 import 'package:amicons/amicons.dart';
 
@@ -38,7 +39,6 @@ class _ProdukPenjualState extends State<ProdukPenjual> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.bgpenjual,
-
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -55,7 +55,7 @@ class _ProdukPenjualState extends State<ProdukPenjual> {
       body: SafeArea(
         child: Column(
           children: [
-            /// SEARCH + FILTER
+            /// SEARCH
             Padding(
               padding: const EdgeInsets.all(16),
               child: Row(
@@ -66,13 +66,6 @@ class _ProdukPenjualState extends State<ProdukPenjual> {
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(30),
-                        boxShadow: [
-                          BoxShadow(
-                            blurRadius: 12,
-                            offset: const Offset(0, 4),
-                            color: Colors.black.withOpacity(0.05),
-                          ),
-                        ],
                       ),
                       child: const TextField(
                         decoration: InputDecoration(
@@ -136,7 +129,9 @@ class _ProdukPenjualState extends State<ProdukPenjual> {
                           Text(
                             item["name"],
                             style: TextStyle(
-                              color: isSelected ? Colors.white : Colors.black54,
+                              color: isSelected
+                                  ? Colors.white
+                                  : Colors.black54,
                             ),
                           ),
                         ],
@@ -149,48 +144,70 @@ class _ProdukPenjualState extends State<ProdukPenjual> {
 
             const SizedBox(height: 10),
 
-            /// GRID PRODUK
+            /// 🔥 GRID PRODUK FIREBASE
             Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: GridView.builder(
-                  itemCount: daftarProduk.length,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 14,
-                    mainAxisSpacing: 14,
-                    childAspectRatio: 0.68,
-                  ),
-                  itemBuilder: (context, index) {
-                    final produk = daftarProduk[index];
+              child: StreamBuilder<List<ProductModel>>(
+                stream: ProductService.getMyProducts(),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
 
-                    return SellerGridProductCard(
-                      title: produk.nama,
-                      subtitle: produk.kategori,
-                      price: "Rp ${produk.harga}",
-                      image: produk.image,
-                      location: produk.lokasi,
-                      views: "120",
-                      favorites: "45",
+                  final allProducts = snapshot.data!;
 
-                      onDelete: () {
-                        setState(() {
-                          daftarProduk.removeAt(index);
-                        });
-                      },
+                  /// 🔥 FILTER KATEGORI
+                  List<ProductModel> filtered = allProducts;
 
-                      onEdit: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) =>
-                                EditProduk(produk: produk, index: index),
-                          ),
-                        ).then((_) => setState(() {}));
-                      },
-                    );
-                  },
-                ),
+                  if (selectedKategori != 0) {
+                    final selectedName =
+                        kategori[selectedKategori]["name"];
+
+                    filtered = allProducts.where((p) {
+                      return p.category
+                          .toLowerCase()
+                          .contains(selectedName.toLowerCase());
+                    }).toList();
+                  }
+
+                  if (filtered.isEmpty) {
+                    return const Center(child: Text("Belum ada produk"));
+                  }
+
+                  return GridView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: filtered.length,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 14,
+                      mainAxisSpacing: 14,
+                      childAspectRatio: 0.68,
+                    ),
+                    itemBuilder: (context, index) {
+                      final produk = filtered[index];
+
+                      return SellerGridProductCard(
+                        produk: produk,
+
+                        /// DELETE
+                        onDelete: () async {
+                          await ProductService.deleteProduct(produk.id!);
+                        },
+
+                        /// EDIT
+                        onEdit: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) =>
+                                  EditProduk(produk: produk),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  );
+                },
               ),
             ),
           ],

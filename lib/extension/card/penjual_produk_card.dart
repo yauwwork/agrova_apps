@@ -1,39 +1,14 @@
-import 'dart:io';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:agrova_apps/extension/colors/appcolors.dart';
-
-/// =======================================================
-/// 🔥 MODEL PRODUK (SATU SUMBER SEMUA CARD)
-/// =======================================================
-class Produk {
-  final String id;
-  final String nama;
-  final String kategori;
-  final String harga;
-  final String stok;
-  final String deskripsi;
-  final String lokasi;
-  final String image; // file path / base64 nanti
-  final String penjual;
-
-  Produk({
-    required this.id,
-    required this.nama,
-    required this.kategori,
-    required this.harga,
-    required this.stok,
-    required this.deskripsi,
-    required this.lokasi,
-    required this.image,
-    required this.penjual,
-  });
-}
+import 'package:agrova_apps/models/product_model.dart';
 
 /// =======================================================
 /// 🔥 LIST CARD (SELLER LIST)
+/// dipakai buat list vertical produk penjual
 /// =======================================================
 class ListCard extends StatelessWidget {
-  final Produk produk;
+  final ProductModel produk;
   final VoidCallback? onEdit;
   final VoidCallback? onDelete;
 
@@ -57,24 +32,35 @@ class ListCard extends StatelessWidget {
       ),
       child: Row(
         children: [
+          /// 🔥 IMAGE
           ClipRRect(
             borderRadius: BorderRadius.circular(12),
-            child: Image.file(
-              File(produk.image),
-              width: 70,
-              height: 70,
-              fit: BoxFit.cover,
-            ),
+            child: produk.imageBase64.isNotEmpty
+                ? Image.memory(
+                    base64Decode(produk.imageBase64),
+                    width: 70,
+                    height: 70,
+                    fit: BoxFit.cover,
+                  )
+                : Container(
+                    width: 70,
+                    height: 70,
+                    color: Colors.grey[300],
+                    child: const Icon(Icons.image),
+                  ),
           ),
 
           const SizedBox(width: 16),
 
+          /// 🔥 CONTENT
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  produk.nama,
+                  produk.name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -83,14 +69,14 @@ class ListCard extends StatelessWidget {
                 const SizedBox(height: 4),
 
                 Text(
-                  produk.kategori,
+                  produk.category,
                   style: TextStyle(fontSize: 13, color: Colors.grey[600]),
                 ),
 
                 const SizedBox(height: 6),
 
                 Text(
-                  "Rp ${produk.harga}",
+                  "Rp ${produk.price}",
                   style: const TextStyle(
                     fontSize: 15,
                     color: Colors.blue,
@@ -101,6 +87,7 @@ class ListCard extends StatelessWidget {
             ),
           ),
 
+          /// 🔥 ACTION BUTTON
           Column(
             children: [
               IconButton(
@@ -120,34 +107,8 @@ class ListCard extends StatelessWidget {
 }
 
 /// =======================================================
-/// 🔥 STAT CARD
-/// =======================================================
-class StatItem extends StatelessWidget {
-  final IconData icon;
-  final String value;
-  final String label;
-  final Color color;
-
-  const StatItem(this.icon, this.value, this.label, this.color, {super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        CircleAvatar(
-          backgroundColor: color.withOpacity(0.15),
-          child: Icon(icon, color: color),
-        ),
-        const SizedBox(height: 6),
-        Text(value, style: const TextStyle(fontWeight: FontWeight.bold)),
-        Text(label, style: const TextStyle(fontSize: 12, color: Colors.grey)),
-      ],
-    );
-  }
-}
-
-/// =======================================================
-/// 🔥 MENU CARD
+/// 🔥 MENU CARD (DARI HOME PENJUAL)
+/// buat tombol: Tambah, Analitik, Produk
 /// =======================================================
 class MenuCard extends StatelessWidget {
   final IconData icon;
@@ -160,7 +121,6 @@ class MenuCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 95,
-      padding: const EdgeInsets.symmetric(vertical: 12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
@@ -175,6 +135,7 @@ class MenuCard extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          /// 🔥 ICON BOX
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
@@ -183,10 +144,17 @@ class MenuCard extends StatelessWidget {
             ),
             child: Icon(icon, color: color, size: 22),
           ),
+
           const SizedBox(height: 8),
+
+          /// 🔥 TITLE
           Text(
             title,
-            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: AppColors.textPrimary,
+            ),
           ),
         ],
       ),
@@ -195,93 +163,11 @@ class MenuCard extends StatelessWidget {
 }
 
 /// =======================================================
-/// 🔥 TOP PRODUCT CARD
-/// =======================================================
-class TopProductCard extends StatelessWidget {
-  final int rank;
-  final Produk produk;
-  final String views;
-  final String likes;
-  final String rating;
-
-  const TopProductCard(
-    this.rank,
-    this.produk,
-    this.views,
-    this.likes,
-    this.rating, {
-    super.key,
-  });
-
-  Color getRankColor() {
-    if (rank == 1) return Colors.orange;
-    if (rank == 2) return Colors.grey;
-    if (rank == 3) return Colors.brown;
-    return Colors.grey;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: const [
-          BoxShadow(
-            blurRadius: 10,
-            offset: Offset(0, 4),
-            color: Colors.black12,
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          CircleAvatar(
-            radius: 16,
-            backgroundColor: getRankColor(),
-            child: Text("$rank"),
-          ),
-
-          const SizedBox(width: 12),
-
-          ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: Image.file(
-              File(produk.image),
-              width: 55,
-              height: 55,
-              fit: BoxFit.cover,
-            ),
-          ),
-
-          const SizedBox(width: 12),
-
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [Text(produk.nama), Text(produk.kategori)],
-            ),
-          ),
-
-          Row(
-            children: [
-              const Icon(Icons.star, color: Colors.orange, size: 18),
-              Text(rating),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// =======================================================
-/// 🔥 SELLER GRID CARD
+/// 🔥 SELLER GRID PRODUCT CARD
+/// ini yang dipakai di HomePenjual (grid produk)
 /// =======================================================
 class SellerGridProductCard extends StatelessWidget {
-  final Produk produk;
+  final ProductModel produk;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
 
@@ -309,20 +195,28 @@ class SellerGridProductCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          /// 🔥 IMAGE + ACTION
           Stack(
             children: [
               ClipRRect(
                 borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(18),
                 ),
-                child: Image.file(
-                  File(produk.image),
-                  height: 110,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                ),
+                child: produk.imageBase64.isNotEmpty
+                    ? Image.memory(
+                        base64Decode(produk.imageBase64),
+                        height: 110,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                      )
+                    : Container(
+                        height: 110,
+                        width: double.infinity,
+                        color: Colors.grey,
+                      ),
               ),
 
+              /// 🔥 KATEGORI
               Positioned(
                 top: 8,
                 left: 8,
@@ -335,10 +229,11 @@ class SellerGridProductCard extends StatelessWidget {
                     color: Colors.white.withOpacity(0.9),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Text(produk.kategori),
+                  child: Text(produk.category),
                 ),
               ),
 
+              /// 🔥 EDIT + DELETE
               Positioned(
                 top: 6,
                 right: 6,
@@ -366,14 +261,15 @@ class SellerGridProductCard extends StatelessWidget {
             ],
           ),
 
+          /// 🔥 CONTENT
           Padding(
             padding: const EdgeInsets.all(10),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(produk.nama),
-                Text(produk.lokasi),
-                Text("Rp ${produk.harga}"),
+                Text(produk.name),
+                Text(produk.location),
+                Text("Rp ${produk.price}"),
               ],
             ),
           ),

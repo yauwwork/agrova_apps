@@ -1,30 +1,25 @@
+import 'dart:convert';
 import 'package:agrova_apps/extension/colors/appcolors.dart';
 import 'package:amicons/amicons.dart';
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-import 'dart:io';
 
 class DetailProdukSc extends StatefulWidget {
   final String title;
   final String price;
-  final String image;
+  final String imageBase64; // 🔥 dari firebase
   final String penjual;
   final String location;
   final String deskripsi;
-  final VoidCallback? onEdit;
-  final VoidCallback? onDelete;
 
   const DetailProdukSc({
     super.key,
     required this.title,
     required this.price,
-    required this.image,
+    required this.imageBase64,
     required this.penjual,
     required this.location,
     required this.deskripsi,
-    this.onEdit,
-    this.onDelete,
   });
 
   @override
@@ -39,226 +34,214 @@ class _DetailProdukScState extends State<DetailProdukSc> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       backgroundColor: AppColors.softMint,
+
+      /// ================= APPBAR =================
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
+
         leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: Icon(
-            Icons.arrow_back_ios_new_outlined,
-            color: AppColors.leafGreen,
-          ),
+          onPressed: () => Navigator.pop(context),
+          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black),
         ),
 
         centerTitle: true,
-        title: Text(
+        title: const Text(
           "Detail Produk",
           style: TextStyle(
-            fontSize: 24,
             fontWeight: FontWeight.bold,
-            fontFamily: "Inter",
+            color: Colors.black,
           ),
         ),
 
         actions: [
-          Padding(
-            padding: EdgeInsets.only(right: 10),
-            child: IconButton(
-              onPressed: () {},
-              icon: Icon(Amicons.remix_share, color: AppColors.oceanBlue),
-            ),
+          IconButton(
+            onPressed: () {},
+            icon: const Icon(Icons.share, color: Colors.black),
           ),
         ],
       ),
 
+      /// ================= BODY =================
       body: SafeArea(
         child: SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ClipRRect(
+          child: Column(
+            children: [
+              /// ================= IMAGE =================
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: ClipRRect(
                   borderRadius: BorderRadius.circular(20),
                   child: SizedBox(
                     height: 250,
                     child: PageView(
                       controller: _controller,
                       children: [
-                        Image.file(
-                          File(widget.image),
-                          fit: BoxFit.cover,
-                          width: double.infinity,
-                        ),
+                        widget.imageBase64.isNotEmpty
+                            ? Image.memory(
+                                base64Decode(widget.imageBase64),
+                                fit: BoxFit.cover,
+                                width: double.infinity,
+                              )
+                            : Container(
+                                color: Colors.grey[300],
+                                child: const Icon(Icons.image, size: 60),
+                              ),
                       ],
                     ),
                   ),
                 ),
+              ),
 
-                SizedBox(height: 10),
+              /// DOT
+              SmoothPageIndicator(
+                controller: _controller,
+                count: 1,
+                effect: WormEffect(
+                  dotHeight: 8,
+                  dotWidth: 8,
+                  activeDotColor: AppColors.mintGreen,
+                ),
+              ),
 
-                Center(
-                  child: SmoothPageIndicator(
-                    controller: _controller,
-                    count: 1,
-                    effect: WormEffect(
-                      dotHeight: 8,
-                      dotWidth: 8,
-                      activeDotColor: AppColors.leafGreen,
-                    ),
+              const SizedBox(height: 20),
+
+              /// ================= CONTENT =================
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(24),
                   ),
                 ),
-
-                SizedBox(height: 20),
-
-                Text(
-                  widget.title,
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: "Inter",
-                  ),
-                ),
-
-                Text(
-                  widget.price,
-                  style: TextStyle(
-                    color: AppColors.leafGreen,
-                    fontFamily: "Inter",
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(height: 8),
-
-                Row(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      padding: EdgeInsetsDirectional.symmetric(
-                        vertical: 4,
-                        horizontal: 8,
+                    /// TITLE
+                    Text(
+                      widget.title,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
                       ),
+                    ),
+
+                    const SizedBox(height: 6),
+
+                    /// PRICE
+                    Text(
+                      widget.price,
+                      style: const TextStyle(
+                        color: Colors.green,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+
+                    const SizedBox(height: 10),
+
+                    /// LOCATION
+                    Row(
+                      children: [
+                        const Icon(Icons.location_on,
+                            size: 16, color: Colors.grey),
+                        const SizedBox(width: 4),
+                        Text(
+                          widget.location,
+                          style: const TextStyle(color: Colors.grey),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    /// ================= SELLER =================
+                    Container(
+                      padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: AppColors.skyBlue.withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(24),
+                        color: AppColors.mintGreen.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(16),
                       ),
                       child: Row(
                         children: [
-                          Icon(
-                            Amicons.iconly_location_2_sharp,
-                            color: AppColors.oceanBlue,
-                            size: 20,
+                          const CircleAvatar(
+                            backgroundImage:
+                                AssetImage("assets/profile.jpg"),
                           ),
-                          SizedBox(width: 4),
 
-                          Text(
-                            widget.location,
-                            style: TextStyle(
-                              fontFamily: "Inter",
-                              color: AppColors.oceanBlue,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                            ),
+                          const SizedBox(width: 10),
+
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                widget.penjual,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              const SizedBox(height: 2),
+                              Row(
+                                children: const [
+                                  Icon(Icons.star,
+                                      color: Colors.orange, size: 16),
+                                  SizedBox(width: 4),
+                                  Text("4.8"),
+                                ],
+                              ),
+                            ],
                           ),
                         ],
                       ),
                     ),
+
+                    const SizedBox(height: 20),
+
+                    /// ================= DESKRIPSI =================
+                    const Text(
+                      "Deskripsi Produk",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+
+                    const SizedBox(height: 8),
+
+                    Text(
+                      widget.deskripsi,
+                      style: TextStyle(
+                        color: Colors.grey[700],
+                        height: 1.5,
+                      ),
+                    ),
+
+                    const SizedBox(height: 80),
                   ],
                 ),
-
-                SizedBox(height: 24),
-
-                Container(
-                  padding: EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: AppColors.mintGreen.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(15),
-                    border: Border.all(color: AppColors.leafGreen),
-                  ),
-                  child: Row(
-                    children: [
-                      CircleAvatar(
-                        backgroundImage: AssetImage(
-                          "assets/images/gambarlain/download (1).jpg",
-                        ),
-                      ),
-
-                      SizedBox(width: 12),
-
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            widget.penjual,
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          Row(
-                            children: [
-                              Icon(
-                                Amicons.remix_star_fill,
-                                color: Colors.amber,
-                                size: 16,
-                              ),
-                              SizedBox(width: 4),
-                              Text("4.8 | 120 Ulasan"),
-                            ],
-                          ),
-
-                          SizedBox(height: 4),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-
-                SizedBox(height: 24),
-
-                Text(
-                  "Deskripsi Produk",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: "Inter",
-                  ),
-                ),
-
-                SizedBox(height: 8),
-
-                Text(
-                  widget.deskripsi,
-                  style: TextStyle(
-                    color: Colors.grey[700],
-                    height: 1.5,
-                    fontFamily: "Inter",
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
 
-      bottomNavigationBar: Container(
-        padding: EdgeInsets.all(12),
+      /// ================= BUTTON =================
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(12),
         child: ElevatedButton.icon(
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.mintGreen,
-            padding: EdgeInsets.symmetric(vertical: 14),
+            padding: const EdgeInsets.symmetric(vertical: 14),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(30),
             ),
           ),
-          onPressed: () {},
-          icon: Icon(Amicons.remix_whatsapp, color: AppColors.softMint),
-          label: Text(
-            "WhatsApp",
-            style: TextStyle(
-              color: AppColors.softMint,
-              fontFamily: "Inter",
-              fontSize: 16,
-            ),
+          onPressed: () {
+            /// 🔥 nanti bisa launch whatsapp
+          },
+          icon: const Icon(Icons.chat, color: Colors.white),
+          label: const Text(
+            "Hubungi via WhatsApp",
+            style: TextStyle(color: Colors.white),
           ),
         ),
       ),

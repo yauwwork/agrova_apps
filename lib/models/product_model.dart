@@ -25,6 +25,7 @@ class ProductModel {
     this.createdAt,
   });
 
+  /// 🔥 TO MAP (SAVE KE FIRESTORE)
   Map<String, dynamic> toMap() {
     return {
       "userId": userId,
@@ -39,18 +40,32 @@ class ProductModel {
     };
   }
 
+  /// 🔥 FROM MAP (AMBIL DARI FIRESTORE)
   factory ProductModel.fromMap(Map<String, dynamic> map, String id) {
     return ProductModel(
       id: id,
+
+      /// SAFE STRING
       userId: map["userId"] ?? "",
       name: map["name"] ?? "",
       category: map["category"] ?? "",
-      price: map["price"] ?? 0,
-      stock: map["stock"] ?? 0,
       description: map["description"] ?? "",
       location: map["location"] ?? "",
       imageBase64: map["imageBase64"] ?? "",
-      createdAt: (map["createdAt"] as Timestamp?)?.toDate(),
+
+      /// 🔥 SAFE INT (ANTI ERROR DOUBLE)
+      price: (map["price"] ?? 0) is int
+          ? map["price"]
+          : (map["price"] ?? 0).toInt(),
+
+      stock: (map["stock"] ?? 0) is int
+          ? map["stock"]
+          : (map["stock"] ?? 0).toInt(),
+
+      /// 🔥 SAFE DATE
+      createdAt: map["createdAt"] != null
+          ? (map["createdAt"] as Timestamp).toDate()
+          : null,
     );
   }
 }

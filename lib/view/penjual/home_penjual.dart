@@ -1,6 +1,11 @@
+import 'package:agrova_apps/extension/card/stat_item_card.dart';
 import 'package:agrova_apps/extension/colors/appcolors.dart';
 import 'package:agrova_apps/view/penjual/analitik_screen.dart';
 import 'package:flutter/material.dart';
+
+import 'package:agrova_apps/services/product_service.dart';
+import 'package:agrova_apps/models/product_model.dart';
+import 'package:agrova_apps/extension/card/penjual_produk_card.dart';
 
 class HomePenjual extends StatefulWidget {
   const HomePenjual({super.key});
@@ -18,13 +23,10 @@ class _HomePenjualState extends State<HomePenjual> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            /// =======================================================
-            /// 🔥 HEADER + STAT CARD
-            /// =======================================================
+            /// ================= HEADER =================
             Stack(
               clipBehavior: Clip.none,
               children: [
-                /// 🔥 HEADER (GRADIENT)
                 Container(
                   padding: const EdgeInsets.fromLTRB(16, 50, 16, 80),
                   decoration: const BoxDecoration(
@@ -36,42 +38,31 @@ class _HomePenjualState extends State<HomePenjual> {
                     ),
                   ),
                   child: Row(
-                    children: [
-                      /// FOTO PROFILE
-                      const CircleAvatar(
+                    children: const [
+                      CircleAvatar(
                         radius: 22,
                         backgroundImage: AssetImage("assets/profile.jpg"),
                       ),
-                      const SizedBox(width: 10),
-
-                      /// NAMA USER
+                      SizedBox(width: 10),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
-                          Text(
-                            "Dashboard Penjual 🏪",
-                            style: TextStyle(color: Colors.white70),
-                          ),
+                        children: [
+                          Text("Dashboard Penjual 🏪",
+                              style: TextStyle(color: Colors.white70)),
                           Text(
                             "Andi Wijaya",
                             style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold),
                           ),
                         ],
                       ),
-
-                      const Spacer(),
-
-                      /// ICON NOTIF
-                      const Icon(Icons.notifications, color: Colors.white),
+                      Spacer(),
+                      Icon(Icons.notifications, color: Colors.white),
                     ],
                   ),
                 ),
 
-                /// 🔥 STAT CARD (FLOATING)
                 Positioned(
                   bottom: -40,
                   left: 16,
@@ -81,29 +72,14 @@ class _HomePenjualState extends State<HomePenjual> {
                     decoration: BoxDecoration(
                       color: AppColors.card,
                       borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          blurRadius: 15,
-                          offset: const Offset(0, 8),
-                          color: Colors.black.withOpacity(0.08),
-                        ),
-                      ],
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: const [
-                        StatItem(
-                          Icons.inventory,
-                          "12",
-                          "Produk",
-                          AppColors.mintGreen,
-                        ),
-                        StatItem(
-                          Icons.remove_red_eye,
-                          "15.7k",
-                          "Dilihat",
-                          AppColors.skyBlue,
-                        ),
+                        StatItem(Icons.inventory, "12", "Produk",
+                            AppColors.mintGreen),
+                        StatItem(Icons.remove_red_eye, "15.7k", "Dilihat",
+                            AppColors.skyBlue),
                         StatItem(Icons.favorite, "892", "Favorit", Colors.pink),
                       ],
                     ),
@@ -112,52 +88,35 @@ class _HomePenjualState extends State<HomePenjual> {
               ],
             ),
 
-            /// 🔥 SPACING BIAR CARD KELIHATAN
             const SizedBox(height: 60),
 
-            /// =======================================================
-            /// 🔥 MENU
-            /// =======================================================
+            /// ================= MENU =================
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
                 children: [
-                  /// 🔹 TAMBAH
                   const Expanded(
                     child: MenuCard(Icons.add, "Tambah", AppColors.mintGreen),
                   ),
-
                   const SizedBox(width: 10),
-
-                  /// 🔥 ANALITIK (CLICKABLE)
                   Expanded(
                     child: InkWell(
-                      borderRadius: BorderRadius.circular(18),
                       onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const AnalitikScreen(),
+                            builder: (_) => const AnalitikScreen(),
                           ),
                         );
                       },
                       child: const MenuCard(
-                        Icons.show_chart,
-                        "Analitik",
-                        AppColors.skyBlue,
-                      ),
+                          Icons.show_chart, "Analitik", AppColors.skyBlue),
                     ),
                   ),
-
                   const SizedBox(width: 10),
-
-                  /// 🔹 PRODUK
                   const Expanded(
                     child: MenuCard(
-                      Icons.inventory_2,
-                      "Produk",
-                      AppColors.secondary,
-                    ),
+                        Icons.inventory_2, "Produk", AppColors.secondary),
                   ),
                 ],
               ),
@@ -165,133 +124,71 @@ class _HomePenjualState extends State<HomePenjual> {
 
             const SizedBox(height: 20),
 
-            /// =======================================================
-            /// 🔥 TITLE
-            /// =======================================================
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+            /// ================= TITLE =================
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
-                  Text(
-                    "Produk Terlaris",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                  Text(
-                    "Analitik",
-                    style: TextStyle(
-                      color: AppColors.skyBlue,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                children: [
+                  Text("Produk Saya",
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                 ],
               ),
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 12),
 
-            /// 🔥 (NANTI BISA TAMBAH LIST PRODUK DI SINI)
-            const SizedBox(height: 30),
+            /// ================= 🔥 PRODUK FIREBASE =================
+            StreamBuilder<List<ProductModel>>(
+              stream: ProductService.getMyProducts(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Padding(
+                    padding: EdgeInsets.all(20),
+                    child: CircularProgressIndicator(),
+                  );
+                }
+
+                if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Padding(
+                    padding: EdgeInsets.all(20),
+                    child: Text("Belum ada produk"),
+                  );
+                }
+
+                final products = snapshot.data!;
+
+                return GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  padding: const EdgeInsets.all(16),
+                  itemCount: products.length,
+                  gridDelegate:
+                      const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                    childAspectRatio: 0.75,
+                  ),
+                  itemBuilder: (context, index) {
+                    final p = products[index];
+
+                    return SellerGridProductCard(
+                      produk: p,
+                      onEdit: () {
+                        /// nanti arah ke edit screen
+                      },
+                      onDelete: () async {
+                        await ProductService.deleteProduct(p.id!);
+                      },
+                    );
+                  },
+                );
+              },
+            ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-/// =======================================================
-/// 🔥 STAT ITEM (ATAS)
-/// =======================================================
-class StatItem extends StatelessWidget {
-  final IconData icon;
-  final String value;
-  final String label;
-  final Color color;
-
-  const StatItem(this.icon, this.value, this.label, this.color, {super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        /// ICON
-        Icon(icon, color: color),
-
-        const SizedBox(height: 6),
-
-        /// VALUE
-        Text(
-          value,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
-          ),
-        ),
-
-        /// LABEL
-        Text(label, style: const TextStyle(color: AppColors.textSecondary)),
-      ],
-    );
-  }
-}
-
-/// =======================================================
-/// 🔥 MENU CARD (UPDATED UI MODERN)
-/// =======================================================
-class MenuCard extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final Color color;
-
-  const MenuCard(this.icon, this.title, this.color, {super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 95,
-
-      /// 🔥 STYLE CARD
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-            color: Colors.black.withOpacity(0.05),
-          ),
-        ],
-      ),
-
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          /// 🔥 ICON BOX (MODERN)
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.15),
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: Icon(icon, color: color, size: 22),
-          ),
-
-          const SizedBox(height: 8),
-
-          /// 🔥 TITLE
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-              color: AppColors.textPrimary,
-            ),
-          ),
-        ],
       ),
     );
   }

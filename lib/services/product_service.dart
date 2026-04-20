@@ -12,9 +12,25 @@ class ProductService {
   static Future<void> addProduct(ProductModel product) async {
     final user = _auth.currentUser;
 
-    if (user == null) throw Exception("User belum login");
+    if (user == null) {
+      throw Exception("User belum login");
+    }
 
-    await _firestore.collection("products").add(product.toMap());
+    /// 🔥 FORCE userId dari Firebase Auth
+    final newProduct = ProductModel(
+      id: product.id,
+      userId: user.uid, // ✅ FIX PENTING
+      name: product.name,
+      category: product.category,
+      price: product.price,
+      stock: product.stock,
+      description: product.description,
+      location: product.location,
+      imageBase64: product.imageBase64,
+      createdAt: product.createdAt,
+    );
+
+    await _firestore.collection("products").add(newProduct.toMap());
   }
 
   /// =====================
@@ -26,9 +42,9 @@ class ProductService {
         .orderBy("createdAt", descending: true)
         .snapshots()
         .map((snapshot) {
-          return snapshot.docs
-              .map((e) => ProductModel.fromMap(e.data(), e.id))
-              .toList();
+          return snapshot.docs.map((e) {
+            return ProductModel.fromMap(e.data(), e.id);
+          }).toList();
         });
   }
 
@@ -38,14 +54,20 @@ class ProductService {
   static Stream<List<ProductModel>> getMyProducts() {
     final user = _auth.currentUser;
 
+    if (user == null) {
+      /// 🔥 HANDLE BIAR GAK ERROR
+      return const Stream.empty();
+    }
+
     return _firestore
         .collection("products")
-        .where("userId", isEqualTo: user?.uid)
+        .where("userId", isEqualTo: user.uid)
+        .orderBy("createdAt", descending: true) // ✅ biar rapi
         .snapshots()
         .map((snapshot) {
-          return snapshot.docs
-              .map((e) => ProductModel.fromMap(e.data(), e.id))
-              .toList();
+          return snapshot.docs.map((e) {
+            return ProductModel.fromMap(e.data(), e.id);
+          }).toList();
         });
   }
 

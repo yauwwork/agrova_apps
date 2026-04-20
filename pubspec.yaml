@@ -39,8 +39,9 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_launcher_icons: ^0.14.4
-  geolocation: ^1.1.2
+  geocoding: ^4.0.0
   geolocator: ^14.0.2
+  google_maps_flutter: ^2.17.0
   image_picker: ^1.2.1
   intl: ^0.20.2
   lottie: ^3.3.2
@@ -48,7 +49,6 @@ dependencies:
   shared_preferences: ^2.5.4
   smooth_page_indicator: ^2.0.1
   sqflite: ^2.4.2
-  google_maps_flutter: ^2.2.0 # Add the latest version of google_maps_flutter
 
 dev_dependencies:
   flutter_lints: ^6.0.0

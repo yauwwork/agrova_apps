@@ -1,10 +1,10 @@
-import 'dart:io';
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:agrova_apps/models/produk_models.dart';
+import 'package:agrova_apps/models/product_model.dart';
 
 class ProductCard extends StatefulWidget {
-  final Produk produk;
-  final VoidCallback? onFavorite;
+  final ProductModel produk;
+  final Future<void> Function(bool isFav)? onFavorite;
   final bool isFavorited;
 
   const ProductCard({
@@ -19,127 +19,108 @@ class ProductCard extends StatefulWidget {
 }
 
 class _ProductCardState extends State<ProductCard> {
-  bool isFav = false;
+  late bool isFav;
+  bool loading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    isFav = widget.isFavorited;
+  }
+
+  @override
+  void didUpdateWidget(covariant ProductCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    isFav = widget.isFavorited;
+  }
+
+  Future<void> _toggleFav() async {
+    if (loading) return;
+
+    setState(() {
+      isFav = !isFav;
+      loading = true;
+    });
+
+    try {
+      await widget.onFavorite?.call(isFav);
+    } catch (e) {
+      setState(() => isFav = !isFav);
+    }
+
+    setState(() => loading = false);
+  }
 
   @override
   Widget build(BuildContext context) {
     final p = widget.produk;
 
     return Container(
-      width: double.infinity,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10),
+          BoxShadow(color: Colors.black12, blurRadius: 8),
         ],
       ),
-
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          /// =========================
-          /// IMAGE + FAVORITE
-          /// =========================
           Stack(
             children: [
               ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Image.file(
-                  File(p.image),
-                  width: double.infinity,
-                  height: 120,
-                  fit: BoxFit.cover,
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(16),
                 ),
+                child: p.imageBase64.isNotEmpty
+                    ? Image.memory(
+                        base64Decode(p.imageBase64),
+                        height: 120,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                      )
+                    : Container(
+                        height: 120,
+                        color: Colors.grey[300],
+                        child: const Icon(Icons.image),
+                      ),
               ),
 
               Positioned(
-                top: 8,
                 right: 8,
+                top: 8,
                 child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      isFav = !isFav;
-                    });
-
-                    widget.onFavorite?.call();
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.all(6),
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      isFav ? Icons.favorite : Icons.favorite_border,
-                      color: isFav ? Colors.red : Colors.grey,
-                      size: 18,
-                    ),
+                  onTap: _toggleFav,
+                  child: CircleAvatar(
+                    backgroundColor: Colors.white,
+                    child: loading
+                        ? const SizedBox(
+                            width: 14,
+                            height: 14,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : Icon(
+                            isFav
+                                ? Icons.favorite
+                                : Icons.favorite_border,
+                            color: isFav ? Colors.red : Colors.grey,
+                            size: 18,
+                          ),
                   ),
                 ),
               ),
             ],
           ),
 
-          /// =========================
-          /// CONTENT
-          /// =========================
           Padding(
             padding: const EdgeInsets.all(10),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                /// NAMA PRODUK
-                Text(
-                  p.nama,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontWeight: FontWeight.w600),
-                ),
-
-                const SizedBox(height: 4),
-
-                /// HARGA
-                Text(
-                  "Rp ${p.harga}",
-                  style: const TextStyle(
-                    color: Colors.green,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-
-                const SizedBox(height: 6),
-
-                /// RATING (sementara dummy kalau belum ada di model)
-                Row(
-                  children: const [
-                    Icon(Icons.star, color: Colors.orange, size: 16),
-                    SizedBox(width: 2),
-                    Text("4.5", style: TextStyle(fontSize: 12)),
-                  ],
-                ),
-
-                const SizedBox(height: 6),
-
-                /// SELLER
-                Text(
-                  p.penjual,
-                  style: TextStyle(fontSize: 12, color: Colors.grey[700]),
-                ),
-
-                const SizedBox(height: 2),
-
-                /// LOKASI
-                Row(
-                  children: [
-                    const Icon(Icons.location_on, size: 12, color: Colors.grey),
-                    const SizedBox(width: 2),
-                    Text(
-                      p.lokasi,
-                      style: TextStyle(fontSize: 11, color: Colors.grey[600]),
-                    ),
-                  ],
-                ),
+                Text(p.name),
+                Text("Rp ${p.price}",
+                    style: const TextStyle(color: Colors.green)),
+                Text(p.location,
+                    style: const TextStyle(fontSize: 12)),
               ],
             ),
           ),

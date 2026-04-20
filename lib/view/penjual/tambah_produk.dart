@@ -1,10 +1,13 @@
-import 'package:agrova_apps/extension/colors/appcolors.dart';
-import 'package:agrova_apps/view/penjual/bottom_navigation_penjual.dart';
-import 'package:flutter/material.dart';
-import 'package:agrova_apps/models/produk_models.dart';
-import 'package:agrova_apps/database/produk_data.dart';
-import 'package:image_picker/image_picker.dart';
+import 'dart:convert';
 import 'dart:io';
+
+import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+
+import 'package:agrova_apps/extension/colors/appcolors.dart';
+import 'package:agrova_apps/models/product_model.dart';
+import 'package:agrova_apps/services/product_service.dart';
+import 'package:agrova_apps/view/penjual/bottom_navigation_penjual.dart';
 
 class TambahProduk extends StatefulWidget {
   const TambahProduk({super.key});
@@ -14,43 +17,108 @@ class TambahProduk extends StatefulWidget {
 }
 
 class _TambahProdukState extends State<TambahProduk> {
-  final namaController = TextEditingController();
-  final hargaController = TextEditingController();
-  final stokController = TextEditingController();
-  final deskripsiController = TextEditingController();
-  final lokasiController = TextEditingController();
+  // CONTROLLERS
+  final _namaController = TextEditingController();
+  final _hargaController = TextEditingController();
+  final _stokController = TextEditingController();
+  final _deskripsiController = TextEditingController();
+  final _lokasiController = TextEditingController();
 
-  List<File> images = [];
-  final picker = ImagePicker();
+  final ImagePicker _picker = ImagePicker();
 
-  Future<void> ambilFoto() async {
-    if (images.length >= 5) return;
+  List<File> _images = [];
+  String _kategori = "Buah-buahan";
 
-    final XFile? file = await picker.pickImage(source: ImageSource.gallery);
+  bool _isLoading = false;
 
-    if (file != null) {
-      setState(() {
-        images.add(File(file.path));
-      });
+  @override
+  void dispose() {
+    _namaController.dispose();
+    _hargaController.dispose();
+    _stokController.dispose();
+    _deskripsiController.dispose();
+    _lokasiController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _pickImage() async {
+    if (_images.length >= 5) return;
+
+    final XFile? file = await _picker.pickImage(source: ImageSource.gallery);
+    if (file == null) return;
+
+    if (!mounted) return;
+
+    setState(() {
+      _images.add(File(file.path));
+    });
+  }
+
+  Future<String> _toBase64(File file) async {
+    final bytes = await file.readAsBytes();
+    return base64Encode(bytes);
+  }
+
+  Future<void> _submit() async {
+    if (_isLoading) return;
+
+    if (_namaController.text.isEmpty) {
+      _showSnack("Nama produk wajib diisi");
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      // convert images
+      List<String> imagesBase64 = [];
+      for (final img in _images) {
+        imagesBase64.add(await _toBase64(img));
+      }
+
+      final price = int.tryParse(_hargaController.text) ?? 0;
+      final stock = int.tryParse(_stokController.text) ?? 0;
+
+      final product = ProductModel(
+        userId: "TODO_USER_ID",
+        name: _namaController.text,
+        category: _kategori,
+        price: price,
+        stock: stock,
+        description: _deskripsiController.text,
+        location: _lokasiController.text,
+        imageBase64: imagesBase64.isNotEmpty ? imagesBase64.first : "",
+      );
+
+      await ProductService.addProduct(product);
+
+      if (!mounted) return;
+
+      _showSnack("Produk berhasil ditambahkan");
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const BottomNavigatorPenjual()),
+      );
+    } catch (e) {
+      if (mounted) _showSnack("Error: $e");
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
-  String kategori = "Buah-buahan";
+  void _showSnack(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(msg)),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.bgpenjual,
-
-      /// 🔥 APPBAR
       appBar: AppBar(
-        elevation: 0,
-        automaticallyImplyLeading: false,
-        backgroundColor: Colors.transparent,
-        clipBehavior: Clip.antiAlias,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(bottom: Radius.circular(24)),
-        ),
+        title: const Text("Tambah Produk"),
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
@@ -58,260 +126,149 @@ class _TambahProdukState extends State<TambahProduk> {
             ),
           ),
         ),
-        title: const Text(
-          "Tambah Produk",
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
-        ),
       ),
-
       body: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
+        padding: const EdgeInsets.all(16),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            /// 🔥 FOTO CARD
-            _card(
+            _buildCard(
               title: "Foto Produk",
-              icon: Icons.image,
-              child: Column(
-                children: [
-                  GridView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: images.length + (images.length < 5 ? 1 : 0),
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                          crossAxisSpacing: 10,
-                          mainAxisSpacing: 10,
+              child: GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: _images.length + (_images.length < 5 ? 1 : 0),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10,
+                ),
+                itemBuilder: (context, i) {
+                  if (i == _images.length) {
+                    return GestureDetector(
+                      onTap: _pickImage,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade200,
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                    itemBuilder: (context, index) {
-                      if (index == images.length && images.length < 5) {
-                        return GestureDetector(
-                          onTap: ambilFoto,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [
-                                  Colors.blue.withOpacity(0.15),
-                                  Colors.green.withOpacity(0.15),
-                                ],
-                              ),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: const Icon(Icons.add, size: 30),
+                        child: const Icon(Icons.add),
+                      ),
+                    );
+                  }
+
+                  return Stack(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.file(_images[i], fit: BoxFit.cover),
+                      ),
+                      Positioned(
+                        right: 5,
+                        top: 5,
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() => _images.removeAt(i));
+                          },
+                          child: const CircleAvatar(
+                            radius: 10,
+                            backgroundColor: Colors.black54,
+                            child: Icon(Icons.close, size: 12),
                           ),
-                        );
-                      }
-
-                      return Stack(
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
-                            child: Image.file(
-                              images[index],
-                              fit: BoxFit.cover,
-                              width: double.infinity,
-                            ),
-                          ),
-
-                          /// DELETE
-                          Positioned(
-                            top: 5,
-                            right: 5,
-                            child: GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  images.removeAt(index);
-                                });
-                              },
-                              child: const CircleAvatar(
-                                radius: 10,
-                                backgroundColor: Colors.black54,
-                                child: Icon(
-                                  Icons.close,
-                                  size: 12,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  ),
-
-                  const SizedBox(height: 10),
-
-                  /// 🔥 COUNTER
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: Text(
-                      "${images.length}/5 foto",
-                      style: const TextStyle(fontSize: 12, color: Colors.grey),
-                    ),
-                  ),
-                ],
+                        ),
+                      )
+                    ],
+                  );
+                },
               ),
             ),
 
             const SizedBox(height: 16),
 
-            /// 🔥 FORM CARD
-            _card(
+            _buildCard(
               title: "Informasi Produk",
-              icon: Icons.inventory_2,
               child: Column(
                 children: [
-                  _input(namaController, "Nama Produk"),
-                  const SizedBox(height: 12),
+                  _input(_namaController, "Nama Produk"),
+                  const SizedBox(height: 10),
 
-                  DropdownButtonFormField(
-                    value: kategori,
-                    decoration: _dec("Kategori"),
+                  DropdownButtonFormField<String>(
+                    value: _kategori,
                     items: const [
-                      DropdownMenuItem(
-                        value: "Buah-buahan",
-                        child: Text("Buah-buahan"),
-                      ),
-                      DropdownMenuItem(
-                        value: "Sayuran",
-                        child: Text("Sayuran"),
-                      ),
+                      DropdownMenuItem(value: "Buah-buahan", child: Text("Buah-buahan")),
+                      DropdownMenuItem(value: "Sayuran", child: Text("Sayuran")),
                       DropdownMenuItem(value: "Ikan", child: Text("Ikan")),
                       DropdownMenuItem(value: "Daging", child: Text("Daging")),
                       DropdownMenuItem(value: "Telur", child: Text("Telur")),
                     ],
-                    onChanged: (v) => setState(() => kategori = v!),
+                    onChanged: (v) => setState(() => _kategori = v!),
                   ),
 
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 10),
 
                   Row(
                     children: [
-                      Expanded(
-                        child: _input(hargaController, "Harga", prefix: "Rp "),
-                      ),
+                      Expanded(child: _input(_hargaController, "Harga", number: true)),
                       const SizedBox(width: 10),
-                      Expanded(child: _input(stokController, "Stok")),
+                      Expanded(child: _input(_stokController, "Stok", number: true)),
                     ],
                   ),
 
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 10),
 
-                  TextField(
-                    controller: deskripsiController,
-                    maxLines: 3,
-                    decoration: _dec("Deskripsi"),
-                  ),
-
-                  const SizedBox(height: 12),
-
-                  TextField(
-                    controller: lokasiController,
-                    decoration: _dec("Lokasi"),
-                  ),
+                  _input(_deskripsiController, "Deskripsi", maxLines: 3),
+                  const SizedBox(height: 10),
+                  _input(_lokasiController, "Lokasi"),
                 ],
               ),
             ),
 
             const SizedBox(height: 20),
 
-            /// 🔥 BUTTON
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {
-                  daftarProduk.add(
-                    Produk(
-                      nama: namaController.text,
-                      kategori: kategori,
-                      harga: hargaController.text,
-                      stok: stokController.text,
-                      deskripsi: deskripsiController.text,
-                      image: images.isNotEmpty ? images.first.path : "",
-                      lokasi: lokasiController.text,
-                      penjual: "Petani Agrova",
-                    ),
-                  );
-
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const BottomNavigatorPenjual(),
-                    ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xff3B82F6),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: const Text(
-                  "Tambah Produk",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                onPressed: _isLoading ? null : _submit,
+                child: _isLoading
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : const Text("Tambah Produk"),
               ),
-            ),
+            )
           ],
         ),
       ),
     );
   }
 
-  /// 🔥 CARD DENGAN HEADER
-  Widget _card({
-    required String title,
-    required IconData icon,
-    required Widget child,
-  }) {
+  Widget _buildCard({required String title, required Widget child}) {
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade200),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Icon(icon, size: 18, color: Colors.blue),
-              const SizedBox(width: 6),
-              Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
-            ],
-          ),
-          const SizedBox(height: 12),
+          Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 10),
           child,
         ],
       ),
     );
   }
 
-  Widget _input(TextEditingController c, String hint, {String? prefix}) {
+  Widget _input(TextEditingController c, String hint,
+      {bool number = false, int maxLines = 1}) {
     return TextField(
       controller: c,
-      decoration: _dec(hint, prefix: prefix),
-    );
-  }
-
-  InputDecoration _dec(String hint, {String? prefix}) {
-    return InputDecoration(
-      hintText: hint,
-      prefixText: prefix,
-      filled: true,
-      fillColor: Colors.grey[100],
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Colors.grey.shade300),
+      keyboardType: number ? TextInputType.number : TextInputType.text,
+      maxLines: maxLines,
+      decoration: InputDecoration(
+        hintText: hint,
+        filled: true,
+        fillColor: Colors.grey.shade100,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
       ),
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
     );
   }
 }
