@@ -28,8 +28,11 @@ class _HomePenjualState extends State<HomePenjual> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: AppColors.bgpenjual,
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: Column(
         children: [
           /// ================= HEADER =================
@@ -109,15 +112,23 @@ class _HomePenjualState extends State<HomePenjual> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(vertical: 18),
                   decoration: BoxDecoration(
-                    color: AppColors.card,
+                    color: theme.cardColor,
                     borderRadius: BorderRadius.circular(20),
+                    border: isDark ? Border.all(color: Colors.white10) : null,
+                    boxShadow: [
+                      if (!isDark)
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                    ],
                   ),
                   child: StreamBuilder<List<ProductModel>>(
                     stream: ProductService.getMyProducts(),
                     builder: (context, snapshot) {
                       final myProducts = snapshot.data ?? [];
                       
-                      // Hitung total views dan favorites
                       int totalViews = 0;
                       int totalFavorites = 0;
                       
@@ -126,7 +137,6 @@ class _HomePenjualState extends State<HomePenjual> {
                         totalFavorites += p.favorites;
                       }
 
-                      /// 🔥 FORMAT ANGKA BIAR KEREN (Misal 1000 -> 1k)
                       String formatNumber(int number) {
                         if (number >= 1000) {
                           return "${(number / 1000).toStringAsFixed(1)}k";
@@ -234,13 +244,17 @@ class _HomePenjualState extends State<HomePenjual> {
           const SizedBox(height: 20),
 
           /// ================= TITLE =================
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
               children: [
                 Text(
                   "Produk Terbaru",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold, 
+                    fontSize: 16,
+                    color: isDark ? Colors.white : Colors.black87,
+                  ),
                 ),
               ],
             ),
@@ -258,12 +272,10 @@ class _HomePenjualState extends State<HomePenjual> {
                 }
 
                 final allMyProducts = snapshot.data ?? [];
-
-                // Ambil hanya 10 produk terbaru (asumsi list sudah terurut dari service)
                 final myProducts = allMyProducts.take(10).toList();
 
                 if (myProducts.isEmpty) {
-                  return const Center(child: Text("Belum ada produk"));
+                  return Center(child: Text("Belum ada produk", style: TextStyle(color: isDark ? Colors.white60 : Colors.black54)));
                 }
 
                 return GridView.builder(
@@ -284,17 +296,21 @@ class _HomePenjualState extends State<HomePenjual> {
                         final confirm = await showDialog(
                           context: context,
                           builder: (_) => AlertDialog(
+                            backgroundColor: theme.cardColor,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20),
                             ),
-                            title: const Row(
+                            title: Row(
                               children: [
-                                Icon(Icons.warning_amber_rounded, color: Colors.red),
-                                SizedBox(width: 10),
-                                Text("Hapus Produk"),
+                                const Icon(Icons.warning_amber_rounded, color: Colors.red),
+                                const SizedBox(width: 10),
+                                Text("Hapus Produk", style: TextStyle(color: isDark ? Colors.white : Colors.black)),
                               ],
                             ),
-                            content: const Text("Apakah Anda yakin ingin menghapus produk ini? Tindakan ini tidak dapat dibatalkan."),
+                            content: Text(
+                              "Apakah Anda yakin ingin menghapus produk ini? Tindakan ini tidak dapat dibatalkan.",
+                              style: TextStyle(color: isDark ? Colors.white70 : Colors.black87),
+                            ),
                             actions: [
                               TextButton(
                                 onPressed: () => Navigator.pop(context, false),

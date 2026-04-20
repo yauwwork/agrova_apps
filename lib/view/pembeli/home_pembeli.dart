@@ -80,7 +80,7 @@ class _HomePembeliScreenState extends State<HomePembeliScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.softMint,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: StreamBuilder<List<ProductModel>>(
         stream: ProductService.getProducts(),
         builder: (context, snapshot) {
@@ -113,7 +113,7 @@ class _HomePembeliScreenState extends State<HomePembeliScreen> {
                         height: 48,
                         padding: const EdgeInsets.symmetric(horizontal: 12),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: Theme.of(context).cardColor,
                           borderRadius: BorderRadius.circular(24),
                           boxShadow: [
                             BoxShadow(

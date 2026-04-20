@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:agrova_apps/extension/colors/appcolors.dart';
 
 class StatItem extends StatelessWidget {
   final IconData icon;
@@ -17,9 +16,12 @@ class StatItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Column(
       children: [
-        /// 🔥 ICON (SAMA PERSIS)
+        /// 🔥 ICON
         Icon(icon, color: color),
 
         const SizedBox(height: 6),
@@ -27,17 +29,18 @@ class StatItem extends StatelessWidget {
         /// 🔥 VALUE
         Text(
           value,
-          style: const TextStyle(
+          style: TextStyle(
             fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
+            color: isDark ? Colors.white : const Color(0xFF1F2937), // AppColors.textPrimary fallback
           ),
         ),
 
         /// 🔥 LABEL
         Text(
           label,
-          style: const TextStyle(
-            color: AppColors.textSecondary,
+          style: TextStyle(
+            color: isDark ? Colors.white70 : const Color(0xFF6B7280), // AppColors.textSecondary fallback
+            fontSize: 12,
           ),
         ),
       ],

@@ -26,23 +26,24 @@ class _FavoritScreenState extends State<FavoritScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.softMint,
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
+    return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: false,
-        title: const Text(
+        title: Text(
           "Favorit Saya",
           style: TextStyle(
-            color: Colors.black,
+            color: isDark ? Colors.white : Colors.black,
             fontWeight: FontWeight.bold,
             fontSize: 20,
           ),
         ),
       ),
-
       body: StreamBuilder<List<ProductModel>>(
         stream: FavoriteService.getFavorites(),
         builder: (context, snapshot) {
@@ -78,18 +79,28 @@ class _FavoritScreenState extends State<FavoritScreen> {
                 child: Container(
                   height: 46,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: theme.cardColor,
                     borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      if (!isDark)
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                    ],
                   ),
                   child: TextField(
                     onChanged: (value) {
                       setState(() => searchQuery = value);
                     },
-                    decoration: const InputDecoration(
+                    style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+                    decoration: InputDecoration(
                       hintText: "Cari produk favorit...",
-                      prefixIcon: Icon(Icons.search),
+                      hintStyle: TextStyle(color: isDark ? Colors.white60 : Colors.grey),
+                      prefixIcon: Icon(Icons.search, color: isDark ? Colors.white70 : Colors.grey),
                       border: InputBorder.none,
-                      contentPadding: EdgeInsets.symmetric(vertical: 12),
+                      contentPadding: const EdgeInsets.symmetric(vertical: 12),
                     ),
                   ),
                 ),
@@ -97,7 +108,7 @@ class _FavoritScreenState extends State<FavoritScreen> {
 
               const SizedBox(height: 14),
 
-              /// 🔥 KATEGORI (FIX FINAL STYLE - CLEAN KAYAK KATALOG)
+              /// 🔥 KATEGORI
               SizedBox(
                 height: 40,
                 child: ListView.builder(
@@ -107,6 +118,7 @@ class _FavoritScreenState extends State<FavoritScreen> {
                   itemBuilder: (context, index) {
                     final isSelected = selectedKategori == index;
                     final item = kategori[index];
+                    final itemColor = item["color"] as Color;
 
                     return GestureDetector(
                       onTap: () {
@@ -121,21 +133,22 @@ class _FavoritScreenState extends State<FavoritScreen> {
                           horizontal: 14,
                           vertical: 8,
                         ),
-
                         decoration: BoxDecoration(
                           color: isSelected
-                              ? item["color"]
-                              : item["color"].withOpacity(0.15),
+                              ? itemColor
+                              : itemColor.withOpacity(isDark ? 0.2 : 0.15),
                           borderRadius: BorderRadius.circular(20),
+                          border: isSelected 
+                              ? null 
+                              : Border.all(color: itemColor.withOpacity(isDark ? 0.3 : 0.1)),
                         ),
-
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(
                               item["icon"],
                               size: 16,
-                              color: isSelected ? Colors.white : item["color"],
+                              color: isSelected ? Colors.white : itemColor,
                             ),
                             const SizedBox(width: 6),
                             Text(
@@ -145,7 +158,7 @@ class _FavoritScreenState extends State<FavoritScreen> {
                                 fontWeight: FontWeight.w600,
                                 color: isSelected
                                     ? Colors.white
-                                    : item["color"],
+                                    : itemColor,
                               ),
                             ),
                           ],
@@ -165,7 +178,7 @@ class _FavoritScreenState extends State<FavoritScreen> {
                   alignment: Alignment.centerLeft,
                   child: Text(
                     "${filtered.length} produk favorit",
-                    style: const TextStyle(color: Colors.grey, fontSize: 12),
+                    style: TextStyle(color: isDark ? Colors.white60 : Colors.grey, fontSize: 12),
                   ),
                 ),
               ),
@@ -175,7 +188,12 @@ class _FavoritScreenState extends State<FavoritScreen> {
               /// 🔥 GRID PRODUK
               Expanded(
                 child: filtered.isEmpty
-                    ? const Center(child: Text("Belum ada produk favorit"))
+                    ? Center(
+                        child: Text(
+                          "Belum ada produk favorit",
+                          style: TextStyle(color: isDark ? Colors.white70 : Colors.black54),
+                        ),
+                      )
                     : GridView.builder(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         itemCount: filtered.length,

@@ -15,10 +15,8 @@ class ProdukPenjual extends StatefulWidget {
 
 class _ProdukPenjualState extends State<ProdukPenjual> {
   int selectedKategori = 0;
-
   final user = FirebaseAuth.instance.currentUser;
 
-  /// 🔥 SAMAIN DENGAN DATABASE
   final List<Map<String, dynamic>> kategori = [
     {"icon": Icons.all_inbox, "name": "Semua", "color": Colors.grey},
     {"icon": Icons.apple, "name": "Buah-buahan", "color": Colors.green},
@@ -30,19 +28,23 @@ class _ProdukPenjualState extends State<ProdukPenjual> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: AppColors.bgpenjual,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
-        title: const Text(
+        title: Text(
           "Produk Saya",
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
+            color: isDark ? Colors.white : AppColors.textPrimary,
           ),
         ),
+        iconTheme: IconThemeData(color: isDark ? Colors.white : Colors.black),
       ),
       body: SafeArea(
         child: Column(
@@ -56,27 +58,28 @@ class _ProdukPenjualState extends State<ProdukPenjual> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: theme.cardColor,
                         borderRadius: BorderRadius.circular(30),
+                        boxShadow: [
+                          if (!isDark)
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                        ],
                       ),
-                      child: const TextField(
+                      child: TextField(
+                        style: TextStyle(color: isDark ? Colors.white : Colors.black87),
                         decoration: InputDecoration(
-                          icon: Icon(Icons.search, color: Colors.grey),
+                          icon: Icon(Icons.search, color: isDark ? Colors.white60 : Colors.grey),
                           hintText: "Cari produk...",
+                          hintStyle: TextStyle(color: isDark ? Colors.white60 : Colors.grey),
                           border: InputBorder.none,
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 10),
-                  // Container(
-                  //   padding: const EdgeInsets.all(12),
-                  //   decoration: BoxDecoration(
-                  //     color: AppColors.skyBlue,
-                  //     borderRadius: BorderRadius.circular(14),
-                  //   ),
-                  //   child: const Icon(Icons.tune, color: Colors.white),
-                  // ),
                 ],
               ),
             ),
@@ -91,6 +94,7 @@ class _ProdukPenjualState extends State<ProdukPenjual> {
                 itemBuilder: (context, index) {
                   final isSelected = selectedKategori == index;
                   final item = kategori[index];
+                  final itemColor = item["color"] as Color;
 
                   return GestureDetector(
                     onTap: () {
@@ -107,23 +111,26 @@ class _ProdukPenjualState extends State<ProdukPenjual> {
                       ),
                       decoration: BoxDecoration(
                         color: isSelected
-                            ? item["color"]
-                            : item["color"].withOpacity(0.15),
+                            ? itemColor
+                            : itemColor.withOpacity(isDark ? 0.2 : 0.15),
                         borderRadius: BorderRadius.circular(20),
+                        border: isSelected 
+                            ? null 
+                            : Border.all(color: itemColor.withOpacity(isDark ? 0.3 : 0.1)),
                       ),
                       child: Row(
                         children: [
                           Icon(
                             item["icon"],
                             size: 16,
-                            color: isSelected ? Colors.white : item["color"],
+                            color: isSelected ? Colors.white : itemColor,
                           ),
                           const SizedBox(width: 6),
                           Text(
                             item["name"],
                             style: TextStyle(
                               fontWeight: FontWeight.w600,
-                              color: isSelected ? Colors.white : item["color"],
+                              color: isSelected ? Colors.white : itemColor,
                             ),
                           ),
                         ],
@@ -136,17 +143,17 @@ class _ProdukPenjualState extends State<ProdukPenjual> {
 
             const SizedBox(height: 10),
 
-            /// 🔥 GRID PRODUK (HANYA MILIK USER)
+            /// 🔥 GRID PRODUK
             Expanded(
               child: StreamBuilder<List<ProductModel>>(
-                stream: ProductService.getMyProducts(), // ✅ FIX UTAMA
+                stream: ProductService.getMyProducts(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
                   }
 
                   if (snapshot.hasError) {
-                    return Center(child: Text("Error: ${snapshot.error}"));
+                    return Center(child: Text("Error: ${snapshot.error}", style: TextStyle(color: isDark ? Colors.white70 : Colors.black54)));
                   }
 
                   final allProducts = snapshot.data ?? [];
@@ -164,7 +171,7 @@ class _ProdukPenjualState extends State<ProdukPenjual> {
                   }
 
                   if (filtered.isEmpty) {
-                    return const Center(child: Text("Belum ada produk"));
+                    return Center(child: Text("Belum ada produk", style: TextStyle(color: isDark ? Colors.white70 : Colors.black54)));
                   }
 
                   return GridView.builder(
@@ -182,27 +189,27 @@ class _ProdukPenjualState extends State<ProdukPenjual> {
 
                       return SellerGridProductCard(
                         produk: produk,
-
-                        /// 🔥 DELETE AMAN
                         onDelete: () async {
                           final confirm = await showDialog(
                             context: context,
                             builder: (_) => AlertDialog(
+                              backgroundColor: theme.cardColor,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(20),
                               ),
-                              title: const Row(
+                              title: Row(
                                 children: [
-                                  Icon(
+                                  const Icon(
                                     Icons.warning_amber_rounded,
                                     color: Colors.red,
                                   ),
-                                  SizedBox(width: 10),
-                                  Text("Hapus Produk"),
+                                  const SizedBox(width: 10),
+                                  Text("Hapus Produk", style: TextStyle(color: isDark ? Colors.white : Colors.black)),
                                 ],
                               ),
-                              content: const Text(
+                              content: Text(
                                 "Apakah Anda yakin ingin menghapus produk ini? Tindakan ini tidak dapat dibatalkan.",
+                                style: TextStyle(color: isDark ? Colors.white70 : Colors.black87),
                               ),
                               actions: [
                                 TextButton(
@@ -234,8 +241,6 @@ class _ProdukPenjualState extends State<ProdukPenjual> {
                             await ProductService.deleteProduct(produk.id!);
                           }
                         },
-
-                        /// 🔥 EDIT
                         onEdit: () {
                           Navigator.push(
                             context,

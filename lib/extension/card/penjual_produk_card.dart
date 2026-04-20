@@ -54,6 +54,8 @@ class ListCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final categoryColor = getCategoryColor(produk.category);
 
     return GestureDetector(
@@ -62,15 +64,16 @@ class ListCard extends StatelessWidget {
         margin: const EdgeInsets.symmetric(vertical: 8),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: theme.cardColor,
           borderRadius: BorderRadius.circular(_radius),
-          border: Border.all(color: Colors.grey.shade100),
+          border: isDark ? Border.all(color: Colors.white12) : Border.all(color: Colors.grey.shade100),
           boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 20,
-              offset: const Offset(0, 10),
-            ),
+            if (!isDark)
+              BoxShadow(
+                color: Colors.black.withOpacity(0.04),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
           ],
         ),
         child: Row(
@@ -88,7 +91,7 @@ class ListCard extends StatelessWidget {
                   : Container(
                       width: 72,
                       height: 72,
-                      color: Colors.grey.shade100,
+                      color: isDark ? Colors.white10 : Colors.grey.shade100,
                       child: const Icon(Icons.image_outlined, color: Colors.grey),
                     ),
             ),
@@ -103,9 +106,10 @@ class ListCard extends StatelessWidget {
                     produk.name,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.white : Colors.black87,
                     ),
                   ),
 
@@ -196,17 +200,22 @@ class MenuCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       height: 90,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(_radius),
+        border: isDark ? Border.all(color: Colors.white12) : null,
         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
+          if (!isDark)
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
         ],
       ),
       child: Column(
@@ -226,7 +235,7 @@ class MenuCard extends StatelessWidget {
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w600,
-              color: AppColors.textPrimary,
+              color: isDark ? Colors.white70 : AppColors.textPrimary,
             ),
           ),
         ],
@@ -252,21 +261,24 @@ class SellerGridProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final categoryColor = getCategoryColor(produk.category);
 
     return GestureDetector(
       onTap: onEdit,
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: theme.cardColor,
           borderRadius: BorderRadius.circular(_radius),
-          border: Border.all(color: Colors.grey.shade100),
+          border: isDark ? Border.all(color: Colors.white12) : Border.all(color: Colors.grey.shade100),
           boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.06),
-              blurRadius: 18,
-              offset: const Offset(0, 8),
-            ),
+            if (!isDark)
+              BoxShadow(
+                color: Colors.black.withOpacity(0.06),
+                blurRadius: 18,
+                offset: const Offset(0, 8),
+              ),
           ],
         ),
         child: Column(
@@ -288,7 +300,7 @@ class SellerGridProductCard extends StatelessWidget {
                         )
                       : Container(
                           height: 120,
-                          color: Colors.grey.shade100,
+                          color: isDark ? Colors.white10 : Colors.grey.shade100,
                           child: const Center(
                               child: Icon(Icons.image_outlined, color: Colors.grey)),
                         ),
@@ -370,7 +382,11 @@ class SellerGridProductCard extends StatelessWidget {
                     produk.name,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold, 
+                      fontSize: 14,
+                      color: isDark ? Colors.white : Colors.black87,
+                    ),
                   ),
 
                   /// aksen garis
@@ -395,7 +411,7 @@ class SellerGridProductCard extends StatelessWidget {
                           produk.location,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: TextStyle(fontSize: 11, color: Colors.grey.shade500),
+                          style: TextStyle(fontSize: 11, color: isDark ? Colors.white54 : Colors.grey.shade500),
                         ),
                       ),
                     ],

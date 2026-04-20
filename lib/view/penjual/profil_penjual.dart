@@ -28,7 +28,7 @@ class _ProfilPenjualScreenState extends State<ProfilPenjualScreen> {
     if (user == null) return const Scaffold(body: Center(child: Text("Silahkan Login")));
 
     return Scaffold(
-      backgroundColor: AppColors.bgpenjual,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         elevation: 0,
         automaticallyImplyLeading: false,
@@ -198,7 +198,7 @@ class _ProfilPenjualScreenState extends State<ProfilPenjualScreen> {
   Widget _menuCard(List<Widget> children) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(children: children),

@@ -31,8 +31,11 @@ class _BottomNavigationPembeliState extends State<BottomNavigationPembeli> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: AppColors.softMint,
+      backgroundColor: theme.scaffoldBackgroundColor,
 
       /// 🔥 BODY
       body: _pages[_selectedIndex],
@@ -42,24 +45,25 @@ class _BottomNavigationPembeliState extends State<BottomNavigationPembeli> {
         margin: const EdgeInsets.all(16),
         padding: const EdgeInsets.symmetric(vertical: 10),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: theme.cardColor,
           borderRadius: BorderRadius.circular(25),
           boxShadow: [
             BoxShadow(
               blurRadius: 20,
               offset: const Offset(0, 8),
-              color: Colors.black.withOpacity(0.08),
+              color: isDark ? Colors.black.withOpacity(0.2) : Colors.black.withOpacity(0.08),
             ),
           ],
+          border: isDark ? Border.all(color: Colors.white12) : null,
         ),
 
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            navItem(Amicons.remix_home4, "Beranda", 0),
-            navItem(Amicons.lucide_grid_2x2, "Kategori", 1),
-            navItem(Amicons.vuesax_lovely, "Favorit", 2),
-            navItem(Amicons.vuesax_profile_2user, "Profil", 3),
+            navItem(Amicons.remix_home4, "Beranda", 0, isDark),
+            navItem(Amicons.lucide_grid_2x2, "Kategori", 1, isDark),
+            navItem(Amicons.vuesax_lovely, "Favorit", 2, isDark),
+            navItem(Amicons.vuesax_profile_2user, "Profil", 3, isDark),
           ],
         ),
       ),
@@ -69,7 +73,7 @@ class _BottomNavigationPembeliState extends State<BottomNavigationPembeli> {
   /// =======================================================
   /// 🔥 NAV ITEM
   /// =======================================================
-  Widget navItem(IconData icon, String label, int index) {
+  Widget navItem(IconData icon, String label, int index, bool isDark) {
     final isActive = _selectedIndex == index;
 
     return GestureDetector(
@@ -92,7 +96,7 @@ class _BottomNavigationPembeliState extends State<BottomNavigationPembeli> {
               size: 22,
               color: isActive
                   ? AppColors.mintGreen
-                  : AppColors.charcoal.withOpacity(0.4),
+                  : (isDark ? Colors.white60 : AppColors.charcoal.withOpacity(0.4)),
             ),
             const SizedBox(height: 4),
             Text(
@@ -102,7 +106,7 @@ class _BottomNavigationPembeliState extends State<BottomNavigationPembeli> {
                 fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
                 color: isActive
                     ? AppColors.mintGreen
-                    : AppColors.charcoal.withOpacity(0.5),
+                    : (isDark ? Colors.white60 : AppColors.charcoal.withOpacity(0.5)),
               ),
             ),
           ],

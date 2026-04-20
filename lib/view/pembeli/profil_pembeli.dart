@@ -27,7 +27,7 @@ class _ProfilPembeliState extends State<ProfilPembeli> {
     if (user == null) return const Scaffold(body: Center(child: Text("Silahkan Login")));
 
     return Scaffold(
-      backgroundColor: AppColors.softMint,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
@@ -184,7 +184,7 @@ class _ProfilPembeliState extends State<ProfilPembeli> {
   Widget _menuCard(List<Widget> children) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(children: children),

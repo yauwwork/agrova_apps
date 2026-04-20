@@ -30,8 +30,11 @@ class _BottomNavigatorPenjualState extends State<BottomNavigatorPenjual> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: AppColors.bgpenjual,
+      backgroundColor: theme.scaffoldBackgroundColor,
 
       /// 🔥 BODY
       body: _pages[_selectedIndex],
@@ -41,24 +44,25 @@ class _BottomNavigatorPenjualState extends State<BottomNavigatorPenjual> {
         margin: const EdgeInsets.all(16),
         padding: const EdgeInsets.symmetric(vertical: 10),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: theme.cardColor,
           borderRadius: BorderRadius.circular(25),
           boxShadow: [
             BoxShadow(
               blurRadius: 20,
               offset: const Offset(0, 8),
-              color: Colors.black.withOpacity(0.08),
+              color: isDark ? Colors.black.withOpacity(0.2) : Colors.black.withOpacity(0.08),
             ),
           ],
+          border: isDark ? Border.all(color: Colors.white12) : null,
         ),
 
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            navItem(Amicons.remix_home4, "Beranda", 0),
-            navItem(Amicons.iconly_bag_2_curved, "Produk", 1),
-            navItem(Amicons.iconly_plus_curved, "Tambah", 2),
-            navItem(Amicons.vuesax_profile_2user, "Profil", 3),
+            navItem(Amicons.remix_home4, "Beranda", 0, isDark),
+            navItem(Amicons.iconly_bag_2_curved, "Produk", 1, isDark),
+            navItem(Amicons.iconly_plus_curved, "Tambah", 2, isDark),
+            navItem(Amicons.vuesax_profile_2user, "Profil", 3, isDark),
           ],
         ),
       ),
@@ -68,7 +72,7 @@ class _BottomNavigatorPenjualState extends State<BottomNavigatorPenjual> {
   /// =======================================================
   /// 🔥 NAV ITEM
   /// =======================================================
-  Widget navItem(IconData icon, String label, int index) {
+  Widget navItem(IconData icon, String label, int index, bool isDark) {
     final isActive = _selectedIndex == index;
 
     return GestureDetector(
@@ -91,7 +95,7 @@ class _BottomNavigatorPenjualState extends State<BottomNavigatorPenjual> {
               size: 22,
               color: isActive
                   ? AppColors.skyBlue
-                  : AppColors.charcoal.withOpacity(0.4),
+                  : (isDark ? Colors.white60 : AppColors.charcoal.withOpacity(0.4)),
             ),
             const SizedBox(height: 4),
             Text(
@@ -101,7 +105,7 @@ class _BottomNavigatorPenjualState extends State<BottomNavigatorPenjual> {
                 fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
                 color: isActive
                     ? AppColors.skyBlue
-                    : AppColors.charcoal.withOpacity(0.5),
+                    : (isDark ? Colors.white60 : AppColors.charcoal.withOpacity(0.5)),
               ),
             ),
           ],

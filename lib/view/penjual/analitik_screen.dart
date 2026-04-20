@@ -14,16 +14,13 @@ class AnalitikScreen extends StatefulWidget {
 class _AnalitikScreenState extends State<AnalitikScreen> {
   int selectedTab = 0; // 0 = Mingguan, 1 = Bulanan
 
-  /// 🔥 DATA DUMMY (Untuk grafik karena belum ada tracking historis per hari)
-  final List<double> dataMingguan = [300, 450, 380, 520, 600, 480, 580];
-  final List<double> dataBulanan = [500, 700, 650, 800, 900, 750, 880];
-
   @override
   Widget build(BuildContext context) {
-    final data = selectedTab == 0 ? dataMingguan : dataBulanan;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: const Color(0xffF5F6FA),
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: StreamBuilder<List<ProductModel>>(
         stream: ProductService.getMyProducts(),
         builder: (context, snapshot) {
@@ -49,11 +46,14 @@ class _AnalitikScreenState extends State<AnalitikScreen> {
 
           // Urutkan produk berdasarkan performa (views + favorites)
           List<ProductModel> sortedProducts = List.from(products);
-          sortedProducts.sort((a, b) => (b.views + b.favorites).compareTo(a.views + a.favorites));
+          sortedProducts.sort(
+            (a, b) => (b.views + b.favorites).compareTo(a.views + a.favorites),
+          );
           final topProducts = sortedProducts.take(3).toList();
 
           // Distribusi Kategori
-          List<MapEntry<String, int>> sortedCategories = categoryCount.entries.toList();
+          List<MapEntry<String, int>> sortedCategories = categoryCount.entries
+              .toList();
           sortedCategories.sort((a, b) => b.value.compareTo(a.value));
           final topCategories = sortedCategories.take(3).toList();
 
@@ -71,14 +71,22 @@ class _AnalitikScreenState extends State<AnalitikScreen> {
                         borderRadius: BorderRadius.circular(12),
                         child: Container(
                           padding: const EdgeInsets.all(10),
-                          decoration: boxStyle(),
-                          child: const Icon(Icons.arrow_back_ios_new, size: 18),
+                          decoration: boxStyle(context),
+                          child: Icon(
+                            Icons.arrow_back_ios_new,
+                            size: 18,
+                            color: isDark ? Colors.white : Colors.black,
+                          ),
                         ),
                       ),
                       const SizedBox(width: 12),
-                      const Text(
+                      Text(
                         "Analitik",
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: isDark ? Colors.white : Colors.black,
+                        ),
                       ),
                     ],
                   ),
@@ -117,7 +125,9 @@ class _AnalitikScreenState extends State<AnalitikScreen> {
                       ),
                       StatCard(
                         Icons.trending_up,
-                        activeProducts > 0 ? "${(totalViews / activeProducts).toStringAsFixed(1)}" : "0",
+                        activeProducts > 0
+                            ? "${(totalViews / activeProducts).toStringAsFixed(1)}"
+                            : "0",
                         "Avg Views",
                         "Per produk",
                         Colors.orange,
@@ -130,74 +140,165 @@ class _AnalitikScreenState extends State<AnalitikScreen> {
                   /// ================= CHART =================
                   Container(
                     padding: const EdgeInsets.all(16),
-                    decoration: boxStyle(),
+                    decoration: boxStyle(context),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           "Statistik Performa Produk",
-                          style: TextStyle(fontWeight: FontWeight.w600),
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: isDark ? Colors.white : Colors.black,
+                          ),
                         ),
                         const SizedBox(height: 20),
                         SizedBox(
                           height: 180,
-                          child: products.isEmpty 
-                            ? const Center(child: Text("Tidak ada data", style: TextStyle(color: Colors.grey)))
-                            : BarChart(
-                            BarChartData(
-                              alignment: BarChartAlignment.spaceAround,
-                              barTouchData: BarTouchData(enabled: true),
-                              titlesData: FlTitlesData(
-                                leftTitles: AxisTitles(
-                                  sideTitles: SideTitles(showTitles: true, reservedSize: 30),
-                                ),
-                                bottomTitles: AxisTitles(
-                                  sideTitles: SideTitles(
-                                    showTitles: true,
-                                    getTitlesWidget: (value, meta) {
-                                      if (value.toInt() < products.length) {
-                                        return Padding(
-                                          padding: const EdgeInsets.only(top: 8.0),
-                                          child: Text(
-                                            products[value.toInt()].name.length > 5 
-                                                ? "${products[value.toInt()].name.substring(0, 5)}.." 
-                                                : products[value.toInt()].name,
-                                            style: const TextStyle(fontSize: 9),
-                                          ),
+                          child: products.isEmpty
+                              ? Center(
+                                  child: Text(
+                                    "Tidak ada data",
+                                    style: TextStyle(
+                                      color: isDark
+                                          ? Colors.white60
+                                          : Colors.grey,
+                                    ),
+                                  ),
+                                )
+                              : BarChart(
+                                  BarChartData(
+                                    alignment: BarChartAlignment.spaceAround,
+                                    barTouchData: BarTouchData(
+                                      enabled: true,
+                                      touchTooltipData: BarTouchTooltipData(
+                                        getTooltipColor: (group) => isDark
+                                            ? Colors.blueGrey.shade800
+                                            : Colors.blueGrey.shade50,
+                                        getTooltipItem:
+                                            (group, groupIndex, rod, rodIndex) {
+                                              return BarTooltipItem(
+                                                "${rod.toY.toInt()} views",
+                                                TextStyle(
+                                                  color: isDark
+                                                      ? Colors.white
+                                                      : Colors.black,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              );
+                                            },
+                                      ),
+                                    ),
+                                    titlesData: FlTitlesData(
+                                      leftTitles: AxisTitles(
+                                        sideTitles: SideTitles(
+                                          showTitles: true,
+                                          reservedSize: 30,
+                                          getTitlesWidget: (value, meta) {
+                                            return Text(
+                                              value.toInt().toString(),
+                                              style: TextStyle(
+                                                color: isDark
+                                                    ? Colors.white60
+                                                    : Colors.grey,
+                                                fontSize: 10,
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                      bottomTitles: AxisTitles(
+                                        sideTitles: SideTitles(
+                                          showTitles: true,
+                                          getTitlesWidget: (value, meta) {
+                                            if (value.toInt() <
+                                                products.length) {
+                                              return Padding(
+                                                padding: const EdgeInsets.only(
+                                                  top: 8.0,
+                                                ),
+                                                child: Text(
+                                                  products[value.toInt()]
+                                                              .name
+                                                              .length >
+                                                          5
+                                                      ? "${products[value.toInt()].name.substring(0, 5)}.."
+                                                      : products[value.toInt()]
+                                                            .name,
+                                                  style: TextStyle(
+                                                    fontSize: 9,
+                                                    color: isDark
+                                                        ? Colors.white70
+                                                        : Colors.black87,
+                                                  ),
+                                                ),
+                                              );
+                                            }
+                                            return const Text("");
+                                          },
+                                        ),
+                                      ),
+                                      rightTitles: const AxisTitles(
+                                        sideTitles: SideTitles(
+                                          showTitles: false,
+                                        ),
+                                      ),
+                                      topTitles: const AxisTitles(
+                                        sideTitles: SideTitles(
+                                          showTitles: false,
+                                        ),
+                                      ),
+                                    ),
+                                    gridData: FlGridData(
+                                      show: true,
+                                      drawVerticalLine: false,
+                                      getDrawingHorizontalLine: (value) {
+                                        return FlLine(
+                                          color: isDark
+                                              ? Colors.white10
+                                              : Colors.black12,
+                                          strokeWidth: 1,
                                         );
-                                      }
-                                      return const Text("");
-                                    },
+                                      },
+                                    ),
+                                    borderData: FlBorderData(show: false),
+                                    barGroups: List.generate(
+                                      products.length > 7 ? 7 : products.length,
+                                      (index) {
+                                        final p = products[index];
+                                        return BarChartGroupData(
+                                          x: index,
+                                          barRods: [
+                                            BarChartRodData(
+                                              toY: p.views.toDouble(),
+                                              width: 14,
+                                              gradient: const LinearGradient(
+                                                colors: [
+                                                  Colors.green,
+                                                  Colors.blue,
+                                                ],
+                                                begin: Alignment.bottomCenter,
+                                                end: Alignment.topCenter,
+                                              ),
+                                              borderRadius:
+                                                  BorderRadius.circular(4),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    ),
                                   ),
                                 ),
-                                rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                                topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                              ),
-                              gridData: const FlGridData(show: true, drawVerticalLine: false),
-                              borderData: FlBorderData(show: false),
-                              barGroups: List.generate(products.length > 7 ? 7 : products.length, (index) {
-                                final p = products[index];
-                                return BarChartGroupData(
-                                  x: index,
-                                  barRods: [
-                                    BarChartRodData(
-                                      toY: p.views.toDouble(),
-                                      width: 14,
-                                      gradient: const LinearGradient(
-                                        colors: [Colors.green, Colors.blue],
-                                        begin: Alignment.bottomCenter,
-                                        end: Alignment.topCenter,
-                                      ),
-                                      borderRadius: BorderRadius.circular(4),
-                                    ),
-                                  ],
-                                );
-                              }),
+                        ),
+                        const SizedBox(height: 10),
+                        Center(
+                          child: Text(
+                            "Menampilkan penayangan per produk",
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: isDark ? Colors.white60 : Colors.grey,
                             ),
                           ),
                         ),
-                        const SizedBox(height: 10),
-                        const Center(child: Text("Menampilkan penayangan per produk", style: TextStyle(fontSize: 10, color: Colors.grey))),
                       ],
                     ),
                   ),
@@ -207,23 +308,36 @@ class _AnalitikScreenState extends State<AnalitikScreen> {
                   /// ================= DISTRIBUSI =================
                   Container(
                     padding: const EdgeInsets.all(16),
-                    decoration: boxStyle(),
+                    decoration: boxStyle(context),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           "Distribusi Kategori",
-                          style: TextStyle(fontWeight: FontWeight.w600),
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: isDark ? Colors.white : Colors.black,
+                          ),
                         ),
                         const SizedBox(height: 16),
                         if (products.isEmpty)
-                          const Text("Belum ada data kategori", style: TextStyle(color: Colors.grey, fontSize: 12))
+                          Text(
+                            "Belum ada data kategori",
+                            style: TextStyle(
+                              color: isDark ? Colors.white60 : Colors.grey,
+                              fontSize: 12,
+                            ),
+                          )
                         else
                           ...topCategories.map((e) {
                             final percent = e.value / products.length;
                             return Padding(
                               padding: const EdgeInsets.only(bottom: 12),
-                              child: ProgressItem(e.key, percent, getColorForCategory(e.key)),
+                              child: ProgressItem(
+                                e.key,
+                                percent,
+                                getColorForCategory(e.key),
+                              ),
                             );
                           }),
                       ],
@@ -235,17 +349,26 @@ class _AnalitikScreenState extends State<AnalitikScreen> {
                   /// ================= PRODUK TERLARIS =================
                   Container(
                     padding: const EdgeInsets.all(16),
-                    decoration: boxStyle(),
+                    decoration: boxStyle(context),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           "Performa Produk Teratas",
-                          style: TextStyle(fontWeight: FontWeight.w600),
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: isDark ? Colors.white : Colors.black,
+                          ),
                         ),
                         const SizedBox(height: 16),
                         if (topProducts.isEmpty)
-                          const Text("Belum ada data produk", style: TextStyle(color: Colors.grey, fontSize: 12))
+                          Text(
+                            "Belum ada data produk",
+                            style: TextStyle(
+                              color: isDark ? Colors.white60 : Colors.grey,
+                              fontSize: 12,
+                            ),
+                          )
                         else
                           ...topProducts.asMap().entries.map((entry) {
                             final i = entry.key;
@@ -278,38 +401,37 @@ class _AnalitikScreenState extends State<AnalitikScreen> {
 
   Color getColorForCategory(String category) {
     switch (category.toLowerCase()) {
-      case 'buah-buahan': return Colors.orange;
-      case 'sayuran': return Colors.green;
-      case 'ikan': return Colors.blue;
-      case 'daging': return Colors.red;
-      case 'telur': return Colors.amber;
-      default: return Colors.purple;
+      case 'buah-buahan':
+        return Colors.orange;
+      case 'sayuran':
+        return Colors.green;
+      case 'ikan':
+        return Colors.blue;
+      case 'daging':
+        return Colors.red;
+      case 'telur':
+        return Colors.amber;
+      default:
+        return Colors.purple;
     }
-  }
-
-  Widget tabItem(String text, int index) {
-    final isActive = selectedTab == index;
-    return GestureDetector(
-      onTap: () => setState(() => selectedTab = index),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-        decoration: BoxDecoration(
-          color: isActive ? Colors.white : Colors.transparent,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Text(text, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
-      ),
-    );
   }
 }
 
-BoxDecoration boxStyle() {
+BoxDecoration boxStyle(BuildContext context) {
+  final theme = Theme.of(context);
+  final isDark = theme.brightness == Brightness.dark;
   return BoxDecoration(
-    color: Colors.white,
+    color: theme.cardColor,
     borderRadius: BorderRadius.circular(18),
     boxShadow: [
-      BoxShadow(blurRadius: 10, offset: const Offset(0, 4), color: Colors.black.withOpacity(0.05)),
+      if (!isDark)
+        BoxShadow(
+          blurRadius: 10,
+          offset: const Offset(0, 4),
+          color: Colors.black.withOpacity(0.05),
+        ),
     ],
+    border: isDark ? Border.all(color: Colors.white12) : null,
   );
 }
 
@@ -318,13 +440,21 @@ class StatCard extends StatelessWidget {
   final String value, title, subtitle;
   final Color color;
 
-  const StatCard(this.icon, this.value, this.title, this.subtitle, this.color, {super.key});
+  const StatCard(
+    this.icon,
+    this.value,
+    this.title,
+    this.subtitle,
+    this.color, {
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       padding: const EdgeInsets.all(14),
-      decoration: boxStyle(),
+      decoration: boxStyle(context),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -333,10 +463,30 @@ class StatCard extends StatelessWidget {
             child: Icon(icon, color: color, size: 20),
           ),
           const Spacer(),
-          Text(value, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: isDark ? Colors.white : Colors.black,
+            ),
+          ),
           const SizedBox(height: 4),
-          Text(title, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
-          Text(subtitle, style: const TextStyle(fontSize: 11, color: Colors.grey)),
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: isDark ? Colors.white70 : Colors.black87,
+            ),
+          ),
+          Text(
+            subtitle,
+            style: TextStyle(
+              fontSize: 11,
+              color: isDark ? Colors.white54 : Colors.grey,
+            ),
+          ),
         ],
       ),
     );
@@ -352,14 +502,29 @@ class ProgressItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
-            Text("${(value * 100).toInt()}%", style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+                color: isDark ? Colors.white70 : Colors.black87,
+              ),
+            ),
+            Text(
+              "${(value * 100).toInt()}%",
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: isDark ? Colors.white : Colors.black,
+              ),
+            ),
           ],
         ),
         const SizedBox(height: 8),
@@ -368,7 +533,7 @@ class ProgressItem extends StatelessWidget {
           child: LinearProgressIndicator(
             value: value,
             minHeight: 8,
-            backgroundColor: Colors.grey.shade100,
+            backgroundColor: isDark ? Colors.white10 : Colors.grey.shade100,
             color: color,
           ),
         ),
@@ -381,29 +546,55 @@ class ProductItem extends StatelessWidget {
   final int rank;
   final String imageBase64, title, views, likes, rating;
 
-  const ProductItem(this.rank, this.imageBase64, this.title, this.views, this.likes, this.rating, {super.key});
+  const ProductItem(
+    this.rank,
+    this.imageBase64,
+    this.title,
+    this.views,
+    this.likes,
+    this.rating, {
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: const Color(0xffF7F8FA),
+        color: isDark
+            ? Colors.white.withOpacity(0.05)
+            : const Color(0xffF7F8FA),
         borderRadius: BorderRadius.circular(14),
       ),
       child: Row(
         children: [
           SizedBox(
             width: 20,
-            child: Text("$rank", style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
+            child: Text(
+              "$rank",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: isDark ? Colors.white38 : Colors.grey,
+              ),
+            ),
           ),
           const SizedBox(width: 10),
           ClipRRect(
             borderRadius: BorderRadius.circular(10),
             child: imageBase64.isNotEmpty
-                ? Image.memory(base64Decode(imageBase64), width: 45, height: 45, fit: BoxFit.cover)
-                : Container(width: 45, height: 45, color: Colors.grey.shade300),
+                ? Image.memory(
+                    base64Decode(imageBase64),
+                    width: 45,
+                    height: 45,
+                    fit: BoxFit.cover,
+                  )
+                : Container(
+                    width: 45,
+                    height: 45,
+                    color: isDark ? Colors.white10 : Colors.grey.shade300,
+                  ),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -414,12 +605,19 @@ class ProductItem extends StatelessWidget {
                   title,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                    color: isDark ? Colors.white : Colors.black,
+                  ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   "$views tayangan • ❤️ $likes",
-                  style: const TextStyle(fontSize: 11, color: Colors.grey),
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: isDark ? Colors.white54 : Colors.grey,
+                  ),
                 ),
               ],
             ),
@@ -428,7 +626,14 @@ class ProductItem extends StatelessWidget {
             children: [
               const Icon(Icons.star, size: 14, color: Colors.orange),
               const SizedBox(width: 2),
-              Text(rating, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+              Text(
+                rating,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? Colors.white70 : Colors.black87,
+                ),
+              ),
             ],
           ),
         ],

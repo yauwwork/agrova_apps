@@ -48,9 +48,8 @@ class _TambahProdukState extends State<TambahProduk> {
       return;
     }
 
-    /// 🔥 PILIH MULTI IMAGE
     final List<XFile> picked = await _picker.pickMultiImage(
-      imageQuality: 20, // compress
+      imageQuality: 20,
       maxWidth: 800,
       maxHeight: 800,
     );
@@ -58,20 +57,16 @@ class _TambahProdukState extends State<TambahProduk> {
     if (picked.isEmpty) return;
 
     setState(() {
-      /// 🔥 BATASI TOTAL 5
       int remaining = 5 - _images.length;
-
       _images.addAll(picked.take(remaining).map((e) => File(e.path)));
     });
   }
 
-  /// ================= CONVERT BASE64 =================
   Future<String> _toBase64(File file) async {
     final bytes = await file.readAsBytes();
     return base64Encode(bytes);
   }
 
-  /// ================= SUBMIT =================
   Future<void> _submit() async {
     if (_isLoading) return;
 
@@ -80,7 +75,6 @@ class _TambahProdukState extends State<TambahProduk> {
       return;
     }
 
-    /// 🔥 WAJIB ADA FOTO
     if (_images.isEmpty) {
       _showSnack("Minimal 1 foto wajib");
       return;
@@ -89,35 +83,26 @@ class _TambahProdukState extends State<TambahProduk> {
     setState(() => _isLoading = true);
 
     try {
-      /// ================= CONVERT SEMUA FOTO =================
       List<String> imagesBase64 = [];
-
       for (final img in _images) {
         final base64 = await _toBase64(img);
         imagesBase64.add(base64);
       }
 
-      /// 🔥 AMBIL FOTO PERTAMA (fallback lama)
       String firstImage = imagesBase64.first;
 
-      /// ================= BUAT OBJECT =================
       final product = ProductModel(
-        userId: "AUTO", // 🔥 nanti dioverride di ProductService
+        userId: "AUTO",
         name: _namaController.text,
         category: _kategori,
         price: int.tryParse(_hargaController.text) ?? 0,
         stock: int.tryParse(_stokController.text) ?? 0,
         description: _deskripsiController.text,
         location: _lokasiController.text,
-
-        /// 🔥 FALLBACK (WAJIB ADA)
         imageBase64: firstImage,
-
-        /// 🔥 INI YANG BIKIN MULTI IMAGE
         images: imagesBase64,
       );
 
-      /// ================= SIMPAN =================
       await ProductService.addProduct(product);
 
       _showSnack("Produk berhasil ditambahkan");
@@ -139,12 +124,16 @@ class _TambahProdukState extends State<TambahProduk> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: AppColors.bgpenjual,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         centerTitle: true,
         elevation: 0,
-        title: const Text("Tambah Produk"),
+        title: const Text("Tambah Produk", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        iconTheme: const IconThemeData(color: Colors.white),
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
@@ -160,6 +149,8 @@ class _TambahProdukState extends State<TambahProduk> {
             /// ================= FOTO =================
             _buildCard(
               title: "Foto Produk (max 5)",
+              isDark: isDark,
+              theme: theme,
               child: GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
@@ -170,21 +161,20 @@ class _TambahProdukState extends State<TambahProduk> {
                   mainAxisSpacing: 10,
                 ),
                 itemBuilder: (context, i) {
-                  /// 🔥 BUTTON TAMBAH
                   if (i == _images.length) {
                     return GestureDetector(
                       onTap: _pickImages,
                       child: Container(
                         decoration: BoxDecoration(
-                          color: Colors.grey.shade200,
+                          color: isDark ? Colors.white12 : Colors.grey.shade200,
                           borderRadius: BorderRadius.circular(12),
+                          border: isDark ? Border.all(color: Colors.white24) : null,
                         ),
-                        child: const Icon(Icons.add),
+                        child: Icon(Icons.add, color: isDark ? Colors.white70 : Colors.grey),
                       ),
                     );
                   }
 
-                  /// 🔥 PREVIEW IMAGE
                   return Stack(
                     children: [
                       ClipRRect(
@@ -196,8 +186,6 @@ class _TambahProdukState extends State<TambahProduk> {
                           fit: BoxFit.cover,
                         ),
                       ),
-
-                      /// 🔥 DELETE BUTTON
                       Positioned(
                         right: 5,
                         top: 5,
@@ -208,7 +196,7 @@ class _TambahProdukState extends State<TambahProduk> {
                           child: const CircleAvatar(
                             radius: 10,
                             backgroundColor: Colors.black54,
-                            child: Icon(Icons.close, size: 12),
+                            child: Icon(Icons.close, size: 12, color: Colors.white),
                           ),
                         ),
                       ),
@@ -223,27 +211,25 @@ class _TambahProdukState extends State<TambahProduk> {
             /// ================= FORM =================
             _buildCard(
               title: "Informasi Produk",
+              isDark: isDark,
+              theme: theme,
               child: Column(
                 children: [
-                  _input(_namaController, "Nama Produk"),
+                  _input(_namaController, "Nama Produk", isDark: isDark),
                   const SizedBox(height: 10),
 
                   DropdownButtonFormField<String>(
                     value: _kategori,
-                    decoration: _inputDecoration("Kategori"),
-                    items: const [
-                      DropdownMenuItem(
-                        value: "Buah-buahan",
-                        child: Text("Buah-buahan"),
-                      ),
-                      DropdownMenuItem(
-                        value: "Sayuran",
-                        child: Text("Sayuran"),
-                      ),
-                      DropdownMenuItem(value: "Ikan", child: Text("Ikan")),
-                      DropdownMenuItem(value: "Daging", child: Text("Daging")),
-                      DropdownMenuItem(value: "Telur", child: Text("Telur")),
-                    ],
+                    dropdownColor: isDark ? theme.cardColor : Colors.white,
+                    style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+                    decoration: _inputDecoration("Kategori", isDark),
+                    items: [
+                      "Buah-buahan",
+                      "Sayuran",
+                      "Ikan",
+                      "Daging",
+                      "Telur",
+                    ].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
                     onChanged: (v) => setState(() => _kategori = v!),
                   ),
 
@@ -252,20 +238,20 @@ class _TambahProdukState extends State<TambahProduk> {
                   Row(
                     children: [
                       Expanded(
-                        child: _input(_hargaController, "Harga", number: true),
+                        child: _input(_hargaController, "Harga", number: true, isDark: isDark),
                       ),
                       const SizedBox(width: 10),
                       Expanded(
-                        child: _input(_stokController, "Stok", number: true),
+                        child: _input(_stokController, "Stok", number: true, isDark: isDark),
                       ),
                     ],
                   ),
 
                   const SizedBox(height: 10),
 
-                  _input(_deskripsiController, "Deskripsi", maxLines: 3),
+                  _input(_deskripsiController, "Deskripsi", maxLines: 3, isDark: isDark),
                   const SizedBox(height: 10),
-                  _input(_lokasiController, "Lokasi"),
+                  _input(_lokasiController, "Lokasi", isDark: isDark),
                 ],
               ),
             ),
@@ -295,7 +281,7 @@ class _TambahProdukState extends State<TambahProduk> {
                       )
                     : const Text(
                         "Tambah Produk",
-                        style: TextStyle(color: Colors.white),
+                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                       ),
               ),
             ),
@@ -305,21 +291,22 @@ class _TambahProdukState extends State<TambahProduk> {
     );
   }
 
-  /// ================= CARD =================
-  Widget _buildCard({required String title, required Widget child}) {
+  Widget _buildCard({required String title, required Widget child, required bool isDark, required ThemeData theme}) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10),
+          if (!isDark)
+            BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10),
         ],
+        border: isDark ? Border.all(color: Colors.white12) : null,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+          Text(title, style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
           const SizedBox(height: 10),
           child,
         ],
@@ -327,26 +314,28 @@ class _TambahProdukState extends State<TambahProduk> {
     );
   }
 
-  /// ================= INPUT =================
   Widget _input(
     TextEditingController c,
     String hint, {
     bool number = false,
     int maxLines = 1,
+    required bool isDark,
   }) {
     return TextField(
       controller: c,
       keyboardType: number ? TextInputType.number : TextInputType.text,
       maxLines: maxLines,
-      decoration: _inputDecoration(hint),
+      style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+      decoration: _inputDecoration(hint, isDark),
     );
   }
 
-  InputDecoration _inputDecoration(String hint) {
+  InputDecoration _inputDecoration(String hint, bool isDark) {
     return InputDecoration(
       hintText: hint,
+      hintStyle: TextStyle(color: isDark ? Colors.white60 : Colors.grey),
       filled: true,
-      fillColor: Colors.grey.shade100,
+      fillColor: isDark ? Colors.white.withOpacity(0.05) : Colors.grey.shade100,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide.none,

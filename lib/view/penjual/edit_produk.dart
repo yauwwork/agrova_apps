@@ -43,9 +43,7 @@ class _EditProdukState extends State<EditProduk> {
   @override
   void initState() {
     super.initState();
-
     final p = widget.produk;
-
     namaController.text = p.name;
     hargaController.text = p.price.toString();
     stokController.text = p.stock.toString();
@@ -53,18 +51,14 @@ class _EditProdukState extends State<EditProduk> {
     lokasiController.text = p.location;
     kategori = p.category;
 
-    /// 🔥 AMBIL IMAGE LAMA (AMAN)
     existingImages = (p.images).where((e) => e.isNotEmpty).toList();
-
     if (existingImages.isEmpty && p.imageBase64.isNotEmpty) {
       existingImages = [p.imageBase64];
     }
   }
 
-  /// ================= PICK IMAGE =================
   Future<void> pickImages() async {
     int total = images.length + existingImages.length;
-
     if (total >= 5) {
       _snack("Maksimal 5 foto");
       return;
@@ -80,7 +74,6 @@ class _EditProdukState extends State<EditProduk> {
 
     setState(() {
       int remaining = 5 - total;
-
       images.addAll(
         picked
             .take(remaining)
@@ -95,7 +88,6 @@ class _EditProdukState extends State<EditProduk> {
     return base64Encode(bytes);
   }
 
-  /// ================= SAVE =================
   Future<void> simpanPerubahan() async {
     if (namaController.text.isEmpty ||
         hargaController.text.isEmpty ||
@@ -108,11 +100,7 @@ class _EditProdukState extends State<EditProduk> {
 
     try {
       List<String> finalImages = [];
-
-      /// 🔥 EXISTING
       finalImages.addAll(existingImages.where((e) => e.isNotEmpty));
-
-      /// 🔥 NEW
       for (var img in images) {
         final base64 = await toBase64(img);
         if (base64.isNotEmpty) {
@@ -156,15 +144,16 @@ class _EditProdukState extends State<EditProduk> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xffF4F7FB),
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
-      /// ================= APPBAR =================
+    return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text("Edit Produk"),
+        title: const Text("Edit Produk", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         centerTitle: true,
         elevation: 0,
-        backgroundColor: Colors.transparent,
+        iconTheme: const IconThemeData(color: Colors.white),
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
@@ -173,7 +162,6 @@ class _EditProdukState extends State<EditProduk> {
           ),
         ),
       ),
-
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -199,7 +187,6 @@ class _EditProdukState extends State<EditProduk> {
                     ),
                   ),
                   const SizedBox(height: 12),
-
                   SizedBox(
                     height: 100,
                     child: ListView(
@@ -212,36 +199,35 @@ class _EditProdukState extends State<EditProduk> {
                           (e) => _previewFile(e.key),
                         ),
                         if ((images.length + existingImages.length) < 5)
-                          _addButton(),
+                          _addButton(isDark),
                       ],
                     ),
                   ),
                 ],
               ),
             ),
-
             const SizedBox(height: 20),
 
             /// ================= FORM =================
             _card(
-              Column(
+              isDark: isDark,
+              theme: theme,
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _input(namaController, "Nama Produk"),
+                  _input(namaController, "Nama Produk", isDark: isDark),
                   const SizedBox(height: 16),
-
-                  /// 🔥 DROPDOWN (FIX SPACING)
                   DropdownButtonFormField(
                     value: kategori,
-                    decoration: _decoration("Kategori"),
+                    dropdownColor: isDark ? theme.cardColor : Colors.white,
+                    style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+                    decoration: _decoration("Kategori", isDark),
                     items: kategoriList
                         .map((e) => DropdownMenuItem(value: e, child: Text(e)))
                         .toList(),
                     onChanged: (v) => setState(() => kategori = v!),
                   ),
-
                   const SizedBox(height: 16),
-
                   Row(
                     children: [
                       Expanded(
@@ -249,6 +235,7 @@ class _EditProdukState extends State<EditProduk> {
                           hargaController,
                           "Harga",
                           type: TextInputType.number,
+                          isDark: isDark,
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -257,36 +244,31 @@ class _EditProdukState extends State<EditProduk> {
                           stokController,
                           "Stok",
                           type: TextInputType.number,
+                          isDark: isDark,
                         ),
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 16),
-
-                  /// 🔥 DESKRIPSI (FIX MEPEt)
                   Text(
                     "Deskripsi",
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
-                      color: Colors.grey[700],
+                      color: isDark ? Colors.white70 : Colors.grey[700],
                     ),
                   ),
                   const SizedBox(height: 8),
-
                   TextField(
                     controller: deskripsiController,
                     maxLines: 4,
-                    decoration: _decoration("Masukkan deskripsi produk"),
+                    style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+                    decoration: _decoration("Masukkan deskripsi produk", isDark),
                   ),
-
                   const SizedBox(height: 16),
-
-                  _input(lokasiController, "Lokasi"),
+                  _input(lokasiController, "Lokasi", isDark: isDark),
                 ],
               ),
             ),
-
             const SizedBox(height: 20),
 
             /// ================= BUTTON =================
@@ -303,10 +285,9 @@ class _EditProdukState extends State<EditProduk> {
                 ),
                 child: isLoading
                     ? const CircularProgressIndicator(color: Colors.white)
-                    : const Text("Simpan Perubahan", style: TextStyle(color: Colors.white),),
+                    : const Text("Simpan Perubahan", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
               ),
             ),
-
             const SizedBox(height: 30),
           ],
         ),
@@ -314,9 +295,7 @@ class _EditProdukState extends State<EditProduk> {
     );
   }
 
-  /// ================= COMPONENT =================
-
-  Widget _addButton() {
+  Widget _addButton(bool isDark) {
     return GestureDetector(
       onTap: pickImages,
       child: Container(
@@ -370,16 +349,18 @@ class _EditProdukState extends State<EditProduk> {
     );
   }
 
-  Widget _card(Widget child) {
+  Widget _card({required Widget child, required bool isDark, required ThemeData theme}) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 12),
+          if (!isDark)
+            BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 12),
         ],
+        border: isDark ? Border.all(color: Colors.white12) : null,
       ),
       child: child,
     );
@@ -389,23 +370,27 @@ class _EditProdukState extends State<EditProduk> {
     TextEditingController c,
     String label, {
     TextInputType type = TextInputType.text,
+    required bool isDark,
   }) {
     return TextField(
       controller: c,
       keyboardType: type,
-      decoration: _decoration(label),
+      style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+      decoration: _decoration(label, isDark),
     );
   }
 
-  InputDecoration _decoration(String label) {
+  InputDecoration _decoration(String label, bool isDark) {
     return InputDecoration(
       labelText: label,
+      labelStyle: TextStyle(color: isDark ? Colors.white60 : Colors.grey[700]),
+      hintStyle: TextStyle(color: isDark ? Colors.white38 : Colors.grey),
       filled: true,
-      fillColor: const Color(0xffF4F6FA),
+      fillColor: isDark ? Colors.white.withOpacity(0.05) : const Color(0xffF4F6FA),
       contentPadding: const EdgeInsets.symmetric(
         horizontal: 16,
         vertical: 14,
-      ), // 🔥 FIX MEPEt
+      ),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
         borderSide: BorderSide.none,

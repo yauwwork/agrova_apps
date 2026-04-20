@@ -35,17 +35,22 @@ class _KategoriScState extends State<KategoriSc> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: AppColors.softMint,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const Text(
+        title: Text(
           "Katalog Produk",
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: isDark ? Colors.white : Colors.black,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
-
       body: SafeArea(
         child: Column(
           children: [
@@ -59,16 +64,24 @@ class _KategoriScState extends State<KategoriSc> {
                       height: 48,
                       padding: const EdgeInsets.symmetric(horizontal: 12),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: theme.cardColor,
                         borderRadius: BorderRadius.circular(24),
+                        boxShadow: [
+                          if (!isDark)
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                        ],
                       ),
-                      child: const Row(
+                      child: Row(
                         children: [
-                          Icon(Icons.search, color: Colors.grey),
-                          SizedBox(width: 8),
+                          Icon(Icons.search, color: isDark ? Colors.white60 : Colors.grey),
+                          const SizedBox(width: 8),
                           Text(
                             "Cari produk...",
-                            style: TextStyle(color: Colors.grey),
+                            style: TextStyle(color: isDark ? Colors.white60 : Colors.grey),
                           ),
                         ],
                       ),
@@ -79,10 +92,11 @@ class _KategoriScState extends State<KategoriSc> {
                     height: 48,
                     width: 48,
                     decoration: BoxDecoration(
-                      color: Color(0xffEAECEF),
+                      color: isDark ? theme.cardColor : const Color(0xffEAECEF),
                       borderRadius: BorderRadius.circular(16),
+                      border: isDark ? Border.all(color: Colors.white12) : null,
                     ),
-                    child: const Icon(Icons.tune, color: Colors.black54),
+                    child: Icon(Icons.tune, color: isDark ? Colors.white70 : Colors.black54),
                   ),
                 ],
               ),
@@ -99,6 +113,7 @@ class _KategoriScState extends State<KategoriSc> {
                 itemCount: kategori.length,
                 itemBuilder: (context, index) {
                   final isSelected = selectedKategori == index;
+                  final itemColor = kategori[index].color;
 
                   return GestureDetector(
                     onTap: () {
@@ -115,9 +130,12 @@ class _KategoriScState extends State<KategoriSc> {
                       ),
                       decoration: BoxDecoration(
                         color: isSelected
-                            ? kategori[index].color
-                            : kategori[index].color.withOpacity(0.15),
+                            ? itemColor
+                            : itemColor.withOpacity(isDark ? 0.2 : 0.15),
                         borderRadius: BorderRadius.circular(20),
+                        border: isSelected 
+                            ? null 
+                            : Border.all(color: itemColor.withOpacity(isDark ? 0.3 : 0.1)),
                       ),
                       child: Row(
                         children: [
@@ -126,7 +144,7 @@ class _KategoriScState extends State<KategoriSc> {
                             size: 16,
                             color: isSelected
                                 ? Colors.white
-                                : kategori[index].color,
+                                : itemColor,
                           ),
                           const SizedBox(width: 6),
                           Text(
@@ -134,7 +152,7 @@ class _KategoriScState extends State<KategoriSc> {
                             style: TextStyle(
                               color: isSelected
                                   ? Colors.white
-                                  : kategori[index].color,
+                                  : itemColor,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -173,7 +191,12 @@ class _KategoriScState extends State<KategoriSc> {
                   }
 
                   if (filtered.isEmpty) {
-                    return const Center(child: Text("Produk tidak ada"));
+                    return Center(
+                      child: Text(
+                        "Produk tidak ada",
+                        style: TextStyle(color: isDark ? Colors.white70 : Colors.black54),
+                      ),
+                    );
                   }
 
                   return GridView.builder(
@@ -208,8 +231,6 @@ class _KategoriScState extends State<KategoriSc> {
                                 );
                               }
                             },
-
-                            /// 🔥 NAVIGASI KE DETAIL (FIX DI SINI)
                             onTap: () {
                               Navigator.push(
                                 context,
